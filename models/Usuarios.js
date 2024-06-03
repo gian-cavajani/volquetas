@@ -1,6 +1,5 @@
 const Sequelize = require('sequelize');
 const db = require('../config/db');
-const Telefonos = require('./Telefonos');
 
 const Usuarios = db.define('Usuarios', {
   id: {
@@ -8,9 +7,10 @@ const Usuarios = db.define('Usuarios', {
     autoIncrement: true,
     primaryKey: true,
   },
-  nombre: {
-    type: Sequelize.STRING,
-    allowNull: false,
+  empleadoId:{
+    type: Sequelize.INTEGER,
+    allowNull:false,
+    unique:true
   },
   rol: {
     type: Sequelize.ENUM('admin', 'normal'),
@@ -27,12 +27,9 @@ const Usuarios = db.define('Usuarios', {
   },
   activo: {
     type: Sequelize.BOOLEAN,
-    defaultValue: true,
+    defaultValue: false,
   },
 });
 
-// Establecer la relación
-Usuarios.hasMany(Telefonos, { foreignKey: 'userId' });
-Telefonos.belongsTo(Usuarios, { foreignKey: 'userId' });
 
 module.exports = Usuarios;

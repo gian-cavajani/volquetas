@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const verificarToken = (req, res, next) => {
+const verificarTokenAdmin = (req, res, next) => {
   const token = req.headers.authorization;
 
   if (!token) {
@@ -11,7 +11,11 @@ const verificarToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.SECRETO);
-    console.log(decoded);
+    if (decoded.rol !== 'admin') {
+      return res.status(401).json({
+        error: 'Debe iniciar sesion como administrador para ver este segmento',
+      });
+    }
     req.user = decoded;
     next();
   } catch (error) {
@@ -22,4 +26,4 @@ const verificarToken = (req, res, next) => {
   }
 };
 
-module.exports = verificarToken;
+module.exports = verificarTokenAdmin;

@@ -7,6 +7,9 @@ const Telefonos = db.define('Telefonos', {
     autoIncrement: true,
     primaryKey: true,
   },
+  empleadoId:{
+    type: Sequelize.INTEGER,
+  },
   telefono: {
     type: Sequelize.STRING,
     allowNull: false,
