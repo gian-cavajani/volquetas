@@ -39,8 +39,13 @@ exports.nuevoUsuario = async (req, res) => {
       password: hashedPassword,
       empleadoId,
     });
-
-    res.status(201).json(newUser);
+    res.status(201).json({
+      id: newUser.id,
+      email: newUser.email,
+      empleadoId: newUser.empleadoId,
+      rol: newUser.rol,
+      activo: newUser.activo,
+    });
   } catch (error) {
     console.error('Error al crear usuario:', error);
     const errorsSequelize = error.errors
@@ -50,9 +55,9 @@ exports.nuevoUsuario = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res
         .status(500)
-        .json({ message: 'Error al crear usuario', error: errorsSequelize });
+        .json({ error: 'Error al crear usuario', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ message: 'Error al crear usuario', error });
+      res.status(500).json({ error: 'Error al crear usuario', detalle: error });
     }
   }
 };
@@ -65,7 +70,7 @@ exports.getUsuarios = async (req, res) => {
     console.error(error);
     res
       .status(500)
-      .json({ error: 'Error al obtener los usuarios', message: error });
+      .json({ error: 'Error al obtener los usuarios', detalle: error });
   }
 };
 
@@ -117,7 +122,7 @@ exports.confirmarUsuario = async (req, res) => {
   try {
     const user = await Usuarios.findOne({ where: { email } });
     if (!user)
-      return res.status(401).json({ error: 'Usuario con ese mail no existe' });
+      return res.status(400).json({ error: 'Usuario con ese mail no existe' });
     if (user.activo)
       return res.status(400).json({ error: 'Usuario ya esta activado' });
 

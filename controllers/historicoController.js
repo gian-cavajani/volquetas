@@ -1,7 +1,7 @@
 const { HistoricoUsoCamion, Empleados, Camiones } = require('../models');
 
 exports.registrarUsoCamion = async (req, res) => {
-  const { empleadoId, camionId } = req.body;
+  const { empleadoId, camionId, fechaInicio } = req.body;
 
   try {
     const chofer = await Empleados.findOne({ where: { id: empleadoId } });
@@ -19,9 +19,13 @@ exports.registrarUsoCamion = async (req, res) => {
       },
     });
 
-    const fechaInicio = Date.now();
-
     if (registroActivo) {
+      if (registroActivo.fechaInicio >= Date.parse(fechaInicio)) {
+        return res.status(400).json({
+          error:
+            'Fecha de inicio de uso del camion no puede ser anterior a la ultima fecha de inicio de uso',
+        });
+      }
       // Actualizar la fecha de finalización del registro activo
       registroActivo.fechaFin = fechaInicio;
       await registroActivo.save();
@@ -38,8 +42,8 @@ exports.registrarUsoCamion = async (req, res) => {
   } catch (error) {
     console.error('Error al crear histórico de uso de camión:', error);
     res.status(500).json({
-      message: 'Error al crear histórico de uso de camión',
-      error: error.message,
+      error: 'Error al crear histórico de uso de camión',
+      detalle: error.message,
     });
   }
 };
@@ -59,8 +63,8 @@ exports.obtenerAsignacionesActuales = async (req, res) => {
   } catch (error) {
     console.error('Error al obtener la asignación actual:', error);
     res.status(500).json({
-      message: 'Error al obtener la asignación actual',
-      error: error.message,
+      error: 'Error al obtener la asignación actual',
+      detalle: error.message,
     });
   }
 };
@@ -96,7 +100,7 @@ exports.obtenerHistoricoPorCamionOEmpleado = async (req, res) => {
       });
     } else {
       res.status(400).json({
-        message: 'Debes proporcionar un id de camion o un id de empleado',
+        error: 'Debes proporcionar un id de camion o un id de empleado',
       });
       return;
     }
@@ -106,6 +110,6 @@ exports.obtenerHistoricoPorCamionOEmpleado = async (req, res) => {
     console.error('Error al obtener el historial:', error);
     res
       .status(500)
-      .json({ message: 'Error al obtener el historial', error: error.message });
+      .json({ error: 'Error al obtener el historial', detalle: error.message });
   }
 };

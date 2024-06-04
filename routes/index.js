@@ -19,9 +19,9 @@ module.exports = function () {
   //Usuarios
   router.post('/usuarios', usuarioController.nuevoUsuario);
   router.get('/usuarios', verificarTokenAdmin, usuarioController.getUsuarios);
-  router.post('/login', usuarioController.loginUsuario);
+  router.post('/usuarios/login', usuarioController.loginUsuario);
   router.post(
-    '/confirmar-usuario',
+    '/usuarios/confirmar',
     verificarTokenAdmin,
     usuarioController.confirmarUsuario
   );
@@ -46,7 +46,7 @@ module.exports = function () {
     historicoController.registrarUsoCamion
   );
   router.get(
-    '/asignacion-camion',
+    '/historico-camion/asignacion',
     verificarToken,
     historicoController.obtenerAsignacionesActuales
   );

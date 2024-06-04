@@ -1,15 +1,18 @@
 const express = require('express');
 const router = require('./routes');
 const { db } = require('./models');
+const cors = require('cors');
 
 //variables de desarrollo
 require('dotenv').config({ path: 'variables.env' });
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.use('/api', router());
+
 (async () => {
   try {
     await db.sync({ force: true }); // Usar { force: true } solo en desarrollo para reiniciar las tablas

@@ -14,7 +14,7 @@ exports.precargarDatos = async () => {
   // Precargar datos de ejemplo
   await Empleados.bulkCreate([
     { nombre: 'Carolina Garcia', cedula: 12345678, rol: 'admin' },
-    { nombre: 'Juan Gomez', cedula: 87654321, rol: 'chofer' },
+    { nombre: 'Ana Gomez', cedula: 87654321, rol: 'chofer' },
   ]);
   await Camiones.bulkCreate([
     { matricula: 'SBB-2310', modelo: 'Mercedes', anio: 2020, estado: 'roto' },
@@ -42,7 +42,6 @@ exports.precargarDatos = async () => {
   await HistoricoUsoCamion.bulkCreate([
     { empleadoId: 1, camionId: 1, fechaInicio: new Date('2024-06-01') },
     { empleadoId: 2, camionId: 2, fechaInicio: new Date('2024-06-30') },
-    { empleadoId: 2, camionId: 2, fechaInicio: new Date('2024-07-02') },
   ]);
   await Servicios.bulkCreate([
     {

@@ -7,10 +7,13 @@ const Usuarios = db.define('Usuarios', {
     autoIncrement: true,
     primaryKey: true,
   },
-  empleadoId:{
+  empleadoId: {
     type: Sequelize.INTEGER,
-    allowNull:false,
-    unique:true
+    allowNull: false,
+    unique: {
+      args: true,
+    },
+    msg: 'Ya hay un usuario con ese empleado',
   },
   rol: {
     type: Sequelize.ENUM('admin', 'normal'),
@@ -30,6 +33,5 @@ const Usuarios = db.define('Usuarios', {
     defaultValue: false,
   },
 });
-
 
 module.exports = Usuarios;

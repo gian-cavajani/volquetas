@@ -25,7 +25,7 @@ exports.nuevoServicio = async (req, res) => {
     console.error('Error al crear Servicio de camión:', error);
     res
       .status(500)
-      .json({ message: 'Error al Servicio de camión', error: error.message });
+      .json({ error: 'Error al Servicio de camión', detalle: error.message });
   }
 };
 

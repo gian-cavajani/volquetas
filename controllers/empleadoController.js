@@ -1,14 +1,8 @@
 const { Empleados, Telefonos } = require('../models');
-const bcrypt = require('bcryptjs');
 const validator = require('validator');
 
 exports.nuevoEmpleado = async (req, res) => {
-  const {
-    nombre,
-    cedula,
-    rol,
-    // camionId, telefonos
-  } = req.body;
+  const { nombre, cedula, rol } = req.body;
   try {
     //Sanitizar campos
     const sanitizednombre = nombre ? validator.escape(nombre) : '';
@@ -18,29 +12,13 @@ exports.nuevoEmpleado = async (req, res) => {
         .status(400)
         .json({ error: 'Cedula invalida, deben ser 8 numeros' });
     }
-    // if (
-    //   !Array.isArray(telefonos) ||
-    //   telefonos.some((tel) => !validator.isMobilePhone(tel, 'any'))
-    // ) {
-    //   return res.status(400).json({ error: 'Teléfonos inválidos' });
-    // }
 
     // Crear el empleado
     const nuevoEmpleado = await Empleados.create({
       nombre: sanitizednombre,
       cedula,
       rol: sanitizedrol,
-      // camionId
     });
-
-    // Crear los telefonos (NO LO AGREGO ACA NO SE INSERTAN SI YA EXISTEN)
-    // const nuevosTelefonos = await Promise.all(telefonos.map(async (tel) => {
-    //   const [telefono, created] = await Telefonos.findOrCreate({
-    //     where: { telefono: tel },
-    //     defaults: { empleadoId: nuevoEmpleado.id }
-    //   });
-    //   return telefono;
-    // }));
 
     res.status(201).json(nuevoEmpleado);
   } catch (error) {
@@ -50,7 +28,7 @@ exports.nuevoEmpleado = async (req, res) => {
       : [];
     res
       .status(500)
-      .json({ message: 'Error al crear empleado', error: errorsSequelize });
+      .json({ error: 'Error al crear empleado', detalle: errorsSequelize });
   }
 };
 
