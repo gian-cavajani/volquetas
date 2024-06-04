@@ -1,7 +1,14 @@
 const express = require('express');
 const router = express.Router();
+
+//Middleware
 const verificarToken = require('../middleware/verificarToken'); //verifica token de cualquier usuario
 const verificarTokenAdmin = require('../middleware/verificarTokenAdmin'); //verifica token de admin
+
+const {
+  validateNuevoEmpleado,
+  validateEmpleadoId,
+} = require('../middleware/validarEmpleado');
 
 //Controllers:
 const usuarioController = require('../controllers/usuarioController');
@@ -29,6 +36,12 @@ module.exports = function () {
   //Camiones
   router.post('/camiones', verificarToken, camionController.nuevoCamion);
   router.get('/camiones', verificarToken, camionController.getCamiones);
+  router.get('/camiones/:camionId', verificarToken, camionController.getCamion);
+  router.put(
+    '/camiones/:camionId',
+    verificarToken,
+    camionController.actualizarCamion
+  );
 
   //Empleados
   router.post('/empleados', verificarToken, empleadoController.nuevoEmpleado);
@@ -36,7 +49,20 @@ module.exports = function () {
   router.get(
     '/empleados/:empleadoId',
     verificarToken,
+    validateEmpleadoId,
     empleadoController.getEmpleado
+  );
+  router.patch(
+    '/empleados/:empleadoId/estado',
+    verificarTokenAdmin,
+    validateEmpleadoId,
+    empleadoController.cambiarEstadoEmpleado
+  );
+  router.delete(
+    '/empleados/:empleadoId',
+    verificarTokenAdmin,
+    validateEmpleadoId,
+    empleadoController.eliminarEmpleado
   );
 
   //Historico uso camion

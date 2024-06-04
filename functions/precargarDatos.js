@@ -14,11 +14,15 @@ exports.precargarDatos = async () => {
   // Precargar datos de ejemplo
   await Empleados.bulkCreate([
     { nombre: 'Carolina Garcia', cedula: 12345678, rol: 'admin' },
-    { nombre: 'Ana Gomez', cedula: 87654321, rol: 'chofer' },
+    { nombre: 'Ana Gomez', cedula: 87654321, rol: 'normal' },
+    { nombre: 'Juan Pedro', cedula: 17654321, rol: 'chofer' },
+    { nombre: 'Roberto Gonzalez', cedula: 47654321, rol: 'chofer' },
+    { nombre: 'Jose Varela', cedula: 27654321, rol: 'chofer' },
+    { nombre: 'Pedro Varela', cedula: 23652321, rol: 'chofer' },
   ]);
   await Camiones.bulkCreate([
     { matricula: 'SBB-2310', modelo: 'Mercedes', anio: 2020, estado: 'roto' },
-    { matricula: 'XYZ789', modelo: 'Chevrolet', anio: 2019, estado: 'sano' },
+    { matricula: 'XYZ-789', modelo: 'Chevrolet', anio: 2019, estado: 'sano' },
   ]);
   await Usuarios.bulkCreate([
     {
@@ -30,18 +34,30 @@ exports.precargarDatos = async () => {
     },
     {
       empleadoId: 2,
-      email: 'ana.gomez@example.com',
+      email: 'ana@example.com',
       password: await bcrypt.hash('1', 10),
       rol: 'normal',
     },
   ]);
   await Telefonos.bulkCreate([
     { telefono: '099119922', empleadoId: 1 },
-    { telefono: '099311708', empleadoId: 2 },
+    { telefono: '097300129', empleadoId: 1 },
+    { telefono: '099445432', empleadoId: 2 },
+    { telefono: '099354308', empleadoId: 3 },
+    { telefono: '099354708', empleadoId: 4 },
+    { telefono: '091344308', empleadoId: 5 },
+    { telefono: '099332308', empleadoId: 5 },
+    { telefono: '091233208', empleadoId: 6 },
   ]);
   await HistoricoUsoCamion.bulkCreate([
-    { empleadoId: 1, camionId: 1, fechaInicio: new Date('2024-06-01') },
-    { empleadoId: 2, camionId: 2, fechaInicio: new Date('2024-06-30') },
+    { empleadoId: 3, camionId: 1, fechaInicio: new Date('2024-06-01') },
+    {
+      empleadoId: 4,
+      camionId: 2,
+      fechaInicio: new Date('2024-06-30'),
+      fechaFin: new Date('2024-07-30'),
+    },
+    { empleadoId: 5, camionId: 2, fechaInicio: new Date('2024-07-30') },
   ]);
   await Servicios.bulkCreate([
     {

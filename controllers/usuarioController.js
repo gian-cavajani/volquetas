@@ -130,7 +130,9 @@ exports.confirmarUsuario = async (req, res) => {
     user.save();
     res
       .status(202)
-      .json(`Usuario con mail: ${user.email} activado exitosamente`);
+      .json({
+        detalle: `Usuario con mail: ${user.email} activado exitosamente`,
+      });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al activar usuario' });
