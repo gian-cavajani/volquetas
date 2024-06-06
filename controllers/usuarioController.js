@@ -8,22 +8,16 @@ exports.nuevoUsuario = async (req, res) => {
     const { rol, email, password, confirmPassword, empleadoId } = req.body;
 
     // Validaciones y sanitización
-    if (!rol || !email || !password || !confirmPassword || !empleadoId)
-      return res
-        .status(400)
-        .json({ error: 'Todos los campos son obligatorios' });
+    if (!rol || !email || !password || !confirmPassword || !empleadoId) return res.status(400).json({ error: 'Todos los campos son obligatorios' });
 
     //Sanitiza datos para no tener inyecciones sql
     const sanitizedEmail = validator.normalizeEmail(email);
     const sanitizedRol = validator.escape(rol);
 
     //Validaciones
-    if (!validator.isEmail(sanitizedEmail))
-      return res.status(400).json({ error: 'Email inválido' });
-    if (password !== confirmPassword)
-      return res.status(400).json({ error: 'Las contraseñas no coinciden' });
-    if (!['admin', 'normal'].includes(sanitizedRol))
-      return res.status(400).json({ error: 'Rol inválido' });
+    if (!validator.isEmail(sanitizedEmail)) return res.status(400).json({ error: 'Email inválido' });
+    if (password !== confirmPassword) return res.status(400).json({ error: 'Las contraseñas no coinciden' });
+    if (!['admin', 'normal'].includes(sanitizedRol)) return res.status(400).json({ error: 'Rol inválido' });
 
     const empleado = await Empleados.findByPk(empleadoId);
     //Validar que empleado exista
@@ -48,14 +42,10 @@ exports.nuevoUsuario = async (req, res) => {
     });
   } catch (error) {
     console.error('Error al crear usuario:', error);
-    const errorsSequelize = error.errors
-      ? error.errors.map((err) => err.message)
-      : [];
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
 
     if (errorsSequelize.length > 0) {
-      res
-        .status(500)
-        .json({ error: 'Error al crear usuario', detalle: errorsSequelize });
+      res.status(500).json({ error: 'Error al crear usuario', detalle: errorsSequelize });
     } else {
       res.status(500).json({ error: 'Error al crear usuario', detalle: error });
     }
@@ -68,9 +58,7 @@ exports.getUsuarios = async (req, res) => {
     res.status(200).json(usuarios);
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ error: 'Error al obtener los usuarios', detalle: error });
+    res.status(500).json({ error: 'Error al obtener los usuarios', detalle: error });
   }
 };
 
@@ -79,9 +67,7 @@ exports.loginUsuario = async (req, res) => {
     const { email, password } = req.body;
     // Validar email y contraseña
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ error: 'Email y contraseña son obligatorios' });
+      return res.status(400).json({ error: 'Email y contraseña son obligatorios' });
     }
 
     const user = await Usuarios.findOne({ where: { email } });
@@ -97,13 +83,9 @@ exports.loginUsuario = async (req, res) => {
     }
     // Generar el token JWT con duración de 4 horas
     //todo: agregarle al token
-    const token = jwt.sign(
-      { id: user.id, email: user.email, rol: user.rol },
-      process.env.SECRETO,
-      {
-        expiresIn: '4h',
-      }
-    );
+    const token = jwt.sign({ id: user.id, email: user.email, rol: user.rol }, process.env.SECRETO, {
+      expiresIn: '4h',
+    });
 
     res.status(200).json({ token });
   } catch (error) {
@@ -121,18 +103,14 @@ exports.confirmarUsuario = async (req, res) => {
   }
   try {
     const user = await Usuarios.findOne({ where: { email } });
-    if (!user)
-      return res.status(400).json({ error: 'Usuario con ese mail no existe' });
-    if (user.activo)
-      return res.status(400).json({ error: 'Usuario ya esta activado' });
+    if (!user) return res.status(400).json({ error: 'Usuario con ese mail no existe' });
+    if (user.activo) return res.status(400).json({ error: 'Usuario ya esta activado' });
 
     user.activo = true;
     user.save();
-    res
-      .status(202)
-      .json({
-        detalle: `Usuario con mail: ${user.email} activado exitosamente`,
-      });
+    res.status(202).json({
+      detalle: `Usuario con mail: ${user.email} activado exitosamente`,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al activar usuario' });

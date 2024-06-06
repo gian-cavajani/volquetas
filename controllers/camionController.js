@@ -24,12 +24,8 @@ exports.nuevoCamion = async (req, res) => {
 
     res.status(201).json(nuevoCamion);
   } catch (error) {
-    const errorsSequelize = error.errors
-      ? error.errors.map((err) => err.message)
-      : [];
-    res
-      .status(500)
-      .json({ error: 'Error al crear camion', detalle: errorsSequelize });
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+    res.status(500).json({ error: 'Error al crear camion', detalle: errorsSequelize });
   }
 };
 
@@ -46,6 +42,7 @@ exports.getCamiones = async (req, res) => {
 exports.getCamion = async (req, res) => {
   try {
     const camion = await Camiones.findByPk(req.params.camionId);
+    if (!camion) return res.status(404).json({ error: 'Camion no encontrados' });
     res.status(200).json(camion);
   } catch (error) {
     console.error(error);
@@ -72,8 +69,6 @@ exports.actualizarCamion = async (req, res) => {
     res.status(200).json(camion);
   } catch (error) {
     console.error('Error al actualizar el camión:', error);
-    res
-      .status(500)
-      .json({ error: 'Error al actualizar el camión', detalle: error });
+    res.status(500).json({ error: 'Error al actualizar el camión', detalle: error });
   }
 };
