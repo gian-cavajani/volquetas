@@ -1,6 +1,6 @@
 const { Jornales } = require('../models');
 const { Op } = require('sequelize');
-const { calcularHoras } = require('../functions/calcularHoras');
+const { calcularHoras } = require('../utils/calcularHoras');
 const moment = require('moment');
 
 exports.nuevoJornal = async (req, res) => {
@@ -103,31 +103,18 @@ exports.getJornal = async (req, res) => {
   }
 };
 
-exports.getJornalesPorEmpleadoMes = async (req, res) => {
-  const { empleadoId, mes } = req.params;
+exports.getJornalesPorEmpleado = async (req, res) => {
+  const { empleadoId, fechaInicio, fechaFin } = req.params;
 
-  // Validar que mes tenga el formato YYYY-MM
-  if (!/^\d{4}-\d{2}$/.test(mes)) {
-    return res.status(400).json({ error: 'El formato del mes debe ser YYYY-MM' });
-  }
   try {
     const jornales = await Jornales.findAll({
       where: {
         empleadoId,
-        fecha: {
-          [Op.and]: [
-            { [Op.gte]: new Date(mes + '-01') },
-            {
-              [Op.lt]: new Date(new Date(mes + '-01').setMonth(new Date(mes + '-01').getMonth() + 1)),
-            },
-          ],
-        },
+        fecha: { [Op.and]: [{ [Op.gte]: new Date(fechaInicio) }, { [Op.lte]: new Date(fechaFin) }] },
       },
     });
 
-    if (!jornales || jornales.length === 0) {
-      return res.status(404).json({ error: 'No hay jornales' });
-    }
+    if (!jornales || jornales.length === 0) return res.status(404).json({ error: 'No hay jornales' });
 
     res.status(200).json(jornales);
   } catch (error) {
@@ -136,19 +123,20 @@ exports.getJornalesPorEmpleadoMes = async (req, res) => {
   }
 };
 
-exports.getHorasPorSemana = async (req, res) => {
-  const { empleadoId, semana } = req.params;
+exports.getHorasPorEmpleado = async (req, res) => {
+  const { empleadoId, fechaInicio, fechaFin } = req.params;
+
   try {
-    const fechaInicioSemana = moment(semana, 'YYYY-MM-DD').startOf('isoWeek');
-    const fechaFinSemana = moment(semana, 'YYYY-MM-DD').endOf('isoWeek');
+    const fechaInicioMomento = moment(fechaInicio, 'YYYY-MM-DD').startOf('day');
+    const fechaFinMomento = moment(fechaFin, 'YYYY-MM-DD').endOf('day');
     const jornales = await Jornales.findAll({
       where: {
         empleadoId,
-        fecha: {
-          [Op.between]: [fechaInicioSemana.toDate(), fechaFinSemana.toDate()],
-        },
+        fecha: { [Op.between]: [fechaInicioMomento.toDate(), fechaFinMomento.toDate()] },
       },
     });
+
+    if (!jornales || jornales.length === 0) return res.status(404).json({ error: 'No se encontraron jornales para el período especificado' });
 
     const { horasTrabajadas, horasExtras } = calcularHoras(jornales);
     res.status(200).json({ horasTrabajadas, horasExtras });
@@ -158,24 +146,34 @@ exports.getHorasPorSemana = async (req, res) => {
   }
 };
 
-exports.getHorasPorMes = async (req, res) => {
-  const { empleadoId, mes } = req.params;
+exports.getAllJornalesPorPeriodo = async (req, res) => {
+  const { fechaInicio, fechaFin } = req.params;
+
   try {
-    const fechaInicioMes = moment(mes, 'YYYY-MM').startOf('month');
-    const fechaFinMes = moment(mes, 'YYYY-MM').endOf('month');
+    const fechaInicioMomento = moment(fechaInicio, 'YYYY-MM-DD').startOf('day');
+    const fechaFinMomento = moment(fechaFin, 'YYYY-MM-DD').endOf('day');
     const jornales = await Jornales.findAll({
       where: {
-        empleadoId,
-        fecha: {
-          [Op.between]: [fechaInicioMes.toDate(), fechaFinMes.toDate()],
-        },
+        fecha: { [Op.between]: [fechaInicioMomento.toDate(), fechaFinMomento.toDate()] },
       },
     });
 
-    const { horasTrabajadas, horasExtras } = calcularHoras(jornales);
-    res.status(200).json({ horasTrabajadas, horasExtras });
+    if (!jornales || jornales.length === 0) return res.status(404).json({ error: 'No se encontraron jornales para el período especificado' });
+
+    // Agrupar los jornales por empleadoId en el formato {empleadoId: 1, jornales: []}
+    const jornalesPorEmpleado = jornales.reduce((acc, jornal) => {
+      const empleadoIndex = acc.findIndex((item) => item.empleadoId === jornal.empleadoId);
+      if (empleadoIndex === -1) {
+        acc.push({ empleadoId: jornal.empleadoId, jornales: [jornal] });
+      } else {
+        acc[empleadoIndex].jornales.push(jornal);
+      }
+      return acc;
+    }, []);
+
+    res.status(200).json(jornalesPorEmpleado);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al obtener las horas trabajadas' });
+    res.status(500).json({ error: 'Error al obtener los jornales' });
   }
 };

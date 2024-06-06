@@ -43,21 +43,15 @@ const Jornales = db.define(
         if (!jornal.entrada || !jornal.salida) {
           throw new Error('Por favor ingrese las horas de entrada y salida.');
         }
-        const entrada = new Date(`2022-01-01T${jornal.entrada}`);
-        const salida = new Date(`2022-01-01T${jornal.salida}`);
+        const entrada = moment(jornal.entrada, 'HH:mm:ss');
+        const salida = moment(jornal.salida, 'HH:mm:ss');
+        const horas = salida.diff(entrada, 'hours', true);
 
-        let diff = salida - entrada;
-        const horas = Math.floor(diff / (1000 * 60 * 60));
-        diff -= horas * 1000 * 60 * 60;
-        const minutos = Math.floor(diff / (1000 * 60));
-
-        let horasExtra = horas - 8;
-        if (minutos >= 30) {
-          horasExtra += 0.5;
-        }
+        // Calcular las horas extra solo si se trabaja más de 8 horas
+        const horasExtra = Math.max(horas - 8, 0);
 
         // Asignar el valor calculado de horasExtra a la columna en la base de datos
-        jornal.horasExtra = Math.max(horasExtra, 0);
+        jornal.horasExtra = horasExtra;
       },
     },
   }

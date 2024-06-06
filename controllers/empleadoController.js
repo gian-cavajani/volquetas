@@ -7,13 +7,12 @@ exports.nuevoEmpleado = async (req, res) => {
     //Sanitizar campos
     const sanitizednombre = nombre ? validator.escape(nombre) : '';
     const sanitizedrol = rol ? validator.escape(rol) : '';
+
     if (cedula.toString().length !== 8) {
-      return res
-        .status(400)
-        .json({ error: 'Cedula invalida, deben ser 8 numeros' });
+      return res.status(400).json({ error: 'Cedula invalida, deben ser 8 numeros' });
     }
-    if (!['admin', 'normal', 'chofer'].includes(sanitizedrol))
-      return res.status(400).json({ error: 'Rol inválido' });
+    if (!['admin', 'normal', 'chofer'].includes(sanitizedrol)) return res.status(400).json({ error: 'Rol inválido' });
+
     // Crear el empleado
     const nuevoEmpleado = await Empleados.create({
       nombre: sanitizednombre,
@@ -24,12 +23,8 @@ exports.nuevoEmpleado = async (req, res) => {
     res.status(201).json(nuevoEmpleado);
   } catch (error) {
     console.error('Error al crear empleado:', error);
-    const errorsSequelize = error.errors
-      ? error.errors.map((err) => err.message)
-      : [];
-    res
-      .status(500)
-      .json({ error: 'Error al crear empleado', detalle: errorsSequelize });
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+    res.status(500).json({ error: 'Error al crear empleado', detalle: errorsSequelize });
   }
 };
 
@@ -57,9 +52,8 @@ exports.getEmpleado = async (req, res) => {
         attributes: ['telefono'],
       },
     });
-    if (!empleado) {
-      return res.status(404).json({ error: 'Empleado no encontrado' });
-    }
+
+    if (!empleado) return res.status(404).json({ error: 'Empleado no encontrado' });
     res.status(200).json(empleado);
   } catch (error) {
     console.error(error);
@@ -82,8 +76,7 @@ exports.eliminarEmpleado = async (req, res) => {
     });
     if (usuario) {
       return res.status(400).json({
-        error:
-          'No se puede eliminar el empleado porque tiene un usuario vinculado',
+        error: 'No se puede eliminar el empleado porque tiene un usuario vinculado',
       });
     }
 
@@ -116,14 +109,10 @@ exports.cambiarEstadoEmpleado = async (req, res) => {
     empleado.save();
 
     res.status(202).json({
-      detalle: `Empleado ${empleado.nombre} con CI: ${empleado.cedula} fue ${
-        empleado.habilitado ? 'habilitado' : 'deshabilitado'
-      } exitosamente`,
+      detalle: `Empleado ${empleado.nombre} con CI: ${empleado.cedula} fue ${empleado.habilitado ? 'habilitado' : 'deshabilitado'} exitosamente`,
     });
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ error: 'Error al habilitar/deshabilitar al empleado' });
+    res.status(500).json({ error: 'Error al habilitar/deshabilitar al empleado' });
   }
 };
