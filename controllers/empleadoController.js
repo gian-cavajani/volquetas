@@ -1,23 +1,35 @@
-const { Empleados, Telefonos, Usuarios } = require('../models');
+const { Empleados, Telefonos, Usuarios, TelefonoPropietarios } = require('../models');
 const validator = require('validator');
 
 exports.nuevoEmpleado = async (req, res) => {
-  const { nombre, cedula, rol } = req.body;
+  const { nombre, cedula, rol, fechaEntrada, fechaSalida } = req.body;
   try {
     //Sanitizar campos
     const sanitizednombre = nombre ? validator.escape(nombre) : '';
     const sanitizedrol = rol ? validator.escape(rol) : '';
+    const sanitizedcedula = cedula ? validator.escape(cedula) : '';
 
-    if (cedula.toString().length !== 8) {
+    //validaciones
+    if (!fechaEntrada || isNaN(Date.parse(fechaEntrada))) {
+      return res.status(400).json({ error: 'La fecha de entrada es obligatoria y debe ser válida' });
+    }
+    if (fechaSalida && isNaN(Date.parse(fechaEntrada))) {
+      return res.status(400).json({ error: 'La fecha de salida debe ser válida' });
+    }
+
+    if (cedula.length !== 8) {
       return res.status(400).json({ error: 'Cedula invalida, deben ser 8 numeros' });
     }
+
     if (!['admin', 'normal', 'chofer'].includes(sanitizedrol)) return res.status(400).json({ error: 'Rol inválido' });
 
     // Crear el empleado
     const nuevoEmpleado = await Empleados.create({
       nombre: sanitizednombre,
-      cedula,
+      cedula: sanitizedcedula,
       rol: sanitizedrol,
+      fechaEntrada,
+      fechaSalida,
     });
 
     res.status(201).json(nuevoEmpleado);
@@ -31,10 +43,19 @@ exports.nuevoEmpleado = async (req, res) => {
 exports.getEmpleados = async (req, res) => {
   try {
     const empleados = await Empleados.findAll({
-      include: {
-        model: Telefonos,
-        attributes: ['telefono'],
-      },
+      include: [
+        {
+          model: TelefonoPropietarios,
+          required: false,
+          attributes: ['telefonoId'],
+          include: [
+            {
+              model: Telefonos,
+              attributes: ['telefono', 'tipo', 'extension'],
+            },
+          ],
+        },
+      ],
     });
 
     res.status(200).json(empleados);
@@ -48,8 +69,13 @@ exports.getEmpleado = async (req, res) => {
   try {
     const empleado = await Empleados.findByPk(req.params.empleadoId, {
       include: {
-        model: Telefonos,
-        attributes: ['telefono'],
+        model: TelefonoPropietarios,
+        required: false,
+        attributes: ['telefonoId'],
+        include: {
+          model: Telefonos,
+          attributes: ['telefono', 'tipo', 'extension'],
+        },
       },
     });
 
@@ -114,5 +140,54 @@ exports.cambiarEstadoEmpleado = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al habilitar/deshabilitar al empleado' });
+  }
+};
+
+exports.modificarEmpleado = async (req, res) => {
+  const { empleadoId } = req.params;
+  const { nombre, cedula, rol, habilitado, fechaEntrada, fechaSalida } = req.body;
+
+  try {
+    // Buscar el empleado por ID
+    let empleado = await Empleados.findByPk(empleadoId);
+    if (!empleado) {
+      return res.status(404).json({ error: 'Empleado no encontrado' });
+    }
+
+    // Sanitizar los campos
+    const sanitizedNombre = nombre ? validator.escape(nombre) : empleado.nombre;
+    const sanitizedRol = rol ? validator.escape(rol) : empleado.rol;
+
+    // Validar la cédula y el rol
+    if (cedula && cedula.length !== 8) {
+      return res.status(400).json({ error: 'Cédula inválida, deben ser 8 números' });
+    }
+    if (rol && !['admin', 'normal', 'chofer'].includes(sanitizedRol)) {
+      return res.status(400).json({ error: 'Rol inválido' });
+    }
+
+    if (fechaEntrada && isNaN(Date.parse(fechaEntrada))) {
+      return res.status(400).json({ error: 'La fecha de entrada debe ser válida' });
+    }
+
+    if (fechaSalida && isNaN(Date.parse(fechaSalida))) {
+      return res.status(400).json({ error: 'La fecha de salida debe ser válida' });
+    }
+
+    console.log(fechaEntrada ? fechaEntrada : empleado.fechaEntrada);
+    // Actualizar los campos del empleado
+    const nuevoEmpleado = await empleado.update({
+      nombre: sanitizedNombre,
+      cedula: cedula !== undefined ? cedula : empleado.cedula,
+      rol: sanitizedRol,
+      habilitado: habilitado !== undefined ? habilitado : empleado.habilitado,
+      fechaEntrada: fechaEntrada ? fechaEntrada : empleado.fechaEntrada,
+      fechaSalida: fechaSalida ? fechaSalida : empleado.fechaSalida,
+    });
+
+    res.status(200).json(nuevoEmpleado);
+  } catch (error) {
+    console.error('Error al modificar el empleado:', error);
+    res.status(500).json({ error: 'Error al modificar el empleado' });
   }
 };

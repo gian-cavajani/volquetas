@@ -34,7 +34,7 @@ exports.nuevoJornal = async (req, res) => {
       fecha,
       entrada,
       salida,
-      usuarioId,
+      creadoPor: usuarioId,
     });
 
     res.status(201).json(jornal);

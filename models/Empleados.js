@@ -16,7 +16,7 @@ const Empleados = db.define('Empleados', {
     allowNull: false,
   },
   cedula: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.STRING(8),
     allowNull: false,
     unique: {
       args: true,
@@ -26,6 +26,13 @@ const Empleados = db.define('Empleados', {
   habilitado: {
     type: Sequelize.BOOLEAN,
     defaultValue: true,
+  },
+  fechaEntrada: {
+    type: Sequelize.DATEONLY,
+  },
+  fechaSalida: {
+    type: Sequelize.DATEONLY,
+    defaultValue: null,
   },
 });
 

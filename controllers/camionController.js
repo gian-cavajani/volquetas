@@ -72,3 +72,23 @@ exports.actualizarCamion = async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar el camión', detalle: error });
   }
 };
+
+exports.borrarCamion = async (req, res) => {
+  try {
+    const { camionId } = req.params;
+
+    // Buscar el camión por ID
+    const camion = await Camiones.findByPk(camionId);
+    if (!camion) {
+      return res.status(404).json({ error: 'Camión no encontrado' });
+    }
+
+    // Borrar el camión
+    await camion.destroy();
+
+    res.status(200).json({ message: 'Camión borrado exitosamente' });
+  } catch (error) {
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+    res.status(500).json({ error: 'Error al borrar camión', detalle: errorsSequelize });
+  }
+};

@@ -1,8 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
-
-const { Jornales, Servicios, Camiones, Empleados, Telefonos, Usuarios, HistoricoUsoCamion } = require('../models');
+const { randomUUID, getRandomValues } = require('crypto');
+const { getRandomInt, getRandomName, getRandomEmail, getRandomPhone } = require('./utilsPrecarga');
+const { ContactoEmpresas, ClienteEmpresas, Jornales, Servicios, Camiones, Empleados, Telefonos, Usuarios, HistoricoUsoCamion, TelefonoPropietarios } = require('../models');
 
 exports.precargarDatos = async () => {
   try {
@@ -14,20 +15,34 @@ exports.precargarDatos = async () => {
     const existingHistorico = await HistoricoUsoCamion.count();
     const existingServicios = await Servicios.count();
     const existingJornales = await Jornales.count();
+    const existingTelefonosProp = await TelefonoPropietarios.count();
+    const existingClienteEmpresas = await ClienteEmpresas.count();
+    const existingContactoEmpresas = await ContactoEmpresas.count();
 
-    if (existingEmpleados > 0 || existingCamiones > 0 || existingUsuarios > 0 || existingTelefonos > 0 || existingHistorico > 0 || existingServicios > 0 || existingJornales > 0) {
+    if (
+      existingClienteEmpresas > 0 ||
+      existingContactoEmpresas > 0 ||
+      existingTelefonosProp > 0 ||
+      existingEmpleados > 0 ||
+      existingCamiones > 0 ||
+      existingUsuarios > 0 ||
+      existingTelefonos > 0 ||
+      existingHistorico > 0 ||
+      existingServicios > 0 ||
+      existingJornales > 0
+    ) {
       console.log('Datos ya existen. No se realizará la precarga.');
       return;
     }
 
     // Precargar datos de ejemplo
     await Empleados.bulkCreate([
-      { nombre: 'Carolina Garcia', cedula: 12345678, rol: 'admin' },
-      { nombre: 'Ana Gomez', cedula: 87654321, rol: 'normal' },
-      { nombre: 'Juan Pedro', cedula: 17654321, rol: 'chofer' },
-      { nombre: 'Roberto Gonzalez', cedula: 47654321, rol: 'chofer' },
-      { nombre: 'Jose Varela', cedula: 27654321, rol: 'chofer' },
-      { nombre: 'Pedro Varela', cedula: 23652321, rol: 'chofer' },
+      { nombre: 'Carolina Garcia', cedula: getRandomInt(10000000, 60000000) + '', rol: 'admin', fechaEntrada: moment('2024-06-02').toDate() },
+      { nombre: 'Ana Gomez', cedula: getRandomInt(10000000, 60000000) + '', rol: 'normal', fechaEntrada: moment('2024-06-03').toDate() },
+      { nombre: 'Juan Pedro', cedula: getRandomInt(10000000, 60000000) + '', rol: 'chofer', fechaEntrada: moment('2024-06-04').toDate() },
+      { nombre: 'Roberto Gonzalez', cedula: getRandomInt(10000000, 60000000) + '', rol: 'chofer', fechaEntrada: moment('2024-06-05').toDate() },
+      { nombre: 'Jose Varela', cedula: getRandomInt(10000000, 60000000) + '', rol: 'chofer', fechaEntrada: moment('2024-06-01').toDate() },
+      { nombre: 'Pedro Varela', cedula: getRandomInt(10000000, 60000000) + '', rol: 'chofer', fechaEntrada: moment('2024-06-03').toDate() },
     ]);
 
     await Camiones.bulkCreate([
@@ -44,15 +59,111 @@ exports.precargarDatos = async () => {
       { empleadoId: 2, email: 'ana@example.com', password: await bcrypt.hash('1', 10), rol: 'normal' },
     ]);
 
-    await Telefonos.bulkCreate([
-      { telefono: '099119922', empleadoId: 1 },
-      { telefono: '097300129', empleadoId: 1 },
-      { telefono: '099445432', empleadoId: 2 },
-      { telefono: '099354308', empleadoId: 3 },
-      { telefono: '099354708', empleadoId: 4 },
-      { telefono: '091344308', empleadoId: 5 },
-      { telefono: '099332308', empleadoId: 5 },
-      { telefono: '091233208', empleadoId: 6 },
+    const empresas = [
+      {
+        rut: '123456789012',
+        nombre: 'Empresa A',
+        descripcion: 'Descripción de Empresa A',
+      },
+      {
+        rut: '234567890123',
+        nombre: 'Empresa B',
+        descripcion: 'Descripción de Empresa B',
+      },
+      {
+        rut: '345678901234',
+        nombre: 'Empresa C',
+        descripcion: 'Descripción de Empresa C',
+      },
+      {
+        rut: '456789012345',
+        nombre: 'Empresa D',
+        descripcion: 'Descripción de Empresa D',
+      },
+      {
+        rut: '567890123456',
+        nombre: 'Empresa E',
+        descripcion: 'Descripción de Empresa E',
+      },
+      {
+        rut: '678901234567',
+        nombre: 'Empresa F',
+        descripcion: 'Descripción de Empresa F',
+      },
+      {
+        rut: '789012345678',
+        nombre: 'Empresa G',
+        descripcion: 'Descripción de Empresa G',
+      },
+      {
+        rut: '890123456789',
+        nombre: 'Empresa H',
+        descripcion: 'Descripción de Empresa H',
+      },
+      {
+        rut: '901234567890',
+        nombre: 'Empresa I',
+        descripcion: 'Descripción de Empresa I',
+      },
+      {
+        rut: '012345678901',
+        nombre: 'Empresa J',
+        descripcion: 'Descripción de Empresa J',
+      },
+    ];
+
+    await ClienteEmpresas.bulkCreate(
+      empresas.map((empresa) => ({
+        ...empresa,
+      }))
+    );
+
+    const personasEmpresas = [];
+
+    for (let i = 0; i < 10; i++) {
+      const nombre = getRandomName();
+      const email = `${nombre}@empresa.com`;
+      personasEmpresas.push({
+        nombre,
+        cedula: getRandomInt(10000000, 60000000) + '',
+        descripcion: `Descripción de ${nombre}`,
+        email,
+        clienteEmpresaId: getRandomInt(1, 10),
+      });
+    }
+
+    await ContactoEmpresas.bulkCreate(personasEmpresas);
+
+    const telefonos = [];
+
+    for (let i = 0; i < 15; i++) {
+      let telefono;
+      let tipo;
+      if (i < 7) {
+        tipo = 'celular';
+      } else {
+        tipo = 'telefono';
+      }
+      telefono = getRandomPhone(tipo);
+
+      telefonos.push({
+        telefono,
+        tipo,
+        extension: getRandomInt(100, 9000) + '',
+      });
+    }
+
+    await Telefonos.bulkCreate(telefonos);
+
+    await TelefonoPropietarios.bulkCreate([
+      { propietarioId: 1, propietarioTipo: 'empleados', telefonoId: 1 },
+      { propietarioId: 2, propietarioTipo: 'contactoEmpresas', telefonoId: 2 },
+      { propietarioId: 3, propietarioTipo: 'empleados', telefonoId: 3 },
+      { propietarioId: 4, propietarioTipo: 'contactoEmpresas', telefonoId: 4 },
+      { propietarioId: 5, propietarioTipo: 'empleados', telefonoId: 5 },
+      { propietarioId: 6, propietarioTipo: 'contactoEmpresas', telefonoId: 6 },
+      { propietarioId: 6, propietarioTipo: 'contactoEmpresas', telefonoId: 7 },
+      { propietarioId: 5, propietarioTipo: 'empleados', telefonoId: 8 },
     ]);
 
     await HistoricoUsoCamion.bulkCreate([
@@ -87,18 +198,18 @@ exports.precargarDatos = async () => {
     ]);
 
     await Jornales.bulkCreate([
-      { usuarioId: 1, empleadoId: 1, fecha: moment('2024-06-01').toDate(), entrada: '08:00:00', salida: '17:00:00', horasExtra: 1 },
-      { usuarioId: 1, empleadoId: 1, fecha: moment('2024-06-02').toDate(), entrada: '08:00:00', salida: '17:30:00', horasExtra: 1.5 },
-      { usuarioId: 1, empleadoId: 2, fecha: moment('2024-06-01').toDate(), entrada: '09:00:00', salida: '18:00:00', horasExtra: 1 },
-      { usuarioId: 1, empleadoId: 2, fecha: moment('2024-06-02').toDate(), entrada: '09:00:00', salida: '17:00:00', horasExtra: 0 },
-      { usuarioId: 1, empleadoId: 3, fecha: moment('2024-06-01').toDate(), entrada: '07:00:00', salida: '16:00:00', horasExtra: 1 },
-      { usuarioId: 1, empleadoId: 3, fecha: moment('2024-06-02').toDate(), entrada: '07:30:00', salida: '17:00:00', horasExtra: 1.5 },
-      { usuarioId: 1, empleadoId: 4, fecha: moment('2024-06-01').toDate(), entrada: '10:00:00', salida: '19:00:00', horasExtra: 1 },
-      { usuarioId: 1, empleadoId: 4, fecha: moment('2024-06-02').toDate(), entrada: '10:30:00', salida: '19:30:00', horasExtra: 1 },
-      { usuarioId: 1, empleadoId: 5, fecha: moment('2024-06-03').toDate(), entrada: '08:00:00', salida: '17:00:00', horasExtra: 1 },
-      { usuarioId: 1, empleadoId: 5, fecha: moment('2024-06-04').toDate(), entrada: '09:00:00', salida: '18:00:00', horasExtra: 1 },
-      { usuarioId: 1, empleadoId: 6, fecha: moment('2024-06-03').toDate(), entrada: '08:00:00', salida: '17:00:00', horasExtra: 1 },
-      { usuarioId: 1, empleadoId: 6, fecha: moment('2024-06-04').toDate(), entrada: '09:00:00', salida: '18:00:00', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 1, fecha: moment('2024-06-01').toDate(), entrada: '08:00:00', salida: '17:00:00', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 1, fecha: moment('2024-06-02').toDate(), entrada: '08:00:00', salida: '17:30:00', horasExtra: 1.5 },
+      { creadoPor: 1, empleadoId: 2, fecha: moment('2024-06-01').toDate(), entrada: '09:00:00', salida: '18:00:00', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 2, fecha: moment('2024-06-02').toDate(), entrada: '09:00:00', salida: '17:00:00', horasExtra: 0 },
+      { creadoPor: 1, empleadoId: 3, fecha: moment('2024-06-01').toDate(), entrada: '07:00:00', salida: '16:00:00', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 3, fecha: moment('2024-06-02').toDate(), entrada: '07:30:00', salida: '17:00:00', horasExtra: 1.5 },
+      { creadoPor: 1, empleadoId: 4, fecha: moment('2024-06-01').toDate(), entrada: '10:00:00', salida: '19:00:00', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 4, fecha: moment('2024-06-02').toDate(), entrada: '10:30:00', salida: '19:30:00', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 5, fecha: moment('2024-06-03').toDate(), entrada: '08:00:00', salida: '17:00:00', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 5, fecha: moment('2024-06-04').toDate(), entrada: '09:00:00', salida: '18:00:00', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 6, fecha: moment('2024-06-03').toDate(), entrada: '08:00:00', salida: '17:00:00', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 6, fecha: moment('2024-06-04').toDate(), entrada: '09:00:00', salida: '18:00:00', horasExtra: 1 },
     ]);
 
     console.log('Datos precargados con éxito.');

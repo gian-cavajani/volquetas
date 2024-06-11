@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
 const db = require('../config/db');
+const Empleados = require('./Empleados');
 
 const Usuarios = db.define('Usuarios', {
   id: {
@@ -10,6 +11,10 @@ const Usuarios = db.define('Usuarios', {
   empleadoId: {
     type: Sequelize.INTEGER,
     allowNull: false,
+    references: {
+      model: Empleados,
+      key: 'id',
+    },
     unique: {
       args: true,
     },
@@ -21,8 +26,9 @@ const Usuarios = db.define('Usuarios', {
   },
   email: {
     type: Sequelize.STRING,
-    allowNull: false,
-    unique: true,
+    validate: {
+      isEmail: true,
+    },
   },
   password: {
     type: Sequelize.STRING,

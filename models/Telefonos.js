@@ -7,13 +7,14 @@ const Telefonos = db.define('Telefonos', {
     autoIncrement: true,
     primaryKey: true,
   },
-  empleadoId:{
-    type: Sequelize.INTEGER,
-  },
   telefono: {
     type: Sequelize.STRING,
     allowNull: false,
-    unique: true,
+  },
+  extension: { type: Sequelize.STRING },
+  tipo: {
+    type: Sequelize.ENUM('telefono', 'celular'),
+    allowNull: false,
   },
 });
 

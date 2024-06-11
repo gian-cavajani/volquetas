@@ -62,6 +62,32 @@ exports.getUsuarios = async (req, res) => {
   }
 };
 
+exports.getUsuario = async (req, res) => {
+  try {
+    const usuario = await Usuarios.findByPk(req.params.usuarioId, {
+      include: {
+        model: Empleados,
+      },
+    });
+
+    if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado' });
+    res.status(200).json(usuario);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener el Usuario' });
+  }
+};
+
+exports.getUsuariosInactivos = async (req, res) => {
+  try {
+    const usuarios = await Usuarios.findAll({ where: { activo: false } });
+    res.status(200).json(usuarios);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener los usuarios', detalle: error });
+  }
+};
+
 exports.loginUsuario = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -72,7 +98,7 @@ exports.loginUsuario = async (req, res) => {
 
     const user = await Usuarios.findOne({ where: { email } });
 
-    if (!user) return res.status(401).json({ error: 'Credenciales inválidas' });
+    if (!user) return res.status(404).json({ error: 'No hay usuario con ese email' });
     if (!user.activo) {
       return res.status(403).json({ error: 'Usuario no activado' });
     }
@@ -81,6 +107,7 @@ exports.loginUsuario = async (req, res) => {
     if (!passwordMatch) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
+
     // Generar el token JWT con duración de 4 horas
     //todo: agregarle al token
     const token = jwt.sign({ id: user.id, email: user.email, rol: user.rol }, process.env.SECRETO, {
@@ -103,7 +130,7 @@ exports.confirmarUsuario = async (req, res) => {
   }
   try {
     const user = await Usuarios.findOne({ where: { email } });
-    if (!user) return res.status(400).json({ error: 'Usuario con ese mail no existe' });
+    if (!user) return res.status(404).json({ error: 'Usuario con ese mail no existe' });
     if (user.activo) return res.status(400).json({ error: 'Usuario ya esta activado' });
 
     user.activo = true;
@@ -114,5 +141,50 @@ exports.confirmarUsuario = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al activar usuario' });
+  }
+};
+
+exports.borrarUsuario = async (req, res) => {
+  try {
+    const { usuarioId } = req.params;
+
+    // Buscar el usuario por ID
+    const usuario = await Usuarios.findByPk(usuarioId);
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    // Borrar el usuario
+    await usuario.destroy();
+
+    res.status(200).json({ detalle: 'Usuario borrado exitosamente' });
+  } catch (error) {
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+    res.status(500).json({ error: 'Error al borrar usuario', detalle: errorsSequelize });
+  }
+};
+
+exports.modificarUsuario = async (req, res) => {
+  try {
+    const { usuarioId } = req.params;
+    const { rol, email, activo } = req.body;
+
+    // Buscar el usuario por ID
+    const usuario = await Usuarios.findByPk(usuarioId);
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    // Actualizar los datos del usuario
+    usuario.rol = rol ? validator.escape(rol) : usuario.rol;
+    usuario.email = email ? validator.escape(email) : usuario.email;
+    usuario.activo = activo !== undefined ? activo : usuario.activo;
+
+    await usuario.save();
+
+    res.status(200).json(usuario);
+  } catch (error) {
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+    res.status(500).json({ error: 'Error al modificar usuario', detalle: errorsSequelize });
   }
 };

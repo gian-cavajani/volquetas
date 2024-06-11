@@ -18,7 +18,7 @@ const Jornales = db.define(
       },
     },
     fecha: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     entrada: DataTypes.TIME,
@@ -27,7 +27,7 @@ const Jornales = db.define(
       type: DataTypes.FLOAT,
       defaultValue: 0,
     },
-    usuarioId: {
+    creadoPor: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {

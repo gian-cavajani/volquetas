@@ -23,18 +23,24 @@ module.exports = function () {
   router.get('/usuarios', verificarToken(true), usuarioController.getUsuarios);
   router.post('/usuarios/login', usuarioController.loginUsuario);
   router.post('/usuarios/confirmar', verificarToken(true), usuarioController.confirmarUsuario);
+  router.get('/usuarios/inactivos', verificarToken(true), usuarioController.getUsuariosInactivos);
+  router.get('/usuarios/:usuarioId', validarId('usuarioId'), verificarToken(true), usuarioController.getUsuario);
+  router.put('/usuarios/:usuarioId', validarId('usuarioId'), verificarToken(true), usuarioController.modificarUsuario);
+  router.delete('/usuarios/:usuarioId', validarId('usuarioId'), verificarToken(true), usuarioController.borrarUsuario);
 
   //Camiones
   router.post('/camiones', verificarToken(), camionController.nuevoCamion);
   router.get('/camiones', verificarToken(), camionController.getCamiones);
   router.get('/camiones/:camionId', verificarToken(), validarId('camionId'), camionController.getCamion);
   router.put('/camiones/:camionId', verificarToken(), validarId('camionId'), camionController.actualizarCamion);
+  router.delete('/camiones/:camionId', verificarToken(true), validarId('camionId'), camionController.borrarCamion);
 
   //Empleados
   router.post('/empleados', verificarToken(), empleadoController.nuevoEmpleado);
   router.get('/empleados', verificarToken(), empleadoController.getEmpleados);
   router.get('/empleados/:empleadoId', verificarToken(), validarId('empleadoId'), empleadoController.getEmpleado);
   router.patch('/empleados/:empleadoId/estado', verificarToken(true), validarId('empleadoId'), empleadoController.cambiarEstadoEmpleado);
+  router.put('/empleados/:empleadoId', verificarToken(), validarId('empleadoId'), empleadoController.modificarEmpleado);
   router.delete('/empleados/:empleadoId', verificarToken(true), validarId('empleadoId'), empleadoController.eliminarEmpleado);
 
   //Historico uso camion
