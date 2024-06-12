@@ -2,24 +2,38 @@ const { Jornales } = require('../models');
 const { Op } = require('sequelize');
 const { calcularHoras } = require('../utils/calcularHoras');
 const moment = require('moment');
+const validator = require('validator');
+const db = require('../config/db');
 
 exports.nuevoJornal = async (req, res) => {
-  const { empleadoId, fecha, entrada, salida } = req.body;
+  let { empleadoId, fecha, entrada, salida, tipo } = req.body;
   const usuarioId = req.user.id;
+
+  //sanitizar:
+  const sanitizedTipo = tipo ? validator.escape(tipo) : '';
+
   // Validaciones
   if (!empleadoId) {
     return res.status(400).json({ error: 'El empleadoId es obligatorio' });
   }
+  if (!['trabajo', 'licencia', 'enfermedad', 'falta'].includes(sanitizedTipo)) return res.status(400).json({ error: 'Tipo inválido' });
   if (!fecha || isNaN(Date.parse(fecha))) {
     return res.status(400).json({ error: 'La fecha es obligatoria y debe ser válida' });
   }
-  if (!entrada || typeof entrada !== 'string') {
-    return res.status(400).json({ error: 'La hora de entrada es obligatoria y debe ser un string' });
-  }
-  if (!salida || typeof salida !== 'string') {
-    return res.status(400).json({ error: 'La hora de salida es obligatoria y debe ser un string' });
+  if (tipo === 'trabajo') {
+    if (!entrada || typeof entrada !== 'string') {
+      return res.status(400).json({ error: 'La hora de entrada es obligatoria y debe ser un string' });
+    }
+    if (!salida || typeof salida !== 'string') {
+      return res.status(400).json({ error: 'La hora de salida es obligatoria y debe ser un string' });
+    }
   }
 
+  //si el empleado no trabajo se asegura que se borren las horas pasadas en el body.
+  if (tipo !== 'trabajo') {
+    entrada = null;
+    salida = null;
+  }
   try {
     const existeJornal = await Jornales.findOne({
       where: { empleadoId, fecha },
@@ -35,12 +49,13 @@ exports.nuevoJornal = async (req, res) => {
       entrada,
       salida,
       creadoPor: usuarioId,
+      tipo,
     });
 
     res.status(201).json(jornal);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al crear el jornal' });
+    res.status(500).json({ error: 'Error al crear el jornal', detalle: error });
   }
 };
 
@@ -61,7 +76,7 @@ exports.borrarJornal = async (req, res) => {
 
 exports.editarJornal = async (req, res) => {
   const { jornalId } = req.params;
-  const { empleadoId, fecha, entrada, salida } = req.body;
+  const { empleadoId, fecha, entrada, salida, tipo } = req.body;
   try {
     let jornal = await Jornales.findByPk(jornalId);
     if (!jornal) {
@@ -81,7 +96,7 @@ exports.editarJornal = async (req, res) => {
       return res.status(400).json({ error: 'Ya existe un jornal para este empleado en esta fecha' });
     }
 
-    jornal = await jornal.update({ empleadoId, fecha, entrada, salida });
+    jornal = await jornal.update({ empleadoId, fecha, entrada, salida, tipo });
     res.status(200).json(jornal);
   } catch (error) {
     console.error(error);
@@ -113,36 +128,31 @@ exports.getJornalesPorEmpleado = async (req, res) => {
         fecha: { [Op.and]: [{ [Op.gte]: new Date(fechaInicio) }, { [Op.lte]: new Date(fechaFin) }] },
       },
     });
-
     if (!jornales || jornales.length === 0) return res.status(404).json({ error: 'No hay jornales' });
 
-    res.status(200).json(jornales);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener los jornales' });
-  }
-};
-
-exports.getHorasPorEmpleado = async (req, res) => {
-  const { empleadoId, fechaInicio, fechaFin } = req.params;
-
-  try {
-    const fechaInicioMomento = moment(fechaInicio, 'YYYY-MM-DD').startOf('day');
-    const fechaFinMomento = moment(fechaFin, 'YYYY-MM-DD').endOf('day');
-    const jornales = await Jornales.findAll({
+    const datos = await Jornales.findAll({
       where: {
-        empleadoId,
-        fecha: { [Op.between]: [fechaInicioMomento.toDate(), fechaFinMomento.toDate()] },
+        empleadoId: empleadoId,
+        fecha: { [Op.and]: [{ [Op.gte]: new Date(fechaInicio) }, { [Op.lte]: new Date(fechaFin) }] },
       },
+      attributes: [
+        'empleadoId',
+        [db.fn('COUNT', db.col('id')), 'registros'],
+        [db.fn('SUM', db.literal(`CASE WHEN tipo = 'trabajo' THEN 1 ELSE 0 END`)), 'diasTrabajo'],
+        [db.fn('SUM', db.literal(`CASE WHEN tipo = 'licencia' THEN 1 ELSE 0 END`)), 'diasLicencia'],
+        [db.fn('SUM', db.literal(`CASE WHEN tipo = 'enfermedad' THEN 1 ELSE 0 END`)), 'diasEnfermedad'],
+        [db.fn('SUM', db.literal(`CASE WHEN tipo = 'falta' THEN 1 ELSE 0 END`)), 'diasFalta'],
+        [db.fn('SUM', db.literal(`CASE WHEN tipo = 'trabajo' THEN EXTRACT(EPOCH FROM (salida - entrada)) / 3600 ELSE 0 END`)), 'horasTrabajadas'],
+        [db.fn('SUM', db.col('horasExtra')), 'horasExtra'],
+      ],
+
+      group: ['empleadoId'],
+      raw: true,
     });
-
-    if (!jornales || jornales.length === 0) return res.status(404).json({ error: 'No se encontraron jornales para el período especificado' });
-
-    const { horasTrabajadas, horasExtras } = calcularHoras(jornales);
-    res.status(200).json({ horasTrabajadas, horasExtras });
+    res.status(200).json({ datos, jornales });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al obtener las horas trabajadas' });
+    res.status(500).json({ error: 'Error al obtener los jornales', error });
   }
 };
 
@@ -150,28 +160,32 @@ exports.getAllJornalesPorPeriodo = async (req, res) => {
   const { fechaInicio, fechaFin } = req.params;
 
   try {
-    const fechaInicioMomento = moment(fechaInicio, 'YYYY-MM-DD').startOf('day');
-    const fechaFinMomento = moment(fechaFin, 'YYYY-MM-DD').endOf('day');
     const jornales = await Jornales.findAll({
       where: {
-        fecha: { [Op.between]: [fechaInicioMomento.toDate(), fechaFinMomento.toDate()] },
+        fecha: { [Op.and]: [{ [Op.gte]: new Date(fechaInicio) }, { [Op.lte]: new Date(fechaFin) }] },
       },
     });
+    if (!jornales || jornales.length === 0) return res.status(404).json({ error: 'No hay jornales' });
 
-    if (!jornales || jornales.length === 0) return res.status(404).json({ error: 'No se encontraron jornales para el período especificado' });
+    const datos = await Jornales.findAll({
+      where: {
+        fecha: { [Op.and]: [{ [Op.gte]: new Date(fechaInicio) }, { [Op.lte]: new Date(fechaFin) }] },
+      },
+      attributes: [
+        'empleadoId',
+        [db.fn('COUNT', db.col('id')), 'registros'],
+        [db.fn('SUM', db.literal(`CASE WHEN tipo = 'trabajo' THEN 1 ELSE 0 END`)), 'diasTrabajo'],
+        [db.fn('SUM', db.literal(`CASE WHEN tipo = 'licencia' THEN 1 ELSE 0 END`)), 'diasLicencia'],
+        [db.fn('SUM', db.literal(`CASE WHEN tipo = 'enfermedad' THEN 1 ELSE 0 END`)), 'diasEnfermedad'],
+        [db.fn('SUM', db.literal(`CASE WHEN tipo = 'falta' THEN 1 ELSE 0 END`)), 'diasFalta'],
+        [db.fn('SUM', db.literal(`CASE WHEN tipo = 'trabajo' THEN EXTRACT(EPOCH FROM (salida - entrada)) / 3600 ELSE 0 END`)), 'horasTrabajadas'],
+        [db.fn('SUM', db.col('horasExtra')), 'horasExtra'],
+      ],
 
-    // Agrupar los jornales por empleadoId en el formato {empleadoId: 1, jornales: []}
-    const jornalesPorEmpleado = jornales.reduce((acc, jornal) => {
-      const empleadoIndex = acc.findIndex((item) => item.empleadoId === jornal.empleadoId);
-      if (empleadoIndex === -1) {
-        acc.push({ empleadoId: jornal.empleadoId, jornales: [jornal] });
-      } else {
-        acc[empleadoIndex].jornales.push(jornal);
-      }
-      return acc;
-    }, []);
-
-    res.status(200).json(jornalesPorEmpleado);
+      group: ['empleadoId'],
+      raw: true,
+    });
+    res.status(200).json({ datos, jornales });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al obtener los jornales' });

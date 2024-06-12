@@ -198,18 +198,19 @@ exports.precargarDatos = async () => {
     ]);
 
     await Jornales.bulkCreate([
-      { creadoPor: 1, empleadoId: 1, fecha: moment('2024-06-01').toDate(), entrada: '08:00:00', salida: '17:00:00', horasExtra: 1 },
-      { creadoPor: 1, empleadoId: 1, fecha: moment('2024-06-02').toDate(), entrada: '08:00:00', salida: '17:30:00', horasExtra: 1.5 },
-      { creadoPor: 1, empleadoId: 2, fecha: moment('2024-06-01').toDate(), entrada: '09:00:00', salida: '18:00:00', horasExtra: 1 },
-      { creadoPor: 1, empleadoId: 2, fecha: moment('2024-06-02').toDate(), entrada: '09:00:00', salida: '17:00:00', horasExtra: 0 },
-      { creadoPor: 1, empleadoId: 3, fecha: moment('2024-06-01').toDate(), entrada: '07:00:00', salida: '16:00:00', horasExtra: 1 },
-      { creadoPor: 1, empleadoId: 3, fecha: moment('2024-06-02').toDate(), entrada: '07:30:00', salida: '17:00:00', horasExtra: 1.5 },
-      { creadoPor: 1, empleadoId: 4, fecha: moment('2024-06-01').toDate(), entrada: '10:00:00', salida: '19:00:00', horasExtra: 1 },
-      { creadoPor: 1, empleadoId: 4, fecha: moment('2024-06-02').toDate(), entrada: '10:30:00', salida: '19:30:00', horasExtra: 1 },
-      { creadoPor: 1, empleadoId: 5, fecha: moment('2024-06-03').toDate(), entrada: '08:00:00', salida: '17:00:00', horasExtra: 1 },
-      { creadoPor: 1, empleadoId: 5, fecha: moment('2024-06-04').toDate(), entrada: '09:00:00', salida: '18:00:00', horasExtra: 1 },
-      { creadoPor: 1, empleadoId: 6, fecha: moment('2024-06-03').toDate(), entrada: '08:00:00', salida: '17:00:00', horasExtra: 1 },
-      { creadoPor: 1, empleadoId: 6, fecha: moment('2024-06-04').toDate(), entrada: '09:00:00', salida: '18:00:00', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 1, fecha: moment('2024-06-01').toDate(), entrada: '08:00:00', salida: '17:00:00', tipo: 'trabajo', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 1, fecha: moment('2024-06-02').toDate(), entrada: '08:00:00', salida: '17:30:00', tipo: 'trabajo', horasExtra: 1.5 },
+      { creadoPor: 1, empleadoId: 2, fecha: moment('2024-06-01').toDate(), entrada: '09:00:00', salida: '18:00:00', tipo: 'trabajo', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 2, fecha: moment('2024-06-02').toDate(), entrada: '09:00:00', salida: '17:00:00', tipo: 'trabajo', horasExtra: 0 },
+      { creadoPor: 1, empleadoId: 3, fecha: moment('2024-06-01').toDate(), entrada: '07:00:00', salida: '16:00:00', tipo: 'trabajo', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 3, fecha: moment('2024-06-02').toDate(), entrada: '07:30:00', salida: '17:00:00', tipo: 'trabajo', horasExtra: 1.5 },
+      { creadoPor: 1, empleadoId: 4, fecha: moment('2024-06-01').toDate(), entrada: '10:00:00', salida: '19:00:00', tipo: 'trabajo', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 4, fecha: moment('2024-06-02').toDate(), entrada: '10:30:00', salida: '19:30:00', tipo: 'trabajo', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 5, fecha: moment('2024-06-03').toDate(), entrada: '08:00:00', salida: '17:00:00', tipo: 'trabajo', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 5, fecha: moment('2024-06-04').toDate(), entrada: '09:00:00', salida: '18:00:00', tipo: 'trabajo', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 6, fecha: moment('2024-06-03').toDate(), entrada: '08:00:00', salida: '17:00:00', tipo: 'trabajo', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 6, fecha: moment('2024-06-04').toDate(), entrada: '09:00:00', salida: '18:00:00', tipo: 'trabajo', horasExtra: 1 },
+      { creadoPor: 1, empleadoId: 6, fecha: moment('2024-06-04').toDate(), tipo: 'licencia' },
     ]);
 
     console.log('Datos precargados con éxito.');

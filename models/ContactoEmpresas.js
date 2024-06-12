@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const db = require('../config/db');
 const ClienteEmpresas = require('./ClienteEmpresas');
+const Ubicaciones = require('./Ubicaciones');
 
 const ContactoEmpresas = db.define('ContactoEmpresas', {
   id: {
@@ -28,6 +29,14 @@ const ContactoEmpresas = db.define('ContactoEmpresas', {
     allowNull: false,
     references: {
       model: ClienteEmpresas,
+      key: 'id',
+    },
+  },
+  UbicacionDesignada: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: Ubicaciones,
       key: 'id',
     },
   },
