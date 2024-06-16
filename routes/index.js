@@ -8,9 +8,13 @@ const { validarId, validarFechaParams, verificarToken } = require('../middleware
 const usuarioController = require('../controllers/usuarioController');
 const camionController = require('../controllers/camionController');
 const empleadoController = require('../controllers/empleadoController');
+const telefonoController = require('../controllers/telefonoController');
 const historicoController = require('../controllers/historicoController');
 const servicioController = require('../controllers/servicioController');
 const jornalController = require('../controllers/jornalController');
+const clienteEmpresaController = require('../controllers/clienteEmpresaController');
+const contactoEmpresaController = require('../controllers/contactoEmpresaController');
+const ubicacionesController = require('../controllers/ubicacionesController');
 
 module.exports = function () {
   //healthcheck
@@ -43,6 +47,12 @@ module.exports = function () {
   router.put('/empleados/:empleadoId', verificarToken(), validarId('empleadoId'), empleadoController.modificarEmpleado);
   router.delete('/empleados/:empleadoId', verificarToken(true), validarId('empleadoId'), empleadoController.eliminarEmpleado);
 
+  //Telefonos:
+  router.post('/telefonos', verificarToken(), telefonoController.nuevoTelefono);
+  router.get('/telefonos/:telefonoId', verificarToken(), validarId('telefonoId'), telefonoController.getTelefono);
+  router.get('/telefonos', verificarToken(), telefonoController.getAllTelefonos);
+  router.put('/telefonos/:telefonoId', verificarToken(), validarId('telefonoId'), telefonoController.updateTelefono);
+
   //Historico uso camion
   router.post('/historico-camion', verificarToken(), historicoController.registrarUsoCamion);
   router.get('/historico-camion/asignacion', verificarToken(), historicoController.obtenerAsignacionesActuales);
@@ -62,6 +72,24 @@ module.exports = function () {
   //router.get('/jornales/horas/:empleadoId/:fechaInicio/:fechaFin', verificarToken(), validarFechaParams, jornalController.getHorasPorEmpleado);
   router.get('/jornales/todos/:fechaInicio/:fechaFin', verificarToken(), validarFechaParams, jornalController.getAllJornalesPorPeriodo);
   router.get('/jornales/:empleadoId/:fechaInicio/:fechaFin', verificarToken(), validarFechaParams, jornalController.getJornalesPorEmpleado);
+
+  // ClienteEmpresas
+  router.get('/cliente-empresas', clienteEmpresaController.getAllClienteEmpresas);
+  router.get('/cliente-empresas/:id', clienteEmpresaController.getClienteEmpresa);
+  router.post('/cliente-empresas', clienteEmpresaController.createClienteEmpresa);
+  router.put('/cliente-empresas/:id', clienteEmpresaController.updateClienteEmpresa);
+
+  // ContactoEmpresas
+  router.get('/contacto-empresas', contactoEmpresaController.getAllContactoEmpresas);
+  router.get('/contacto-empresas/:id', contactoEmpresaController.getContactoEmpresa);
+  router.post('/contacto-empresas', contactoEmpresaController.createContactoEmpresa);
+  router.put('/contacto-empresas/:id', contactoEmpresaController.updateContactoEmpresa);
+
+  // Ubicaciones
+  router.get('/ubicaciones', ubicacionesController.getAllUbicaciones);
+  router.get('/ubicaciones/:id', ubicacionesController.getUbicacion);
+  router.post('/ubicaciones', ubicacionesController.createUbicacion);
+  router.put('/ubicaciones/:id', ubicacionesController.updateUbicacion);
 
   return router;
 };

@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const moment = require('moment');
 const { randomUUID, getRandomValues } = require('crypto');
 const { getRandomInt, getRandomName, getRandomEmail, getRandomPhone } = require('./utilsPrecarga');
-const { ContactoEmpresas, ClienteEmpresas, Jornales, Servicios, Camiones, Empleados, Telefonos, Usuarios, HistoricoUsoCamion, TelefonoPropietarios } = require('../models');
+const { ClienteParticulares, ContactoEmpresas, ClienteEmpresas, Jornales, Servicios, Camiones, Empleados, Telefonos, Usuarios, HistoricoUsoCamion, TelefonoPropietarios } = require('../models');
 
 exports.precargarDatos = async () => {
   try {
@@ -15,14 +15,14 @@ exports.precargarDatos = async () => {
     const existingHistorico = await HistoricoUsoCamion.count();
     const existingServicios = await Servicios.count();
     const existingJornales = await Jornales.count();
-    const existingTelefonosProp = await TelefonoPropietarios.count();
     const existingClienteEmpresas = await ClienteEmpresas.count();
+    const existingClienteParticulares = await ClienteParticulares.count();
     const existingContactoEmpresas = await ContactoEmpresas.count();
 
     if (
       existingClienteEmpresas > 0 ||
+      existingClienteParticulares > 0 ||
       existingContactoEmpresas > 0 ||
-      existingTelefonosProp > 0 ||
       existingEmpleados > 0 ||
       existingCamiones > 0 ||
       existingUsuarios > 0 ||
@@ -41,7 +41,7 @@ exports.precargarDatos = async () => {
       { nombre: 'Ana Gomez', cedula: getRandomInt(10000000, 60000000) + '', rol: 'normal', fechaEntrada: moment('2024-06-03').toDate() },
       { nombre: 'Juan Pedro', cedula: getRandomInt(10000000, 60000000) + '', rol: 'chofer', fechaEntrada: moment('2024-06-04').toDate() },
       { nombre: 'Roberto Gonzalez', cedula: getRandomInt(10000000, 60000000) + '', rol: 'chofer', fechaEntrada: moment('2024-06-05').toDate() },
-      { nombre: 'Jose Varela', cedula: getRandomInt(10000000, 60000000) + '', rol: 'chofer', fechaEntrada: moment('2024-06-01').toDate() },
+      { nombre: 'Jose Rios', cedula: getRandomInt(10000000, 60000000) + '', rol: 'chofer', fechaEntrada: moment('2024-06-01').toDate() },
       { nombre: 'Pedro Varela', cedula: getRandomInt(10000000, 60000000) + '', rol: 'chofer', fechaEntrada: moment('2024-06-03').toDate() },
     ]);
 
@@ -59,7 +59,7 @@ exports.precargarDatos = async () => {
       { empleadoId: 2, email: 'ana@example.com', password: await bcrypt.hash('1', 10), rol: 'normal' },
     ]);
 
-    const empresas = [
+    await ClienteEmpresas.bulkCreate([
       {
         rut: '123456789012',
         nombre: 'Empresa A',
@@ -110,16 +110,9 @@ exports.precargarDatos = async () => {
         nombre: 'Empresa J',
         descripcion: 'Descripción de Empresa J',
       },
-    ];
-
-    await ClienteEmpresas.bulkCreate(
-      empresas.map((empresa) => ({
-        ...empresa,
-      }))
-    );
+    ]);
 
     const personasEmpresas = [];
-
     for (let i = 0; i < 10; i++) {
       const nombre = getRandomName();
       const email = `${nombre}@empresa.com`;
@@ -134,36 +127,39 @@ exports.precargarDatos = async () => {
 
     await ContactoEmpresas.bulkCreate(personasEmpresas);
 
-    const telefonos = [];
-
-    for (let i = 0; i < 15; i++) {
-      let telefono;
-      let tipo;
-      if (i < 7) {
-        tipo = 'celular';
-      } else {
-        tipo = 'telefono';
-      }
-      telefono = getRandomPhone(tipo);
-
-      telefonos.push({
-        telefono,
-        tipo,
-        extension: getRandomInt(100, 9000) + '',
+    const clienteParticulares = [];
+    for (let i = 0; i < 10; i++) {
+      const nombre = getRandomName();
+      const email = `${nombre}@particular.com`;
+      clienteParticulares.push({
+        nombre,
+        cedula: getRandomInt(10000000, 60000000) + '',
+        descripcion: `Descripción de ${nombre}`,
+        email,
       });
     }
 
-    await Telefonos.bulkCreate(telefonos);
+    await ClienteParticulares.bulkCreate(clienteParticulares);
 
-    await TelefonoPropietarios.bulkCreate([
-      { propietarioId: 1, propietarioTipo: 'empleados', telefonoId: 1 },
-      { propietarioId: 2, propietarioTipo: 'contactoEmpresas', telefonoId: 2 },
-      { propietarioId: 3, propietarioTipo: 'empleados', telefonoId: 3 },
-      { propietarioId: 4, propietarioTipo: 'contactoEmpresas', telefonoId: 4 },
-      { propietarioId: 5, propietarioTipo: 'empleados', telefonoId: 5 },
-      { propietarioId: 6, propietarioTipo: 'contactoEmpresas', telefonoId: 6 },
-      { propietarioId: 6, propietarioTipo: 'contactoEmpresas', telefonoId: 7 },
-      { propietarioId: 5, propietarioTipo: 'empleados', telefonoId: 8 },
+    await Telefonos.bulkCreate([
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
     ]);
 
     await HistoricoUsoCamion.bulkCreate([

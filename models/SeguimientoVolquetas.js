@@ -7,12 +7,12 @@ const SeguimientoVolquetas = db.define('SeguimientoVolquetas', {
     autoIncrement: true,
     primaryKey: true,
   },
-  volquetaId: {
+  numeroVolqueta: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
       model: 'Volquetas',
-      key: 'id',
+      key: 'numero',
     },
   },
   ubicacionId: {
@@ -23,7 +23,7 @@ const SeguimientoVolquetas = db.define('SeguimientoVolquetas', {
       key: 'id',
     },
   },
-  otros: DataTypes.STRING,
+  otros: DataTypes.STRING, //guardaria el titulo del pedido / si esta arreglandose / si esta perdida / etc
   fecha: {
     type: DataTypes.DATEONLY,
     allowNull: false,

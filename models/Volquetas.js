@@ -2,15 +2,10 @@ const { DataTypes } = require('sequelize');
 const db = require('../config/db');
 
 const Volquetas = db.define('Volquetas', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
   numero: {
+    //numero es la PK
     type: DataTypes.INTEGER,
-    allowNull: false,
-    unique: true,
+    primaryKey: true,
   },
   estado: {
     type: DataTypes.STRING,

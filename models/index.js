@@ -6,7 +6,6 @@ const Camiones = require('./Camiones');
 const Servicios = require('./Servicios');
 const HistoricoUsoCamion = require('./HistoricoUsoCamion');
 const Jornales = require('./Jornales');
-const TelefonoPropietarios = require('./TelefonoPropietarios');
 const ClienteEmpresas = require('./ClienteEmpresas');
 const ContactoEmpresas = require('./ContactoEmpresas');
 const ClienteParticulares = require('./ClienteParticulares');
@@ -15,6 +14,7 @@ const Permisos = require('./Permisos');
 const Volquetas = require('./Volquetas');
 const SeguimientoVolquetas = require('./SeguimientoVolquetas');
 const Cajas = require('./Cajas');
+const Pedidos = require('./Pedidos');
 
 // --------- RELACIONES ---------
 
@@ -69,23 +69,17 @@ Permisos.belongsTo(Ubicaciones, { foreignKey: 'ubicacionId' });
 Ubicaciones.hasMany(Permisos, { foreignKey: 'ubicacionId' });
 
 //------------------TELEFONOS------------------//
-//Telefonos tienen un telefonoPropietario pero telefonoPropietario puede tener muchos telefonos:
-TelefonoPropietarios.belongsTo(Telefonos, { foreignKey: 'telefonoId' });
-Telefonos.hasOne(TelefonoPropietarios, { foreignKey: 'telefonoId' });
-
-TelefonoPropietarios.belongsTo(ContactoEmpresas, { foreignKey: 'propietarioId', constraints: false, scope: { propietarioTipo: 'contactoEmpresas' } });
-ContactoEmpresas.hasMany(TelefonoPropietarios, { foreignKey: 'propietarioId', constraints: false, scope: { propietarioTipo: 'contactoEmpresas' } });
-
-TelefonoPropietarios.belongsTo(Empleados, { foreignKey: 'propietarioId', constraints: false, scope: { propietarioTipo: 'empleados' } });
-Empleados.hasMany(TelefonoPropietarios, { foreignKey: 'propietarioId', constraints: false, scope: { propietarioTipo: 'empleados' } });
-
-TelefonoPropietarios.belongsTo(ClienteParticulares, { foreignKey: 'propietarioId', constraints: false, scope: { propietarioTipo: 'clienteParticulares' } });
-ClienteParticulares.hasMany(TelefonoPropietarios, { foreignKey: 'propietarioId', constraints: false, scope: { propietarioTipo: 'clienteParticulares' } });
+Telefonos.belongsTo(Empleados, { foreignKey: 'empleadoId', as: 'empleado' });
+Empleados.hasMany(Telefonos, { foreignKey: 'empleadoId' });
+Telefonos.belongsTo(ClienteParticulares, { foreignKey: 'clienteParticularId', as: 'clienteParticular' });
+ClienteParticulares.hasMany(Telefonos, { foreignKey: 'clienteParticularId' });
+Telefonos.belongsTo(ContactoEmpresas, { foreignKey: 'contactoEmpresaId', as: 'contactoEmpresa' });
+ContactoEmpresas.hasMany(Telefonos, { foreignKey: 'contactoEmpresaId' });
 
 //------------------VOLQUETAS------------------//
 // Relación Volquetas - SeguimientoVolquetas
-Volquetas.hasMany(SeguimientoVolquetas, { foreignKey: 'volquetaId' });
-SeguimientoVolquetas.belongsTo(Volquetas, { foreignKey: 'volquetaId' });
+Volquetas.hasMany(SeguimientoVolquetas, { foreignKey: 'numeroVolqueta' });
+SeguimientoVolquetas.belongsTo(Volquetas, { foreignKey: 'numeroVolqueta' });
 
 // Relación Ubicaciones - SeguimientoVolquetas
 Ubicaciones.hasMany(SeguimientoVolquetas, { foreignKey: 'ubicacionId' });
@@ -108,6 +102,17 @@ Cajas.belongsTo(ClienteEmpresas, { foreignKey: 'clienteEmpresaId' });
 Ubicaciones.hasMany(Cajas, { foreignKey: 'ubicacionDelCliente' });
 Cajas.belongsTo(Ubicaciones, { foreignKey: 'ubicacionDelCliente' });
 
+//------------------PEDIDOS------------------//
+Pedidos.belongsTo(Usuarios, { foreignKey: 'usuarioId', as: 'creador' });
+Pedidos.belongsTo(ClienteParticulares, { foreignKey: 'clienteParticularId', as: 'clienteParticular' });
+Pedidos.belongsTo(ClienteEmpresas, { foreignKey: 'clienteEmpresaId', as: 'clienteEmpresa' });
+Pedidos.belongsTo(Ubicaciones, { foreignKey: 'ubicacionId', as: 'ubicacion' });
+Pedidos.belongsTo(Empleados, { foreignKey: 'choferEntregaId', as: 'choferEntrega' });
+Pedidos.belongsTo(Empleados, { foreignKey: 'choferLevanteId', as: 'choferLevante' });
+Pedidos.belongsTo(Permisos, { foreignKey: 'permisoId', as: 'permiso' });
+Pedidos.belongsTo(Volquetas, { foreignKey: 'volquetaId', as: 'volqueta' });
+Pedidos.belongsTo(Pedidos, { foreignKey: 'referenciaId', as: 'referencia' });
+
 module.exports = {
   db,
   Empleados,
@@ -117,7 +122,6 @@ module.exports = {
   HistoricoUsoCamion,
   Servicios,
   Jornales,
-  TelefonoPropietarios,
   ContactoEmpresas,
   ClienteEmpresas,
   ClienteParticulares,
@@ -126,4 +130,5 @@ module.exports = {
   Volquetas,
   SeguimientoVolquetas,
   Cajas,
+  Pedidos,
 };

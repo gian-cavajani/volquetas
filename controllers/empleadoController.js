@@ -13,7 +13,7 @@ exports.nuevoEmpleado = async (req, res) => {
     if (!fechaEntrada || isNaN(Date.parse(fechaEntrada))) {
       return res.status(400).json({ error: 'La fecha de entrada es obligatoria y debe ser válida' });
     }
-    if (fechaSalida && isNaN(Date.parse(fechaEntrada))) {
+    if (fechaSalida && isNaN(Date.parse(fechaSalida))) {
       return res.status(400).json({ error: 'La fecha de salida debe ser válida' });
     }
 
@@ -45,15 +45,9 @@ exports.getEmpleados = async (req, res) => {
     const empleados = await Empleados.findAll({
       include: [
         {
-          model: TelefonoPropietarios,
+          model: Telefonos,
           required: false,
-          attributes: ['telefonoId'],
-          include: [
-            {
-              model: Telefonos,
-              attributes: ['telefono', 'tipo', 'extension'],
-            },
-          ],
+          attributes: ['id', 'tipo', 'telefono', 'extension'],
         },
       ],
     });
@@ -61,7 +55,7 @@ exports.getEmpleados = async (req, res) => {
     res.status(200).json(empleados);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al obtener los empleados' });
+    res.status(500).json({ error: 'Error al obtener los empleados', detalle: error });
   }
 };
 
@@ -69,21 +63,19 @@ exports.getEmpleado = async (req, res) => {
   try {
     const empleado = await Empleados.findByPk(req.params.empleadoId, {
       include: {
-        model: TelefonoPropietarios,
+        model: Telefonos,
         required: false,
-        attributes: ['telefonoId'],
-        include: {
-          model: Telefonos,
-          attributes: ['telefono', 'tipo', 'extension'],
-        },
+        attributes: ['id', 'tipo', 'telefono', 'extension'],
       },
     });
+    console.log(empleado.hasAn);
 
     if (!empleado) return res.status(404).json({ error: 'Empleado no encontrado' });
+
     res.status(200).json(empleado);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al obtener el empleado' });
+    res.status(500).json({ error: 'Error al obtener el empleado', detalle: error });
   }
 };
 
@@ -113,23 +105,29 @@ exports.eliminarEmpleado = async (req, res) => {
     res.status(200).json({ detalle: 'Empleado eliminado exitosamente' });
   } catch (error) {
     console.error('Error al eliminar empleado:', error);
-    res.status(500).json({ error: 'Error al eliminar empleado' });
+    res.status(500).json({ error: 'Error al eliminar empleado', detalle: error });
   }
 };
 
 exports.cambiarEstadoEmpleado = async (req, res) => {
   //usuario admin habilita/deshabilita a empleados
   const { empleadoId } = req.params;
+  const { fechaSalida } = req.body;
 
-  if (!empleadoId) {
-    return res.status(400).json({ error: 'id es obligatorio' });
-  }
+  if (!empleadoId) return res.status(400).json({ error: 'id es obligatorio' });
 
   try {
     const empleado = await Empleados.findOne({ where: { id: empleadoId } });
     if (!empleado) return res.status(400).json({ error: 'Empleado no existe' });
 
     const { habilitado } = empleado;
+
+    if (habilitado) {
+      if (isNaN(Date.parse(fechaSalida))) return res.status(400).json({ error: 'Fecha incorrecta' });
+      empleado.fechaSalida = fechaSalida;
+    } else {
+      empleado.fechaSalida = null;
+    }
 
     empleado.habilitado = !habilitado;
     empleado.save();
@@ -139,7 +137,7 @@ exports.cambiarEstadoEmpleado = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al habilitar/deshabilitar al empleado' });
+    res.status(500).json({ error: 'Error al habilitar/deshabilitar al empleado', detalle: error });
   }
 };
 
@@ -188,6 +186,6 @@ exports.modificarEmpleado = async (req, res) => {
     res.status(200).json(nuevoEmpleado);
   } catch (error) {
     console.error('Error al modificar el empleado:', error);
-    res.status(500).json({ error: 'Error al modificar el empleado' });
+    res.status(500).json({ error: 'Error al modificar el empleado', detalle: error });
   }
 };
