@@ -39,21 +39,21 @@ Empleados.hasMany(Jornales, { foreignKey: 'empleadoId' });
 Jornales.belongsTo(Empleados, { foreignKey: 'empleadoId' });
 
 //ClienteEmpresas - ContactoEmpresas 1aN -->
-ContactoEmpresas.belongsTo(ClienteEmpresas, { foreignKey: 'clienteEmpresaId' });
-ClienteEmpresas.hasMany(ContactoEmpresas, { foreignKey: 'clienteEmpresaId' });
+ContactoEmpresas.belongsTo(ClienteEmpresas, { foreignKey: 'clienteEmpresaId', as: 'clienteEmpresa' });
+ClienteEmpresas.hasMany(ContactoEmpresas, { foreignKey: 'clienteEmpresaId', as: 'contactos' });
 
 //------------------UBICACIONES------------------//
 //ClienteEmpresas - Ubicaciones 1aN --> Ubicaciones tiene clienteEmpresaId
-Ubicaciones.belongsTo(ClienteEmpresas, { foreignKey: 'clienteEmpresaId' });
-ClienteEmpresas.hasMany(Ubicaciones, { foreignKey: 'clienteEmpresaId' });
+Ubicaciones.belongsTo(ClienteEmpresas, { foreignKey: 'clienteEmpresaId', as: 'clienteEmpresa' });
+ClienteEmpresas.hasMany(Ubicaciones, { foreignKey: 'clienteEmpresaId', as: 'ubicaciones' });
 
 //ClienteParticulares - Ubicaciones 1aN --> Ubicaciones tiene clienteParticularId
-Ubicaciones.belongsTo(ClienteParticulares, { foreignKey: 'clienteParticularId' });
-ClienteParticulares.hasMany(Ubicaciones, { foreignKey: 'clienteParticularId' });
+Ubicaciones.belongsTo(ClienteParticulares, { foreignKey: 'clienteParticularId', as: 'clienteParticular' });
+ClienteParticulares.hasMany(Ubicaciones, { foreignKey: 'clienteParticularId', as: 'ubicaciones' });
 
-//Ubicaciones - ContactoEmpresas 1aN --> ContactoEmpresa tiene UbicacionDesignada
-ContactoEmpresas.belongsTo(Ubicaciones, { foreignKey: 'UbicacionDesignada' });
-Ubicaciones.hasMany(ContactoEmpresas, { foreignKey: 'UbicacionDesignada' });
+//Ubicaciones - ContactoEmpresas 1aN --> ContactoEmpresa tiene ubicacionId
+ContactoEmpresas.belongsTo(Ubicaciones, { foreignKey: 'ubicacionId', as: 'ubicacion' });
+Ubicaciones.hasMany(ContactoEmpresas, { foreignKey: 'ubicacionId' });
 
 //------------------PERMISOS------------------//
 //ClienteEmpresas - Permisos 1aN --> Permisos tiene clienteEmpresaId

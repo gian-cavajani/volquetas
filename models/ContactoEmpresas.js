@@ -16,6 +16,7 @@ const ContactoEmpresas = db.define('ContactoEmpresas', {
   cedula: {
     type: DataTypes.STRING(8),
     unique: true,
+    allowNull: true,
   },
   descripcion: DataTypes.STRING,
   email: {
@@ -32,7 +33,7 @@ const ContactoEmpresas = db.define('ContactoEmpresas', {
       key: 'id',
     },
   },
-  UbicacionDesignada: {
+  ubicacionId: {
     type: DataTypes.INTEGER,
     allowNull: true,
     references: {

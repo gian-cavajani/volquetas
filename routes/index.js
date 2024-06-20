@@ -74,22 +74,26 @@ module.exports = function () {
   router.get('/jornales/:empleadoId/:fechaInicio/:fechaFin', verificarToken(), validarFechaParams, jornalController.getJornalesPorEmpleado);
 
   // ClienteEmpresas
-  router.get('/cliente-empresas', clienteEmpresaController.getAllClienteEmpresas);
-  router.get('/cliente-empresas/:id', clienteEmpresaController.getClienteEmpresa);
-  router.post('/cliente-empresas', clienteEmpresaController.createClienteEmpresa);
-  router.put('/cliente-empresas/:id', clienteEmpresaController.updateClienteEmpresa);
+  router.post('/cliente-empresas', verificarToken(), clienteEmpresaController.createClienteEmpresa);
+  router.get('/cliente-empresas', verificarToken(), clienteEmpresaController.getAllClienteEmpresas);
+  router.get('/cliente-empresas/:clienteEmpresaId', verificarToken(), validarId('clienteEmpresaId'), clienteEmpresaController.getClienteEmpresa);
+  router.put('/cliente-empresas/:clienteEmpresaId', verificarToken(), validarId('clienteEmpresaId'), clienteEmpresaController.updateClienteEmpresa);
+  router.delete('/cliente-empresas/:clienteEmpresaId', verificarToken(true), validarId('clienteEmpresaId'), clienteEmpresaController.deleteClienteEmpresa);
 
   // ContactoEmpresas
-  router.get('/contacto-empresas', contactoEmpresaController.getAllContactoEmpresas);
-  router.get('/contacto-empresas/:id', contactoEmpresaController.getContactoEmpresa);
-  router.post('/contacto-empresas', contactoEmpresaController.createContactoEmpresa);
-  router.put('/contacto-empresas/:id', contactoEmpresaController.updateContactoEmpresa);
+  router.post('/contacto-empresas', verificarToken(), contactoEmpresaController.createContactoEmpresa);
+  router.get('/contacto-empresas', verificarToken(), contactoEmpresaController.getAllContactoEmpresas);
+  router.get('/contacto-empresas/:contactoEmpresaId', verificarToken(), validarId('contactoEmpresaId'), contactoEmpresaController.getContactoEmpresa);
+  router.put('/contacto-empresas/:contactoEmpresaId', verificarToken(), validarId('contactoEmpresaId'), contactoEmpresaController.updateContactoEmpresa);
+  router.put('/contacto-empresas/asignar/:contactoEmpresaId', verificarToken(), validarId('contactoEmpresaId'), contactoEmpresaController.asignarUbicacion);
+  router.delete('/contacto-empresas/:contactoEmpresaId', verificarToken(true), validarId('contactoEmpresaId'), contactoEmpresaController.deleteContactoEmpresa);
 
   // Ubicaciones
-  router.get('/ubicaciones', ubicacionesController.getAllUbicaciones);
-  router.get('/ubicaciones/:id', ubicacionesController.getUbicacion);
-  router.post('/ubicaciones', ubicacionesController.createUbicacion);
-  router.put('/ubicaciones/:id', ubicacionesController.updateUbicacion);
+  router.post('/ubicaciones', verificarToken(), ubicacionesController.createUbicacion);
+  router.get('/ubicaciones', verificarToken(), ubicacionesController.getAllUbicaciones);
+  router.get('/ubicaciones/:ubicacionId', verificarToken(), validarId('ubicacionId'), ubicacionesController.getUbicacion);
+  router.put('/ubicaciones/:ubicacionId', verificarToken(), validarId('ubicacionId'), ubicacionesController.updateUbicacion);
+  router.delete('/ubicaciones/:ubicacionId', verificarToken(true), validarId('ubicacionId'), ubicacionesController.deleteUbicacion);
 
   return router;
 };

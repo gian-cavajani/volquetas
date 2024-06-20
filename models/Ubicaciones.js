@@ -32,6 +32,8 @@ const Ubicaciones = db.define('Ubicaciones', {
   residuosMezclados: DataTypes.BOOLEAN,
   residuosReciclados: DataTypes.BOOLEAN,
   frecuenciaSemanal: DataTypes.INTEGER,
+  destinoFinal: DataTypes.STRING,
+  dias: DataTypes.STRING,
   clienteParticularId: {
     type: DataTypes.INTEGER,
     allowNull: true,

@@ -68,7 +68,6 @@ exports.getEmpleado = async (req, res) => {
         attributes: ['id', 'tipo', 'telefono', 'extension'],
       },
     });
-    console.log(empleado.hasAn);
 
     if (!empleado) return res.status(404).json({ error: 'Empleado no encontrado' });
 

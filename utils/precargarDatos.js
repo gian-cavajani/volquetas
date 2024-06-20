@@ -2,13 +2,15 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
 const { randomUUID, getRandomValues } = require('crypto');
-const { getRandomInt, getRandomName, getRandomEmail, getRandomPhone } = require('./utilsPrecarga');
-const { ClienteParticulares, ContactoEmpresas, ClienteEmpresas, Jornales, Servicios, Camiones, Empleados, Telefonos, Usuarios, HistoricoUsoCamion, TelefonoPropietarios } = require('../models');
+const faker = require('faker');
+const { getRandomDetalleResiduos, getRandomDireccion, getRandomInt, getRandomName, getRandomEmail, getRandomPhone } = require('./utilsPrecarga');
+const { Ubicaciones, ClienteParticulares, ContactoEmpresas, ClienteEmpresas, Jornales, Servicios, Camiones, Empleados, Telefonos, Usuarios, HistoricoUsoCamion } = require('../models');
 
 exports.precargarDatos = async () => {
   try {
     // Verificar si hay datos existentes
     const existingEmpleados = await Empleados.count();
+    const existingUbicaciones = await Ubicaciones.count();
     const existingCamiones = await Camiones.count();
     const existingUsuarios = await Usuarios.count();
     const existingTelefonos = await Telefonos.count();
@@ -21,6 +23,7 @@ exports.precargarDatos = async () => {
 
     if (
       existingClienteEmpresas > 0 ||
+      existingUbicaciones > 0 ||
       existingClienteParticulares > 0 ||
       existingContactoEmpresas > 0 ||
       existingEmpleados > 0 ||
@@ -36,6 +39,7 @@ exports.precargarDatos = async () => {
     }
 
     // Precargar datos de ejemplo
+    // --------------------EMPLEADOS--------------------
     await Empleados.bulkCreate([
       { nombre: 'Carolina Garcia', cedula: getRandomInt(10000000, 60000000) + '', rol: 'admin', fechaEntrada: moment('2024-06-02').toDate() },
       { nombre: 'Ana Gomez', cedula: getRandomInt(10000000, 60000000) + '', rol: 'normal', fechaEntrada: moment('2024-06-03').toDate() },
@@ -45,6 +49,7 @@ exports.precargarDatos = async () => {
       { nombre: 'Pedro Varela', cedula: getRandomInt(10000000, 60000000) + '', rol: 'chofer', fechaEntrada: moment('2024-06-03').toDate() },
     ]);
 
+    // --------------------CAMIONES--------------------
     await Camiones.bulkCreate([
       { matricula: 'SBB-2310', modelo: 'Mercedes', anio: 2020, estado: 'roto' },
       { matricula: 'XYZ-789', modelo: 'Chevrolet', anio: 2019, estado: 'sano' },
@@ -54,11 +59,13 @@ exports.precargarDatos = async () => {
       { matricula: 'JKL-012', modelo: 'Iveco', anio: 2022, estado: 'sano' },
     ]);
 
+    // --------------------USUARIOS--------------------
     await Usuarios.bulkCreate([
       { empleadoId: 1, email: 'carola@example.com', password: await bcrypt.hash('1', 10), rol: 'admin', activo: true },
       { empleadoId: 2, email: 'ana@example.com', password: await bcrypt.hash('1', 10), rol: 'normal' },
     ]);
 
+    // --------------------CLIENTE EMPRESA--------------------
     await ClienteEmpresas.bulkCreate([
       {
         rut: '123456789012',
@@ -112,6 +119,51 @@ exports.precargarDatos = async () => {
       },
     ]);
 
+    // --------------------CLIENTE PARTICULAR--------------------
+    const clienteParticulares = [];
+    for (let i = 0; i < 10; i++) {
+      const nombre = getRandomName();
+      const email = `${nombre}@particular.com`.replaceAll(' ', '');
+      clienteParticulares.push({
+        nombre,
+        cedula: getRandomInt(10000000, 60000000) + '',
+        descripcion: `Descripción de ${nombre}`,
+        email,
+      });
+    }
+    await ClienteParticulares.bulkCreate(clienteParticulares);
+
+    // --------------------UBICACIONES--------------------
+    const ubicacionesData = [];
+    for (let i = 0; i < 10; i++) {
+      let clienteParticularId = null;
+      let clienteEmpresaId = null;
+      if (i > 5) {
+        clienteEmpresaId = getRandomInt(1, 10);
+      } else {
+        clienteParticularId = getRandomInt(1, 10);
+      }
+
+      ubicacionesData.push({
+        calle: getRandomDireccion('calle'),
+        esquina: getRandomDireccion('calle'),
+        barrio: getRandomDireccion('barrio'),
+        coordenadas: 'placeholder',
+        numeroPuerta: getRandomInt(1000, 9999).toString(),
+        descripcion: `descripcion falsa ${i}`,
+        detalleResiduos: getRandomDetalleResiduos(),
+        residuosMezclados: Math.random() < 0.5,
+        residuosReciclados: Math.random() < 0.5,
+        frecuenciaSemanal: getRandomInt(1, 7).toString(),
+        dias: 'A SOLICITUD',
+        destinoFinal: 'USINA 8',
+        clienteParticularId,
+        clienteEmpresaId,
+      });
+    }
+    await Ubicaciones.bulkCreate(ubicacionesData);
+
+    // --------------------CONTACTO EMPRESA--------------------
     const personasEmpresas = [];
     for (let i = 0; i < 10; i++) {
       const nombre = getRandomName();
@@ -124,23 +176,9 @@ exports.precargarDatos = async () => {
         clienteEmpresaId: getRandomInt(1, 10),
       });
     }
-
     await ContactoEmpresas.bulkCreate(personasEmpresas);
 
-    const clienteParticulares = [];
-    for (let i = 0; i < 10; i++) {
-      const nombre = getRandomName();
-      const email = `${nombre}@particular.com`;
-      clienteParticulares.push({
-        nombre,
-        cedula: getRandomInt(10000000, 60000000) + '',
-        descripcion: `Descripción de ${nombre}`,
-        email,
-      });
-    }
-
-    await ClienteParticulares.bulkCreate(clienteParticulares);
-
+    // --------------------TELEFONOS--------------------
     await Telefonos.bulkCreate([
       { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
       { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
@@ -162,6 +200,7 @@ exports.precargarDatos = async () => {
       { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
     ]);
 
+    // --------------------HISTORICO-USO-CAMION--------------------
     await HistoricoUsoCamion.bulkCreate([
       { empleadoId: 3, camionId: 1, fechaInicio: new Date('2024-06-01') },
       { empleadoId: 4, camionId: 1, fechaInicio: new Date('2024-08-16'), fechaFin: new Date('2024-08-30') },
@@ -177,6 +216,7 @@ exports.precargarDatos = async () => {
       { empleadoId: 5, camionId: 6, fechaInicio: new Date('2024-11-15') },
     ]);
 
+    // --------------------SERVICIOS-CAMION--------------------
     await Servicios.bulkCreate([
       { camionId: 1, fecha: new Date('2024-06-01'), tipo: 'arreglo', precio: 1200, descripcion: 'arreglo de pintura' },
       { camionId: 1, fecha: new Date('2020-02-01'), tipo: 'service', precio: 100, descripcion: 'pinchazo' },
@@ -193,6 +233,7 @@ exports.precargarDatos = async () => {
       { camionId: 6, fecha: new Date('2024-10-10'), tipo: 'arreglo', precio: 500, descripcion: 'arreglo de puertas' },
     ]);
 
+    // --------------------JORNALES--------------------
     await Jornales.bulkCreate([
       { creadoPor: 1, empleadoId: 1, fecha: moment('2024-06-01').toDate(), entrada: '08:00:00', salida: '17:00:00', tipo: 'trabajo', horasExtra: 1 },
       { creadoPor: 1, empleadoId: 1, fecha: moment('2024-06-02').toDate(), entrada: '08:00:00', salida: '17:30:00', tipo: 'trabajo', horasExtra: 1.5 },
