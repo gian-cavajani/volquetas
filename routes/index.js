@@ -63,6 +63,7 @@ module.exports = function () {
   router.post('/servicios', verificarToken(), servicioController.nuevoServicio);
   router.get('/servicios', verificarToken(), servicioController.getServicios);
   router.get('/servicios/:camionId', verificarToken(), validarId('camionId'), servicioController.getServicioPorCamion);
+  router.delete('/servicios/:servicioId', verificarToken(true), validarId('servicioId'), servicioController.deleteServicio);
 
   //Jornales
   router.post('/jornales', verificarToken(), jornalController.nuevoJornal);

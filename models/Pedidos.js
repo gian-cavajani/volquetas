@@ -71,10 +71,6 @@ const Pedidos = db.define('Pedidos', {
       key: 'id',
     },
   },
-  horarioCreacion: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-  },
   horarioSugerido: {
     type: DataTypes.DATE,
     allowNull: true,

@@ -2,7 +2,6 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
 const { randomUUID, getRandomValues } = require('crypto');
-const faker = require('faker');
 const { getRandomDetalleResiduos, getRandomDireccion, getRandomInt, getRandomName, getRandomEmail, getRandomPhone } = require('./utilsPrecarga');
 const { Ubicaciones, ClienteParticulares, ContactoEmpresas, ClienteEmpresas, Jornales, Servicios, Camiones, Empleados, Telefonos, Usuarios, HistoricoUsoCamion } = require('../models');
 

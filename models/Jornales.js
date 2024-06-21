@@ -42,6 +42,7 @@ const Jornales = db.define(
     },
   },
   {
+    timestamps: false,
     // Hooks de Sequelize para calcular horasExtra antes de guardar
     hooks: {
       beforeSave: (jornal, options) => {

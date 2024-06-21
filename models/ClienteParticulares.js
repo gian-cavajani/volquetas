@@ -27,6 +27,7 @@ const ClienteParticulares = db.define(
   },
   {
     initialAutoIncrement: 10000,
+    timestamps: false,
   }
 );
 

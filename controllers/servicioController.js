@@ -58,3 +58,19 @@ exports.getServicioPorCamion = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener los servicios' });
   }
 };
+
+exports.deleteServicio = async (req, res) => {
+  const { servicioId } = req.params;
+
+  try {
+    const servicio = await Servicios.findByPk(servicioId);
+
+    if (!servicio) return res.status(404).json({ error: 'El servicio con ese id no existe' });
+    await servicio.destroy();
+
+    res.status(200).json({ detalle: `El servicio fue eliminado correctamente` });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: 'Error al eliminar el servicio', detalle: error });
+  }
+};

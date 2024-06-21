@@ -25,6 +25,7 @@ const Cajas = db.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    moneda: DataTypes.ENUM('peso', 'dolar'),
     monto: {
       type: DataTypes.FLOAT,
       allowNull: false,
@@ -66,6 +67,7 @@ const Cajas = db.define(
     },
   },
   {
+    timestamps: false,
     indexes: [{ fields: ['fecha'] }, { fields: ['tipo'] }, { fields: ['empleadoId'] }, { fields: ['clienteParticularId'] }, { fields: ['clienteEmpresaId'] }],
   }
 );
@@ -78,6 +80,7 @@ module.exports = Cajas;
 //   motivo: 'Pago de servicios',
 //   tipo: 'gasto',
 //   descripcion: 'Pago de electricidad',
+//   moneda: 'peso',
 //   monto: 100.0,
 //   empleadoId: 1, // ID del empleado
 //   clienteParticularId: null,

@@ -36,7 +36,6 @@ const HistoricoUsoCamion = db.define(
   },
   {
     timestamps: false,
-    tableName: 'historicoUsoCamion',
   }
 );
 

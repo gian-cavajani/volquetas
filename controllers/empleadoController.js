@@ -200,12 +200,12 @@ exports.getEmpleadosActivosYSinUsuario = async (req, res) => {
       },
       include: {
         model: Usuarios,
-        required: false, // LEFT JOIN
-        attributes: ['id'], // No necesitamos los atributos de Usuarios
+        required: false,
+        attributes: ['id'],
       },
     });
 
-    const empleadosSinUsuario = empleados.filter((empleado) => !empleado.Usuario);
+    const empleadosSinUsuario = empleados.filter((empleado) => !empleado.Usuario).map((e) => ({ id: e.id, nombre: e.nombre }));
     res.status(200).json(empleadosSinUsuario);
   } catch (error) {
     console.log(error);
