@@ -1,4 +1,6 @@
-const { Empleados, Telefonos, Usuarios, TelefonoPropietarios } = require('../models');
+const { Empleados, Telefonos, Usuarios } = require('../models');
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 const validator = require('validator');
 
 exports.nuevoEmpleado = async (req, res) => {
@@ -186,5 +188,27 @@ exports.modificarEmpleado = async (req, res) => {
   } catch (error) {
     console.error('Error al modificar el empleado:', error);
     res.status(500).json({ error: 'Error al modificar el empleado', detalle: error });
+  }
+};
+
+exports.getEmpleadosActivosYSinUsuario = async (req, res) => {
+  try {
+    const empleados = await Empleados.findAll({
+      attributes: ['id', 'nombre'],
+      where: {
+        habilitado: true,
+      },
+      include: {
+        model: Usuarios,
+        required: false, // LEFT JOIN
+        attributes: ['id'], // No necesitamos los atributos de Usuarios
+      },
+    });
+
+    const empleadosSinUsuario = empleados.filter((empleado) => !empleado.Usuario);
+    res.status(200).json(empleadosSinUsuario);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Error al obtener empleados sin usuario y activos', detalle: error });
   }
 };

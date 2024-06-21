@@ -218,19 +218,19 @@ exports.precargarDatos = async () => {
 
     // --------------------SERVICIOS-CAMION--------------------
     await Servicios.bulkCreate([
-      { camionId: 1, fecha: new Date('2024-06-01'), tipo: 'arreglo', precio: 1200, descripcion: 'arreglo de pintura' },
-      { camionId: 1, fecha: new Date('2020-02-01'), tipo: 'service', precio: 100, descripcion: 'pinchazo' },
-      { camionId: 2, fecha: new Date('2010-02-01'), tipo: 'chequeo', precio: 0, descripcion: 'chequeo en general de todo' },
-      { camionId: 3, fecha: new Date('2024-07-01'), tipo: 'service', precio: 800, descripcion: 'cambio de aceite' },
-      { camionId: 4, fecha: new Date('2024-07-10'), tipo: 'arreglo', precio: 1500, descripcion: 'reparación de motor' },
-      { camionId: 5, fecha: new Date('2024-08-15'), tipo: 'service', precio: 200, descripcion: 'revisión de frenos' },
-      { camionId: 6, fecha: new Date('2024-09-01'), tipo: 'chequeo', precio: 0, descripcion: 'inspección general' },
-      { camionId: 1, fecha: new Date('2024-10-01'), tipo: 'arreglo', precio: 300, descripcion: 'reemplazo de neumáticos' },
-      { camionId: 2, fecha: new Date('2024-11-01'), tipo: 'service', precio: 250, descripcion: 'ajuste de suspensión' },
-      { camionId: 3, fecha: new Date('2024-12-01'), tipo: 'chequeo', precio: 700, descripcion: 'limpieza del sistema de combustible' },
-      { camionId: 4, fecha: new Date('2024-12-15'), tipo: 'pintura', precio: 1000, descripcion: 'pintura completa' },
-      { camionId: 5, fecha: new Date('2024-11-20'), tipo: 'pintura', precio: 1200, descripcion: 'pintura de cabina' },
-      { camionId: 6, fecha: new Date('2024-10-10'), tipo: 'arreglo', precio: 500, descripcion: 'arreglo de puertas' },
+      { camionId: 1, fecha: new Date('2024-06-01'), tipo: 'arreglo', precio: 1200, moneda: 'peso', descripcion: 'arreglo de pintura' },
+      { camionId: 1, fecha: new Date('2020-02-01'), tipo: 'service', precio: 100, moneda: 'peso', descripcion: 'pinchazo' },
+      { camionId: 2, fecha: new Date('2010-02-01'), tipo: 'chequeo', precio: 0, moneda: 'peso', descripcion: 'chequeo en general de todo' },
+      { camionId: 3, fecha: new Date('2024-07-01'), tipo: 'service', precio: 800, moneda: 'peso', descripcion: 'cambio de aceite' },
+      { camionId: 4, fecha: new Date('2024-07-10'), tipo: 'arreglo', precio: 1500, moneda: 'peso', descripcion: 'reparación de motor' },
+      { camionId: 5, fecha: new Date('2024-08-15'), tipo: 'service', precio: 200, moneda: 'peso', descripcion: 'revisión de frenos' },
+      { camionId: 6, fecha: new Date('2024-09-01'), tipo: 'chequeo', precio: 0, moneda: 'dolar', descripcion: 'inspección general' },
+      { camionId: 1, fecha: new Date('2024-10-01'), tipo: 'arreglo', precio: 300, moneda: 'dolar', descripcion: 'reemplazo de neumáticos' },
+      { camionId: 2, fecha: new Date('2024-11-01'), tipo: 'service', precio: 250, moneda: 'dolar', descripcion: 'ajuste de suspensión' },
+      { camionId: 3, fecha: new Date('2024-12-01'), tipo: 'chequeo', precio: 700, moneda: 'dolar', descripcion: 'limpieza del sistema de combustible' },
+      { camionId: 4, fecha: new Date('2024-12-15'), tipo: 'pintura', precio: 1000, moneda: 'dolar', descripcion: 'pintura completa' },
+      { camionId: 5, fecha: new Date('2024-11-20'), tipo: 'pintura', precio: 1200, moneda: 'dolar', descripcion: 'pintura de cabina' },
+      { camionId: 6, fecha: new Date('2024-10-10'), tipo: 'arreglo', precio: 500, moneda: 'dolar', descripcion: 'arreglo de puertas' },
     ]);
 
     // --------------------JORNALES--------------------

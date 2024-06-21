@@ -42,6 +42,7 @@ module.exports = function () {
   //Empleados
   router.post('/empleados', verificarToken(), empleadoController.nuevoEmpleado);
   router.get('/empleados', verificarToken(), empleadoController.getEmpleados);
+  router.get('/empleados/sin-usuario-activos', empleadoController.getEmpleadosActivosYSinUsuario);
   router.get('/empleados/:empleadoId', verificarToken(), validarId('empleadoId'), empleadoController.getEmpleado);
   router.patch('/empleados/:empleadoId/estado', verificarToken(true), validarId('empleadoId'), empleadoController.cambiarEstadoEmpleado);
   router.put('/empleados/:empleadoId', verificarToken(), validarId('empleadoId'), empleadoController.modificarEmpleado);
