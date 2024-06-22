@@ -6,15 +6,17 @@ const Camiones = require('./Camiones');
 const Servicios = require('./Servicios');
 const HistoricoUsoCamion = require('./HistoricoUsoCamion');
 const Jornales = require('./Jornales');
-const ClienteEmpresas = require('./ClienteEmpresas');
-const ContactoEmpresas = require('./ContactoEmpresas');
-const ClienteParticulares = require('./ClienteParticulares');
+const Empresas = require('./Empresas');
+// const ContactoEmpresas = require('./ContactoEmpresas');
+// const ClienteParticulares = require('./ClienteParticulares');
 const Ubicaciones = require('./Ubicaciones');
 const Permisos = require('./Permisos');
 const Volquetas = require('./Volquetas');
 const SeguimientoVolquetas = require('./SeguimientoVolquetas');
 const Cajas = require('./Cajas');
 const Pedidos = require('./Pedidos');
+const Clientes = require('./Clientes');
+const ClienteUbicaciones = require('./ClienteUbicaciones');
 
 // --------- RELACIONES ---------
 
@@ -38,32 +40,20 @@ Servicios.belongsTo(Camiones, { foreignKey: 'camionId' });
 Empleados.hasMany(Jornales, { foreignKey: 'empleadoId' });
 Jornales.belongsTo(Empleados, { foreignKey: 'empleadoId' });
 
-//ClienteEmpresas - ContactoEmpresas 1aN -->
-ContactoEmpresas.belongsTo(ClienteEmpresas, { foreignKey: 'clienteEmpresaId', as: 'clienteEmpresa' });
-ClienteEmpresas.hasMany(ContactoEmpresas, { foreignKey: 'clienteEmpresaId', as: 'contactos' });
+//Empresas - Clientes 1aN -->
+Clientes.belongsTo(Empresas, { foreignKey: 'empresaId', as: 'empresa' });
+Empresas.hasMany(Clientes, { foreignKey: 'empresaId', as: 'contactos' });
 
 //------------------UBICACIONES------------------//
-//ClienteEmpresas - Ubicaciones 1aN --> Ubicaciones tiene clienteEmpresaId
-Ubicaciones.belongsTo(ClienteEmpresas, { foreignKey: 'clienteEmpresaId', as: 'clienteEmpresa' });
-ClienteEmpresas.hasMany(Ubicaciones, { foreignKey: 'clienteEmpresaId', as: 'ubicaciones' });
+//Empresas - Ubicaciones 1aN --> Ubicaciones tiene empresaId
+Ubicaciones.belongsTo(Empresas, { foreignKey: 'empresaId', as: 'empresa' });
+Empresas.hasMany(Ubicaciones, { foreignKey: 'empresaId', as: 'ubicaciones' });
 
-//ClienteParticulares - Ubicaciones 1aN --> Ubicaciones tiene clienteParticularId
-Ubicaciones.belongsTo(ClienteParticulares, { foreignKey: 'clienteParticularId', as: 'clienteParticular' });
-ClienteParticulares.hasMany(Ubicaciones, { foreignKey: 'clienteParticularId', as: 'ubicaciones' });
-
-//Ubicaciones - ContactoEmpresas 1aN --> ContactoEmpresa tiene ubicacionId
-ContactoEmpresas.belongsTo(Ubicaciones, { foreignKey: 'ubicacionId', as: 'ubicacion' });
-Ubicaciones.hasMany(ContactoEmpresas, { foreignKey: 'ubicacionId' });
+// Relación de muchos a muchos
+Clientes.belongsToMany(Ubicaciones, { through: ClienteUbicaciones });
+Ubicaciones.belongsToMany(Clientes, { through: ClienteUbicaciones });
 
 //------------------PERMISOS------------------//
-//ClienteEmpresas - Permisos 1aN --> Permisos tiene clienteEmpresaId
-Permisos.belongsTo(ClienteEmpresas, { foreignKey: 'clienteEmpresaId' });
-ClienteEmpresas.hasMany(Permisos, { foreignKey: 'clienteEmpresaId' });
-
-//ClienteParticulares - Permisos 1aN --> Permisos tiene clienteParticularId
-Permisos.belongsTo(ClienteParticulares, { foreignKey: 'clienteParticularId' });
-ClienteParticulares.hasMany(Permisos, { foreignKey: 'clienteParticularId' });
-
 //Ubicaciones - Permisos 1aN --> Permisos tiene ubicacionId
 Permisos.belongsTo(Ubicaciones, { foreignKey: 'ubicacionId' });
 Ubicaciones.hasMany(Permisos, { foreignKey: 'ubicacionId' });
@@ -71,10 +61,8 @@ Ubicaciones.hasMany(Permisos, { foreignKey: 'ubicacionId' });
 //------------------TELEFONOS------------------//
 Telefonos.belongsTo(Empleados, { foreignKey: 'empleadoId', as: 'empleado' });
 Empleados.hasMany(Telefonos, { foreignKey: 'empleadoId' });
-Telefonos.belongsTo(ClienteParticulares, { foreignKey: 'clienteParticularId', as: 'clienteParticular' });
-ClienteParticulares.hasMany(Telefonos, { foreignKey: 'clienteParticularId' });
-Telefonos.belongsTo(ContactoEmpresas, { foreignKey: 'contactoEmpresaId', as: 'contactoEmpresa' });
-ContactoEmpresas.hasMany(Telefonos, { foreignKey: 'contactoEmpresaId' });
+Telefonos.belongsTo(Clientes, { foreignKey: 'clienteId', as: 'cliente' });
+Clientes.hasMany(Telefonos, { foreignKey: 'clienteId' });
 
 //------------------VOLQUETAS------------------//
 // Relación Volquetas - SeguimientoVolquetas
@@ -91,12 +79,12 @@ Empleados.hasMany(Cajas, { foreignKey: 'empleadoId' });
 Cajas.belongsTo(Empleados, { foreignKey: 'empleadoId' });
 
 // Relación ClienteParticular - Cajas
-ClienteParticulares.hasMany(Cajas, { foreignKey: 'clienteParticularId' });
-Cajas.belongsTo(ClienteParticulares, { foreignKey: 'clienteParticularId' });
+ClienteParticulares.hasMany(Cajas, { foreignKey: 'clienteId' });
+Cajas.belongsTo(ClienteParticulares, { foreignKey: 'clienteId' });
 
-// Relación ClienteEmpresas - Cajas
-ClienteEmpresas.hasMany(Cajas, { foreignKey: 'clienteEmpresaId' });
-Cajas.belongsTo(ClienteEmpresas, { foreignKey: 'clienteEmpresaId' });
+// Relación Empresas - Cajas
+Empresas.hasMany(Cajas, { foreignKey: 'empresaId' });
+Cajas.belongsTo(Empresas, { foreignKey: 'empresaId' });
 
 // Relación Ubicaciones - Cajas
 Ubicaciones.hasMany(Cajas, { foreignKey: 'ubicacionDelCliente' });
@@ -104,8 +92,8 @@ Cajas.belongsTo(Ubicaciones, { foreignKey: 'ubicacionDelCliente' });
 
 //------------------PEDIDOS------------------//
 Pedidos.belongsTo(Usuarios, { foreignKey: 'usuarioId', as: 'creador' });
-Pedidos.belongsTo(ClienteParticulares, { foreignKey: 'clienteParticularId', as: 'clienteParticular' });
-Pedidos.belongsTo(ClienteEmpresas, { foreignKey: 'clienteEmpresaId', as: 'clienteEmpresa' });
+Pedidos.belongsTo(ClienteParticulares, { foreignKey: 'clienteId', as: 'cliente' });
+Pedidos.belongsTo(Empresas, { foreignKey: 'empresaId', as: 'empresa' });
 Pedidos.belongsTo(Ubicaciones, { foreignKey: 'ubicacionId', as: 'ubicacion' });
 Pedidos.belongsTo(Empleados, { foreignKey: 'choferEntregaId', as: 'choferEntrega' });
 Pedidos.belongsTo(Empleados, { foreignKey: 'choferLevanteId', as: 'choferLevante' });
@@ -123,7 +111,7 @@ module.exports = {
   Servicios,
   Jornales,
   ContactoEmpresas,
-  ClienteEmpresas,
+  Empresas,
   ClienteParticulares,
   Ubicaciones,
   Permisos,
@@ -131,4 +119,6 @@ module.exports = {
   SeguimientoVolquetas,
   Cajas,
   Pedidos,
+  Clientes,
+  ClienteUbicaciones,
 };

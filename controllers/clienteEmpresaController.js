@@ -1,4 +1,4 @@
-const { ClienteEmpresas, Ubicaciones, ContactoEmpresas } = require('../models');
+const { Empresas, Ubicaciones, ContactoEmpresas } = require('../models');
 const validator = require('validator');
 
 exports.createClienteEmpresa = async (req, res) => {
@@ -14,7 +14,7 @@ exports.createClienteEmpresa = async (req, res) => {
   const sanitizedDescripcion = descripcion ? validator.escape(descripcion) : null;
 
   try {
-    const nuevoCliente = await ClienteEmpresas.create({
+    const nuevoCliente = await Empresas.create({
       rut: sanitizedRut,
       nombre: sanitizedNombre,
       descripcion: sanitizedDescripcion,
@@ -27,10 +27,10 @@ exports.createClienteEmpresa = async (req, res) => {
 };
 
 exports.getClienteEmpresa = async (req, res) => {
-  const { clienteEmpresaId } = req.params;
+  const { empresaId } = req.params;
 
   try {
-    const clienteEmpresa = await ClienteEmpresas.findByPk(clienteEmpresaId, {
+    const empresa = await Empresas.findByPk(empresaId, {
       include: [
         {
           model: Ubicaciones,
@@ -45,9 +45,9 @@ exports.getClienteEmpresa = async (req, res) => {
       ],
     });
 
-    if (!clienteEmpresa) return res.status(404).json({ error: 'Cliente Empresa no encontrado' });
+    if (!empresa) return res.status(404).json({ error: 'Cliente Empresa no encontrado' });
 
-    res.status(200).json(clienteEmpresa);
+    res.status(200).json(empresa);
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: 'Error al obtener el cliente empresa', detalle: error.message });
@@ -56,7 +56,7 @@ exports.getClienteEmpresa = async (req, res) => {
 
 exports.getAllClienteEmpresas = async (req, res) => {
   try {
-    const clientes = await ClienteEmpresas.findAll({
+    const clientes = await Empresas.findAll({
       include: [
         {
           model: Ubicaciones,
@@ -80,11 +80,11 @@ exports.getAllClienteEmpresas = async (req, res) => {
 
 exports.updateClienteEmpresa = async (req, res) => {
   try {
-    const [updated] = await ClienteEmpresas.update(req.body, { where: { id: req.params.clienteEmpresaId } });
+    const [updated] = await Empresas.update(req.body, { where: { id: req.params.empresaId } });
     if (!updated) {
       return res.status(404).json({ error: 'Empresa no encontrada' });
     }
-    const updatedCliente = await ClienteEmpresas.findByPk(req.params.clienteEmpresaId);
+    const updatedCliente = await Empresas.findByPk(req.params.empresaId);
     res.status(200).json(updatedCliente);
   } catch (error) {
     console.error(error);
@@ -93,10 +93,10 @@ exports.updateClienteEmpresa = async (req, res) => {
 };
 
 exports.deleteClienteEmpresa = async (req, res) => {
-  const { clienteEmpresaId } = req.params;
+  const { empresaId } = req.params;
 
   try {
-    const cliente = await ClienteEmpresas.findByPk(clienteEmpresaId);
+    const cliente = await Empresas.findByPk(empresaId);
 
     if (!cliente) return res.status(404).json({ error: 'El cliente de tipo empresa con ese id no existe' });
     await cliente.destroy();

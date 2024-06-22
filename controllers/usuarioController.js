@@ -1,4 +1,4 @@
-const { Telefonos, Usuarios, Empleados } = require('../models');
+const { Usuarios, Empleados } = require('../models');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
@@ -92,24 +92,18 @@ exports.loginUsuario = async (req, res) => {
   try {
     const { email, password } = req.body;
     // Validar email y contraseña
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email y contraseña son obligatorios' });
-    }
+    if (!email || !password) return res.status(400).json({ error: 'Email y contraseña son obligatorios' });
 
     const user = await Usuarios.findOne({ where: { email } });
 
-    if (!user) return res.status(404).json({ error: 'No hay usuario con ese email' });
-    if (!user.activo) {
-      return res.status(403).json({ error: 'Usuario no activado' });
-    }
+    if (!user) return res.status(401).json({ error: 'Credenciales inválidas' });
+    if (!user.activo) return res.status(403).json({ error: 'Usuario no activado' });
+
     const passwordMatch = await bcrypt.compare(password, user.password);
 
-    if (!passwordMatch) {
-      return res.status(401).json({ error: 'Credenciales inválidas' });
-    }
+    if (!passwordMatch) return res.status(401).json({ error: 'Credenciales inválidas' });
 
     // Generar el token JWT con duración de 4 horas
-    //todo: agregarle al token
     const token = jwt.sign({ id: user.id, email: user.email, rol: user.rol }, process.env.SECRETO, {
       expiresIn: '4h',
     });

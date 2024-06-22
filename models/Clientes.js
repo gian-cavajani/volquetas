@@ -1,10 +1,9 @@
 const { DataTypes } = require('sequelize');
 const db = require('../config/db');
-const ClienteEmpresas = require('./ClienteEmpresas');
-const Ubicaciones = require('./Ubicaciones');
+const { Ubicaciones, Empresas } = require('.');
 
-const ContactoEmpresas = db.define(
-  'ContactoEmpresas',
+const Clientes = db.define(
+  'Clientes',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -27,19 +26,15 @@ const ContactoEmpresas = db.define(
         isEmail: true,
       },
     },
-    clienteEmpresaId: {
-      type: DataTypes.INTEGER,
+    tipo: {
+      type: DataTypes.ENUM('empresa', 'particular'),
       allowNull: false,
-      references: {
-        model: ClienteEmpresas,
-        key: 'id',
-      },
     },
-    ubicacionId: {
+    empresaId: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: Ubicaciones,
+        model: Empresas,
         key: 'id',
       },
     },
@@ -49,4 +44,4 @@ const ContactoEmpresas = db.define(
   }
 );
 
-module.exports = ContactoEmpresas;
+module.exports = Clientes;

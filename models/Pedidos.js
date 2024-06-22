@@ -15,22 +15,6 @@ const Pedidos = db.define('Pedidos', {
       key: 'id',
     },
   },
-  clienteParticularId: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    references: {
-      model: 'ClienteParticulares',
-      key: 'id',
-    },
-  },
-  clienteEmpresaId: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    references: {
-      model: 'ClienteEmpresas',
-      key: 'id',
-    },
-  },
   ubicacionId: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -60,14 +44,6 @@ const Pedidos = db.define('Pedidos', {
     allowNull: true,
     references: {
       model: 'Empleados',
-      key: 'id',
-    },
-  },
-  permisoId: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    references: {
-      model: 'Permisos',
       key: 'id',
     },
   },

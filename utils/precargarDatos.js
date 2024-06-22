@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const moment = require('moment');
 const { randomUUID, getRandomValues } = require('crypto');
 const { getRandomDetalleResiduos, getRandomDireccion, getRandomInt, getRandomName, getRandomEmail, getRandomPhone } = require('./utilsPrecarga');
-const { Ubicaciones, ClienteParticulares, ContactoEmpresas, ClienteEmpresas, Jornales, Servicios, Camiones, Empleados, Telefonos, Usuarios, HistoricoUsoCamion } = require('../models');
+const { Ubicaciones, ClienteParticulares, ContactoEmpresas, Empresas, Jornales, Servicios, Camiones, Empleados, Telefonos, Usuarios, HistoricoUsoCamion } = require('../models');
 
 exports.precargarDatos = async () => {
   try {
@@ -16,7 +16,7 @@ exports.precargarDatos = async () => {
     const existingHistorico = await HistoricoUsoCamion.count();
     const existingServicios = await Servicios.count();
     const existingJornales = await Jornales.count();
-    const existingClienteEmpresas = await ClienteEmpresas.count();
+    const existingClienteEmpresas = await Empresas.count();
     const existingClienteParticulares = await ClienteParticulares.count();
     const existingContactoEmpresas = await ContactoEmpresas.count();
 
@@ -65,7 +65,7 @@ exports.precargarDatos = async () => {
     ]);
 
     // --------------------CLIENTE EMPRESA--------------------
-    await ClienteEmpresas.bulkCreate([
+    await Empresas.bulkCreate([
       {
         rut: '123456789012',
         nombre: 'Empresa A',
@@ -119,28 +119,28 @@ exports.precargarDatos = async () => {
     ]);
 
     // --------------------CLIENTE PARTICULAR--------------------
-    const clienteParticulares = [];
+    const clientes = [];
     for (let i = 0; i < 10; i++) {
       const nombre = getRandomName();
       const email = `${nombre}@particular.com`.replaceAll(' ', '');
-      clienteParticulares.push({
+      clientes.push({
         nombre,
         cedula: getRandomInt(10000000, 60000000) + '',
         descripcion: `Descripción de ${nombre}`,
         email,
       });
     }
-    await ClienteParticulares.bulkCreate(clienteParticulares);
+    await ClienteParticulares.bulkCreate(clientes);
 
     // --------------------UBICACIONES--------------------
     const ubicacionesData = [];
     for (let i = 0; i < 10; i++) {
-      let clienteParticularId = null;
-      let clienteEmpresaId = null;
+      let clienteId = null;
+      let empresaId = null;
       if (i > 5) {
-        clienteEmpresaId = getRandomInt(1, 10);
+        empresaId = getRandomInt(1, 10);
       } else {
-        clienteParticularId = getRandomInt(1, 10);
+        clienteId = getRandomInt(1, 10);
       }
 
       ubicacionesData.push({
@@ -156,8 +156,8 @@ exports.precargarDatos = async () => {
         frecuenciaSemanal: getRandomInt(1, 7).toString(),
         dias: 'A SOLICITUD',
         destinoFinal: 'USINA 8',
-        clienteParticularId,
-        clienteEmpresaId,
+        clienteId,
+        empresaId,
       });
     }
     await Ubicaciones.bulkCreate(ubicacionesData);
@@ -172,31 +172,31 @@ exports.precargarDatos = async () => {
         cedula: getRandomInt(10000000, 60000000) + '',
         descripcion: `Descripción de ${nombre}`,
         email,
-        clienteEmpresaId: getRandomInt(1, 10),
+        empresaId: getRandomInt(1, 10),
       });
     }
     await ContactoEmpresas.bulkCreate(personasEmpresas);
 
     // --------------------TELEFONOS--------------------
     await Telefonos.bulkCreate([
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteId: null },
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteId: null },
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteId: null },
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteId: getRandomInt(1, 5) },
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteId: getRandomInt(1, 5) },
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteId: getRandomInt(1, 5) },
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteId: null },
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteId: null },
+      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteId: null },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteId: null },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteId: null },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteId: null },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteId: getRandomInt(1, 5) },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteId: getRandomInt(1, 5) },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteId: getRandomInt(1, 5) },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteId: null },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteId: null },
+      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteId: null },
     ]);
 
     // --------------------HISTORICO-USO-CAMION--------------------

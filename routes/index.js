@@ -75,12 +75,12 @@ module.exports = function () {
   router.get('/jornales/todos/:fechaInicio/:fechaFin', verificarToken(), validarFechaParams, jornalController.getAllJornalesPorPeriodo);
   router.get('/jornales/:empleadoId/:fechaInicio/:fechaFin', verificarToken(), validarFechaParams, jornalController.getJornalesPorEmpleado);
 
-  // ClienteEmpresas
+  // Empresas
   router.post('/cliente-empresas', verificarToken(), clienteEmpresaController.createClienteEmpresa);
   router.get('/cliente-empresas', verificarToken(), clienteEmpresaController.getAllClienteEmpresas);
-  router.get('/cliente-empresas/:clienteEmpresaId', verificarToken(), validarId('clienteEmpresaId'), clienteEmpresaController.getClienteEmpresa);
-  router.put('/cliente-empresas/:clienteEmpresaId', verificarToken(), validarId('clienteEmpresaId'), clienteEmpresaController.updateClienteEmpresa);
-  router.delete('/cliente-empresas/:clienteEmpresaId', verificarToken(true), validarId('clienteEmpresaId'), clienteEmpresaController.deleteClienteEmpresa);
+  router.get('/cliente-empresas/:empresaId', verificarToken(), validarId('empresaId'), clienteEmpresaController.getClienteEmpresa);
+  router.put('/cliente-empresas/:empresaId', verificarToken(), validarId('empresaId'), clienteEmpresaController.updateClienteEmpresa);
+  router.delete('/cliente-empresas/:empresaId', verificarToken(true), validarId('empresaId'), clienteEmpresaController.deleteClienteEmpresa);
 
   // ContactoEmpresas
   router.post('/contacto-empresas', verificarToken(), contactoEmpresaController.createContactoEmpresa);

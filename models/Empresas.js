@@ -1,34 +1,28 @@
 const { DataTypes } = require('sequelize');
 const db = require('../config/db');
 
-const ClienteParticulares = db.define(
-  'ClienteParticulares',
+const Empresas = db.define(
+  'Empresas',
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
+    rut: {
+      type: DataTypes.STRING(12),
+      allowNull: false,
+      unique: true,
+    },
     nombre: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    cedula: {
-      type: DataTypes.STRING(8),
-      unique: true,
-    },
-    email: {
-      type: DataTypes.STRING,
-      validate: {
-        isEmail: true,
-      },
-    },
     descripcion: DataTypes.STRING,
   },
   {
-    initialAutoIncrement: 10000,
     timestamps: false,
   }
 );
 
-module.exports = ClienteParticulares;
+module.exports = Empresas;

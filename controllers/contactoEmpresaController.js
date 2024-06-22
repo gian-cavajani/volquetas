@@ -1,14 +1,14 @@
-const { Ubicaciones, ClienteEmpresas, ContactoEmpresas } = require('../models');
+const { Ubicaciones, Empresas, ContactoEmpresas } = require('../models');
 const validator = require('validator');
 
 exports.createContactoEmpresa = async (req, res) => {
-  const { nombre, cedula, descripcion, email, clienteEmpresaId, ubicacionId } = req.body;
+  const { nombre, cedula, descripcion, email, empresaId, ubicacionId } = req.body;
 
   // Validaciones
   if (!nombre) return res.status(400).json({ error: 'El nombre del contacto es obligatorio' });
   if (cedula && !validator.isLength(cedula, { min: 8, max: 8 })) return res.status(400).json({ error: 'La cédula debe tener 8 caracteres' });
   if (email && !validator.isEmail(email)) return res.status(400).json({ error: 'El email no es válido' });
-  if (!clienteEmpresaId) return res.status(400).json({ error: 'El id de la empresa es obligatorio' });
+  if (!empresaId) return res.status(400).json({ error: 'El id de la empresa es obligatorio' });
 
   // Sanitización
   const sanitizedNombre = validator.escape(nombre);
@@ -22,15 +22,15 @@ exports.createContactoEmpresa = async (req, res) => {
       if (!ubi) return res.status(404).json({ error: 'Ubicacion no existe' });
     }
 
-    const clienteEmpresa = await ClienteEmpresas.findByPk(clienteEmpresaId);
-    if (!clienteEmpresa) return res.status(404).json({ error: 'Cliente de tipo empresa no existe' });
+    const empresa = await Empresas.findByPk(empresaId);
+    if (!empresa) return res.status(404).json({ error: 'Cliente de tipo empresa no existe' });
 
     const nuevoContacto = await ContactoEmpresas.create({
       nombre: sanitizedNombre,
       cedula: sanitizedCedula,
       descripcion: sanitizedDescripcion,
       email: sanitizedEmail,
-      clienteEmpresaId,
+      empresaId,
       ubicacionId,
     });
     res.status(201).json(nuevoContacto);
@@ -46,7 +46,7 @@ exports.getContactoEmpresa = async (req, res) => {
   try {
     const contacto = await ContactoEmpresas.findByPk(contactoEmpresaId, {
       include: [
-        { model: ClienteEmpresas, as: 'clienteEmpresa' },
+        { model: Empresas, as: 'empresa' },
         { model: Ubicaciones, required: false, as: 'ubicacion' },
       ],
     });
@@ -64,7 +64,7 @@ exports.getAllContactoEmpresas = async (req, res) => {
   try {
     const contactosEmpresas = await ContactoEmpresas.findAll({
       include: [
-        { model: ClienteEmpresas, as: 'clienteEmpresa' },
+        { model: Empresas, as: 'empresa' },
         { model: Ubicaciones, required: false, as: 'ubicacion' },
       ],
     });
@@ -81,23 +81,23 @@ exports.asignarUbicacion = async (req, res) => {
 
   try {
     // Buscar el contacto de empresa por su ID
-    const contactoEmpresa = await ContactoEmpresas.findByPk(contactoEmpresaId);
+    const cliente = await ContactoEmpresas.findByPk(contactoEmpresaId);
 
     // Verificar si el contacto de empresa existe
-    if (!contactoEmpresa) return res.status(404).json({ error: 'El contacto de empresa no existe' });
+    if (!cliente) return res.status(404).json({ error: 'El contacto de empresa no existe' });
 
     // Verificar si la ubicación asignada existe
     const ubicacionAsignada = await Ubicaciones.findByPk(ubicacionId);
     if (!ubicacionAsignada) return res.status(404).json({ error: 'La ubicación asignada no existe' });
 
     // Verificar si ambos tienen el mismo cliente de empresa vinculado
-    if (contactoEmpresa.clienteEmpresaId !== ubicacionAsignada.clienteEmpresaId) {
+    if (cliente.empresaId !== ubicacionAsignada.empresaId) {
       return res.status(400).json({ error: 'El contacto de empresa y la ubicación asignada no pertenecen a la misma empresa' });
     }
 
     // Asignar la ubicación asignada al contacto de empresa
-    contactoEmpresa.ubicacionId = ubicacionId;
-    await contactoEmpresa.save();
+    cliente.ubicacionId = ubicacionId;
+    await cliente.save();
 
     // Enviar respuesta exitosa
     res.status(200).json({ detalle: 'Ubicación asignada correctamente al contacto de empresa' });

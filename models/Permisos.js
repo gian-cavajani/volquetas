@@ -1,8 +1,6 @@
 const { DataTypes } = require('sequelize');
 const db = require('../config/db');
-const ClienteParticulares = require('./ClienteParticulares');
-const ClienteEmpresas = require('./ClienteEmpresas');
-const Ubicaciones = require('./Ubicaciones');
+const { Empresas, Clientes } = require('.');
 
 const Permisos = db.define(
   'Permisos',
@@ -24,27 +22,11 @@ const Permisos = db.define(
         return fechaEntrega ? moment(fechaEntrega).add(3, 'months').toDate() : null;
       },
     },
-    clienteEmpresaId: {
+    empresaId: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: ClienteEmpresas,
-        key: 'id',
-      },
-    },
-    clienteParticularId: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: ClienteParticulares,
-        key: 'id',
-      },
-    },
-    ubicacionId: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: Ubicaciones,
+        model: Empresas,
         key: 'id',
       },
     },

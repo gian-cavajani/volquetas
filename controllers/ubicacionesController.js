@@ -1,23 +1,9 @@
-const { Ubicaciones, ClienteEmpresas, ClienteParticulares, ContactoEmpresas } = require('../models');
+const { Ubicaciones, Empresas, ClienteParticulares, ContactoEmpresas } = require('../models');
 const validator = require('validator');
 
 exports.createUbicacion = async (req, res) => {
-  const {
-    dias,
-    destinoFinal,
-    calle,
-    esquina,
-    barrio,
-    coordenadas,
-    numeroPuerta,
-    descripcion,
-    detalleResiduos,
-    residuosMezclados,
-    residuosReciclados,
-    frecuenciaSemanal,
-    clienteParticularId,
-    clienteEmpresaId,
-  } = req.body;
+  const { dias, destinoFinal, calle, esquina, barrio, coordenadas, numeroPuerta, descripcion, detalleResiduos, residuosMezclados, residuosReciclados, frecuenciaSemanal, clienteId, empresaId } =
+    req.body;
 
   // Validaciones
   if (!calle) {
@@ -40,8 +26,8 @@ exports.createUbicacion = async (req, res) => {
   const sanitizedResiduosMezclados = residuosMezclados ? validator.toBoolean(residuosMezclados.toString()) : false;
   const sanitizedResiduosReciclados = residuosReciclados ? validator.toBoolean(residuosReciclados.toString()) : false;
   const sanitizedFrecuenciaSemanal = frecuenciaSemanal ? validator.toInt(frecuenciaSemanal.toString()) : null;
-  const sanitizedClienteParticularId = clienteParticularId ? validator.toInt(clienteParticularId.toString()) : null;
-  const sanitizedClienteEmpresaId = clienteEmpresaId ? validator.toInt(clienteEmpresaId.toString()) : null;
+  const sanitizedClienteParticularId = clienteId ? validator.toInt(clienteId.toString()) : null;
+  const sanitizedClienteEmpresaId = empresaId ? validator.toInt(empresaId.toString()) : null;
 
   try {
     const nuevaUbicacion = await Ubicaciones.create({
@@ -57,8 +43,8 @@ exports.createUbicacion = async (req, res) => {
       destinoFinal: sanitizedDestinoFinal,
       dias: sanitizedDias,
       frecuenciaSemanal: sanitizedFrecuenciaSemanal,
-      clienteParticularId: sanitizedClienteParticularId,
-      clienteEmpresaId: sanitizedClienteEmpresaId,
+      clienteId: sanitizedClienteParticularId,
+      empresaId: sanitizedClienteEmpresaId,
     });
     res.status(201).json(nuevaUbicacion);
   } catch (error) {
@@ -72,9 +58,9 @@ exports.getAllUbicaciones = async (req, res) => {
     const ubicaciones = await Ubicaciones.findAll({
       include: [
         {
-          model: ClienteEmpresas,
+          model: Empresas,
           required: false,
-          as: 'clienteEmpresa',
+          as: 'empresa',
         },
         {
           model: ContactoEmpresas,
@@ -83,7 +69,7 @@ exports.getAllUbicaciones = async (req, res) => {
         {
           model: ClienteParticulares,
           required: false,
-          as: 'clienteParticular',
+          as: 'cliente',
         },
       ],
     });
@@ -101,9 +87,9 @@ exports.getUbicacion = async (req, res) => {
     const ubicacion = await Ubicaciones.findByPk(ubicacionId, {
       include: [
         {
-          model: ClienteEmpresas,
+          model: Empresas,
           required: false,
-          as: 'clienteEmpresa',
+          as: 'empresa',
         },
         {
           model: ContactoEmpresas,
@@ -112,7 +98,7 @@ exports.getUbicacion = async (req, res) => {
         {
           model: ClienteParticulares,
           required: false,
-          as: 'clienteParticular',
+          as: 'cliente',
         },
       ],
     });

@@ -1,0 +1,27 @@
+const { DataTypes } = require('sequelize');
+const db = require('../config/db');
+
+const ClienteUbicaciones = db.define(
+  'ClienteUbicaciones',
+  {
+    clienteId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Clientes',
+        key: 'id',
+      },
+    },
+    ubicacionId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Ubicaciones',
+        key: 'id',
+      },
+    },
+  },
+  {
+    timestamps: false,
+  }
+);
+
+module.exports = ClienteUbicaciones;
