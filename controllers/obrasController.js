@@ -154,13 +154,14 @@ exports.updateObra = async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar la Obra', detalle: error });
   }
 };
+
 exports.updateObraDetalles = async (req, res) => {
   try {
     const [updated] = await ObraDetalles.update(req.body, { where: { obraId: req.params.obraId } });
     if (!updated) {
       return res.status(404).json({ error: 'Obra no encontrada' });
     }
-    const updatedObra = await Obras.findByPk(req.params.obraId);
+    const updatedObra = await Obras.findByPk(req.params.obraId, { include: [{ model: ObraDetalles }] });
     res.status(200).json(updatedObra);
   } catch (error) {
     console.error(error);

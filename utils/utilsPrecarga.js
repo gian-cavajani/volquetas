@@ -1,3 +1,75 @@
+const nombres = ['Juan', 'María', 'Carlos', 'Ana', 'Pedro', 'Laura', 'Jorge', 'Sofía', 'Luis', 'Marta', 'Fernando', 'Paula', 'Miguel', 'Elena', 'Diego', 'Lucía'];
+const apellidos = [
+  'Smith',
+  'Johnson',
+  'Williams',
+  'Jones',
+  'Brown',
+  'Davis',
+  'Miller',
+  'Wilson',
+  'Moore',
+  'Taylor',
+  'Anderson',
+  'Thomas',
+  'Jackson',
+  'White',
+  'Harris',
+  'Martin',
+  'Thompson',
+  'Garcia',
+  'Martinez',
+  'Robinson',
+  'Clark',
+  'Rodriguez',
+  'Lewis',
+  'Lee',
+  'Walker',
+  'Hall',
+  'Allen',
+  'Young',
+  'Hernandez',
+  'King',
+  'García',
+  'Rodríguez',
+  'Gómez',
+  'Fernández',
+  'Martínez',
+  'López',
+  'Díaz',
+  'Pérez',
+  'González',
+  'Sánchez',
+];
+let callesUruguay = [
+  '18 de Julio',
+  'Av. Italia',
+  'Bulevar Artigas',
+  'Rambla República Argentina',
+  'Bulevar España',
+  'Av. 8 de Octubre',
+  'Bulevar José Batlle y Ordóñez',
+  'Rambla Sur',
+  'Rambla Mahatma Gandhi',
+  'Av. Luis Alberto de Herrera',
+  'Av. General Rivera',
+  'Bulevar General Artigas',
+  'Av. Millán',
+  'Av. 18 de Julio',
+  'Av. Rivera',
+  'Av. San Martín',
+  'Av. 8 de Octubre',
+  'Av. Agraciada',
+  'Av. José Belloni',
+  'Av. Centenario',
+];
+callesUruguay = callesUruguay.concat(
+  apellidos.map((ap) => {
+    return 'Av. ' + ap;
+  })
+);
+const barriosUruguay = ['Aguada', 'Atahualpa', 'Barrio Sur', 'Bella Vista', 'Belvedere', 'Buceo', 'Paso de la Arena', 'Paso Molino', 'Piedras Blancas', 'Pocitos'];
+
 exports.getRandomInt = (min, max) => {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -5,50 +77,6 @@ exports.getRandomInt = (min, max) => {
 };
 
 exports.getRandomName = (partial) => {
-  const nombres = ['Juan', 'María', 'Carlos', 'Ana', 'Pedro', 'Laura', 'Jorge', 'Sofía', 'Luis', 'Marta', 'Fernando', 'Paula', 'Miguel', 'Elena', 'Diego', 'Lucía'];
-  const apellidos = [
-    'Smith',
-    'Johnson',
-    'Williams',
-    'Jones',
-    'Brown',
-    'Davis',
-    'Miller',
-    'Wilson',
-    'Moore',
-    'Taylor',
-    'Anderson',
-    'Thomas',
-    'Jackson',
-    'White',
-    'Harris',
-    'Martin',
-    'Thompson',
-    'Garcia',
-    'Martinez',
-    'Robinson',
-    'Clark',
-    'Rodriguez',
-    'Lewis',
-    'Lee',
-    'Walker',
-    'Hall',
-    'Allen',
-    'Young',
-    'Hernandez',
-    'King',
-    'García',
-    'Rodríguez',
-    'Gómez',
-    'Fernández',
-    'Martínez',
-    'López',
-    'Díaz',
-    'Pérez',
-    'González',
-    'Sánchez',
-  ];
-
   const nombre = nombres[Math.floor(Math.random() * nombres.length)];
   const apellido = apellidos[Math.floor(Math.random() * apellidos.length)];
 
@@ -70,29 +98,6 @@ exports.getRandomPhone = (tipo) => {
 };
 
 exports.getRandomDireccion = (opcion) => {
-  const callesUruguay = [
-    '18 de Julio',
-    'Avenida Italia',
-    'Bulevar Artigas',
-    'Rambla República Argentina',
-    'Bulevar España',
-    'Avenida 8 de Octubre',
-    'Bulevar José Batlle y Ordóñez',
-    'Rambla Sur',
-    'Rambla Mahatma Gandhi',
-    'Avenida Luis Alberto de Herrera',
-    'Avenida General Rivera',
-    'Bulevar General Artigas',
-    'Avenida Millán',
-    'Avenida 18 de Julio',
-    'Avenida Rivera',
-    'Avenida San Martín',
-    'Avenida 8 de Octubre',
-    'Avenida Agraciada',
-    'Avenida José Belloni',
-    'Avenida Centenario',
-  ];
-  const barriosUruguay = ['Aguada', 'Atahualpa', 'Barrio Sur', 'Bella Vista', 'Belvedere', 'Buceo', 'Paso de la Arena', 'Paso Molino', 'Piedras Blancas', 'Pocitos'];
   if (opcion === 'calle') {
     const randomNumber = Math.floor(Math.random() * callesUruguay.length);
     return `${callesUruguay[randomNumber]}`;
