@@ -17,11 +17,11 @@ const SeguimientoVolquetas = db.define(
         key: 'numero',
       },
     },
-    ubicacionId: {
+    obraId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Ubicaciones',
+        model: 'Obras',
         key: 'id',
       },
     },

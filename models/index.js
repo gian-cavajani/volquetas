@@ -6,10 +6,11 @@ const Camiones = require('./Camiones');
 const Servicios = require('./Servicios');
 const HistoricoUsoCamion = require('./HistoricoUsoCamion');
 const Jornales = require('./Jornales');
-const ClienteEmpresas = require('./ClienteEmpresas');
+const Empresas = require('./Empresas');
 const ContactoEmpresas = require('./ContactoEmpresas');
-const ClienteParticulares = require('./ClienteParticulares');
-const Ubicaciones = require('./Ubicaciones');
+const Particulares = require('./Particulares');
+const Obras = require('./Obras');
+const ObraDetalles = require('./ObraDetalles');
 const Permisos = require('./Permisos');
 const Volquetas = require('./Volquetas');
 const SeguimientoVolquetas = require('./SeguimientoVolquetas');
@@ -38,41 +39,41 @@ Servicios.belongsTo(Camiones, { foreignKey: 'camionId' });
 Empleados.hasMany(Jornales, { foreignKey: 'empleadoId' });
 Jornales.belongsTo(Empleados, { foreignKey: 'empleadoId' });
 
-//ClienteEmpresas - ContactoEmpresas 1aN -->
-ContactoEmpresas.belongsTo(ClienteEmpresas, { foreignKey: 'clienteEmpresaId', as: 'clienteEmpresa' });
-ClienteEmpresas.hasMany(ContactoEmpresas, { foreignKey: 'clienteEmpresaId', as: 'contactos' });
+//Empresas - ContactoEmpresas 1aN -->
+ContactoEmpresas.belongsTo(Empresas, { foreignKey: 'empresaId', as: 'empresa' });
+Empresas.hasMany(ContactoEmpresas, { foreignKey: 'empresaId', as: 'contactos' });
 
-//------------------UBICACIONES------------------//
-//ClienteEmpresas - Ubicaciones 1aN --> Ubicaciones tiene clienteEmpresaId
-Ubicaciones.belongsTo(ClienteEmpresas, { foreignKey: 'clienteEmpresaId', as: 'clienteEmpresa' });
-ClienteEmpresas.hasMany(Ubicaciones, { foreignKey: 'clienteEmpresaId', as: 'ubicaciones' });
+//------------------OBRAS------------------//
+//Empresas - Obras 1aN --> Obras tiene empresaId
+Obras.belongsTo(Empresas, { foreignKey: 'empresaId', as: 'empresa' });
+Empresas.hasMany(Obras, { foreignKey: 'empresaId', as: 'obras' });
 
-//ClienteParticulares - Ubicaciones 1aN --> Ubicaciones tiene clienteParticularId
-Ubicaciones.belongsTo(ClienteParticulares, { foreignKey: 'clienteParticularId', as: 'clienteParticular' });
-ClienteParticulares.hasMany(Ubicaciones, { foreignKey: 'clienteParticularId', as: 'ubicaciones' });
+//Particulares - Obras 1aN --> Obras tiene particularId
+Obras.belongsTo(Particulares, { foreignKey: 'particularId', as: 'particular' });
+Particulares.hasMany(Obras, { foreignKey: 'particularId', as: 'obras' });
 
-//Ubicaciones - ContactoEmpresas 1aN --> ContactoEmpresa tiene ubicacionId
-ContactoEmpresas.belongsTo(Ubicaciones, { foreignKey: 'ubicacionId', as: 'ubicacion' });
-Ubicaciones.hasMany(ContactoEmpresas, { foreignKey: 'ubicacionId' });
+//Obras - ContactoEmpresas 1aN --> ContactoEmpresa tiene obraId
+ContactoEmpresas.belongsTo(Obras, { foreignKey: 'obraId', as: 'obra' });
+Obras.hasMany(ContactoEmpresas, { foreignKey: 'obraId', as: 'contactosDesignados' });
+
+//Empleados - Usuarios 1a1 --> Usuario tiene empleadoId
+Obras.hasOne(ObraDetalles, { foreignKey: 'obraId' });
+ObraDetalles.belongsTo(Obras, { foreignKey: 'obraId' });
 
 //------------------PERMISOS------------------//
-//ClienteEmpresas - Permisos 1aN --> Permisos tiene clienteEmpresaId
-Permisos.belongsTo(ClienteEmpresas, { foreignKey: 'clienteEmpresaId' });
-ClienteEmpresas.hasMany(Permisos, { foreignKey: 'clienteEmpresaId' });
+//Empresas - Permisos 1aN --> Permisos tiene empresaId
+Permisos.belongsTo(Empresas, { foreignKey: 'empresaId' });
+Empresas.hasMany(Permisos, { foreignKey: 'empresaId' });
 
-//ClienteParticulares - Permisos 1aN --> Permisos tiene clienteParticularId
-Permisos.belongsTo(ClienteParticulares, { foreignKey: 'clienteParticularId' });
-ClienteParticulares.hasMany(Permisos, { foreignKey: 'clienteParticularId' });
-
-//Ubicaciones - Permisos 1aN --> Permisos tiene ubicacionId
-Permisos.belongsTo(Ubicaciones, { foreignKey: 'ubicacionId' });
-Ubicaciones.hasMany(Permisos, { foreignKey: 'ubicacionId' });
+//Particulares - Permisos 1aN --> Permisos tiene particularId
+Permisos.belongsTo(Particulares, { foreignKey: 'particularId' });
+Particulares.hasMany(Permisos, { foreignKey: 'particularId' });
 
 //------------------TELEFONOS------------------//
 Telefonos.belongsTo(Empleados, { foreignKey: 'empleadoId', as: 'empleado' });
 Empleados.hasMany(Telefonos, { foreignKey: 'empleadoId' });
-Telefonos.belongsTo(ClienteParticulares, { foreignKey: 'clienteParticularId', as: 'clienteParticular' });
-ClienteParticulares.hasMany(Telefonos, { foreignKey: 'clienteParticularId' });
+Telefonos.belongsTo(Particulares, { foreignKey: 'particularId', as: 'particular' });
+Particulares.hasMany(Telefonos, { foreignKey: 'particularId' });
 Telefonos.belongsTo(ContactoEmpresas, { foreignKey: 'contactoEmpresaId', as: 'contactoEmpresa' });
 ContactoEmpresas.hasMany(Telefonos, { foreignKey: 'contactoEmpresaId' });
 
@@ -81,9 +82,9 @@ ContactoEmpresas.hasMany(Telefonos, { foreignKey: 'contactoEmpresaId' });
 Volquetas.hasMany(SeguimientoVolquetas, { foreignKey: 'numeroVolqueta' });
 SeguimientoVolquetas.belongsTo(Volquetas, { foreignKey: 'numeroVolqueta' });
 
-// Relación Ubicaciones - SeguimientoVolquetas
-Ubicaciones.hasMany(SeguimientoVolquetas, { foreignKey: 'ubicacionId' });
-SeguimientoVolquetas.belongsTo(Ubicaciones, { foreignKey: 'ubicacionId' });
+// Relación Obras - SeguimientoVolquetas
+Obras.hasMany(SeguimientoVolquetas, { foreignKey: 'obraId' });
+SeguimientoVolquetas.belongsTo(Obras, { foreignKey: 'obraId' });
 
 //------------------CAJAS------------------//
 // Relación Empleados - Cajas
@@ -91,22 +92,22 @@ Empleados.hasMany(Cajas, { foreignKey: 'empleadoId' });
 Cajas.belongsTo(Empleados, { foreignKey: 'empleadoId' });
 
 // Relación ClienteParticular - Cajas
-ClienteParticulares.hasMany(Cajas, { foreignKey: 'clienteParticularId' });
-Cajas.belongsTo(ClienteParticulares, { foreignKey: 'clienteParticularId' });
+Particulares.hasMany(Cajas, { foreignKey: 'particularId' });
+Cajas.belongsTo(Particulares, { foreignKey: 'particularId' });
 
-// Relación ClienteEmpresas - Cajas
-ClienteEmpresas.hasMany(Cajas, { foreignKey: 'clienteEmpresaId' });
-Cajas.belongsTo(ClienteEmpresas, { foreignKey: 'clienteEmpresaId' });
+// Relación Empresas - Cajas
+Empresas.hasMany(Cajas, { foreignKey: 'empresaId' });
+Cajas.belongsTo(Empresas, { foreignKey: 'empresaId' });
 
-// Relación Ubicaciones - Cajas
-Ubicaciones.hasMany(Cajas, { foreignKey: 'ubicacionDelCliente' });
-Cajas.belongsTo(Ubicaciones, { foreignKey: 'ubicacionDelCliente' });
+// Relación Obras - Cajas
+Obras.hasMany(Cajas, { foreignKey: 'obraDelCliente' });
+Cajas.belongsTo(Obras, { foreignKey: 'obraDelCliente' });
 
 //------------------PEDIDOS------------------//
 Pedidos.belongsTo(Usuarios, { foreignKey: 'usuarioId', as: 'creador' });
-Pedidos.belongsTo(ClienteParticulares, { foreignKey: 'clienteParticularId', as: 'clienteParticular' });
-Pedidos.belongsTo(ClienteEmpresas, { foreignKey: 'clienteEmpresaId', as: 'clienteEmpresa' });
-Pedidos.belongsTo(Ubicaciones, { foreignKey: 'ubicacionId', as: 'ubicacion' });
+Pedidos.belongsTo(Particulares, { foreignKey: 'particularId', as: 'particular' });
+Pedidos.belongsTo(Empresas, { foreignKey: 'empresaId', as: 'empresa' });
+Pedidos.belongsTo(Obras, { foreignKey: 'obraId', as: 'obra' });
 Pedidos.belongsTo(Empleados, { foreignKey: 'choferEntregaId', as: 'choferEntrega' });
 Pedidos.belongsTo(Empleados, { foreignKey: 'choferLevanteId', as: 'choferLevante' });
 Pedidos.belongsTo(Permisos, { foreignKey: 'permisoId', as: 'permiso' });
@@ -123,12 +124,13 @@ module.exports = {
   Servicios,
   Jornales,
   ContactoEmpresas,
-  ClienteEmpresas,
-  ClienteParticulares,
-  Ubicaciones,
+  Empresas,
+  Particulares,
+  Obras,
   Permisos,
   Volquetas,
   SeguimientoVolquetas,
   Cajas,
   Pedidos,
+  ObraDetalles,
 };

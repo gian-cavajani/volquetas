@@ -41,19 +41,19 @@ const Cajas = db.define(
         key: 'id',
       },
     },
-    clienteParticularId: {
+    particularId: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'ClienteParticulares',
+        model: 'Particulares',
         key: 'id',
       },
     },
-    clienteEmpresaId: {
+    empresaId: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'ClienteEmpresas',
+        model: 'Empresas',
         key: 'id',
       },
     },
@@ -61,14 +61,14 @@ const Cajas = db.define(
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'Ubicaciones',
+        model: 'Obras',
         key: 'id',
       },
     },
   },
   {
     timestamps: false,
-    indexes: [{ fields: ['fecha'] }, { fields: ['tipo'] }, { fields: ['empleadoId'] }, { fields: ['clienteParticularId'] }, { fields: ['clienteEmpresaId'] }],
+    indexes: [{ fields: ['fecha'] }, { fields: ['tipo'] }, { fields: ['empleadoId'] }, { fields: ['particularId'] }, { fields: ['empresaId'] }],
   }
 );
 
@@ -83,7 +83,7 @@ module.exports = Cajas;
 //   moneda: 'peso',
 //   monto: 100.0,
 //   empleadoId: 1, // ID del empleado
-//   clienteParticularId: null,
-//   clienteEmpresaId: 1, // ID de la empresa
+//   particularId: null,
+//   empresaId: 1, // ID de la empresa
 //   ubicacionDelCliente: 1, // ID de la ubicación
 // });

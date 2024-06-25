@@ -1,10 +1,9 @@
 const { DataTypes } = require('sequelize');
 const db = require('../config/db');
-const ClienteParticulares = require('./ClienteParticulares');
-const ClienteEmpresas = require('./ClienteEmpresas');
+const { Empresas, Particulares } = require('.');
 
-const Ubicaciones = db.define(
-  'Ubicaciones',
+const Obras = db.define(
+  'Obras',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -30,25 +29,20 @@ const Ubicaciones = db.define(
     descripcion: {
       type: DataTypes.STRING,
     },
-    detalleResiduos: DataTypes.STRING,
-    residuosMezclados: DataTypes.BOOLEAN,
-    residuosReciclados: DataTypes.BOOLEAN,
-    frecuenciaSemanal: DataTypes.INTEGER,
-    destinoFinal: DataTypes.STRING,
-    dias: DataTypes.STRING,
-    clienteParticularId: {
+    activa: { type: DataTypes.BOOLEAN, defaultValue: true },
+    particularId: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: ClienteParticulares,
+        model: Particulares,
         key: 'id',
       },
     },
-    clienteEmpresaId: {
+    empresaId: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: ClienteEmpresas,
+        model: Empresas,
         key: 'id',
       },
     },
@@ -58,4 +52,4 @@ const Ubicaciones = db.define(
   }
 );
 
-module.exports = Ubicaciones;
+module.exports = Obras;

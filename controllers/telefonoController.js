@@ -1,9 +1,9 @@
 const validator = require('validator');
-const { Telefonos, Empleados, ContactoEmpresas, ClienteParticulares } = require('../models');
+const { Telefonos, Empleados, ContactoEmpresas, Particulares } = require('../models');
 
 exports.nuevoTelefono = async (req, res) => {
   try {
-    const { telefono, tipo, extension, empleadoId, contactoEmpresaId, clienteParticularId } = req.body;
+    const { telefono, tipo, extension, empleadoId, contactoEmpresaId, particularId } = req.body;
     const sanitizedTipo = tipo ? validator.escape(tipo) : '';
     const sanitizedTelefono = telefono ? validator.escape(telefono) : '';
     const sanitizedExtension = extension ? validator.escape(extension) : '';
@@ -12,7 +12,7 @@ exports.nuevoTelefono = async (req, res) => {
 
     if (!['celular', 'telefono'].includes(sanitizedTipo)) return res.status(400).json({ error: 'Tipo inválido' });
     if (!sanitizedTelefono) return res.status(400).json({ error: 'Debe incluir un telefono' });
-    if (!empleadoId && !contactoEmpresaId && !clienteParticularId) return res.status(400).json({ error: 'Debe incluir al menos un propietario' });
+    if (!empleadoId && !contactoEmpresaId && !particularId) return res.status(400).json({ error: 'Debe incluir al menos un propietario' });
 
     if (telefono.length !== 8 && tipo == 'telefono') return res.status(400).json({ error: 'Telefono debe incluir 8 numeros' });
     if (telefono.length !== 9 && tipo == 'celular') return res.status(400).json({ error: 'Celular debe incluir 9 numeros' });
@@ -21,8 +21,8 @@ exports.nuevoTelefono = async (req, res) => {
       const prop = await Empleados.findByPk(empleadoId);
       if (!prop) return res.status(400).json({ error: 'No hay tal empleado' });
     }
-    if (clienteParticularId) {
-      const prop = await ClienteParticulares.findByPk(clienteParticularId);
+    if (particularId) {
+      const prop = await Particulares.findByPk(particularId);
       if (!prop) return res.status(400).json({ error: 'No hay tal cliente' });
     }
     if (contactoEmpresaId) {
@@ -35,7 +35,7 @@ exports.nuevoTelefono = async (req, res) => {
       tipo: sanitizedTipo,
       extension: sanitizedExtension,
       contactoEmpresaId,
-      clienteParticularId,
+      particularId,
       empleadoId,
     });
 

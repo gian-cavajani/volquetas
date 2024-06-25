@@ -4,14 +4,61 @@ exports.getRandomInt = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-exports.getRandomName = () => {
+exports.getRandomName = (partial) => {
   const nombres = ['Juan', 'María', 'Carlos', 'Ana', 'Pedro', 'Laura', 'Jorge', 'Sofía', 'Luis', 'Marta', 'Fernando', 'Paula', 'Miguel', 'Elena', 'Diego', 'Lucía'];
-  const apellidos = ['García', 'Rodríguez', 'Gómez', 'Fernández', 'Martínez', 'López', 'Díaz', 'Pérez', 'González', 'Sánchez'];
+  const apellidos = [
+    'Smith',
+    'Johnson',
+    'Williams',
+    'Jones',
+    'Brown',
+    'Davis',
+    'Miller',
+    'Wilson',
+    'Moore',
+    'Taylor',
+    'Anderson',
+    'Thomas',
+    'Jackson',
+    'White',
+    'Harris',
+    'Martin',
+    'Thompson',
+    'Garcia',
+    'Martinez',
+    'Robinson',
+    'Clark',
+    'Rodriguez',
+    'Lewis',
+    'Lee',
+    'Walker',
+    'Hall',
+    'Allen',
+    'Young',
+    'Hernandez',
+    'King',
+    'García',
+    'Rodríguez',
+    'Gómez',
+    'Fernández',
+    'Martínez',
+    'López',
+    'Díaz',
+    'Pérez',
+    'González',
+    'Sánchez',
+  ];
 
   const nombre = nombres[Math.floor(Math.random() * nombres.length)];
   const apellido = apellidos[Math.floor(Math.random() * apellidos.length)];
 
-  return `${nombre} ${apellido}`;
+  if (partial === 'apellido') {
+    return apellido;
+  } else if (partial === 'nombre') {
+    return nombre;
+  } else {
+    return `${nombre} ${apellido}`;
+  }
 };
 
 exports.getRandomPhone = (tipo) => {
@@ -73,4 +120,49 @@ exports.getRandomDetalleResiduos = () => {
 
   const randomNumber = Math.floor(Math.random() * tipoResiduo.length);
   return `${tipoResiduo[randomNumber]}`;
+};
+exports.getRandomModelo = () => {
+  const modelosCamiones = [
+    'Volvo FH16',
+    'Scania R450',
+    'Mercedes-Benz Actros',
+    'MAN TGX',
+    'DAF XF',
+    'Iveco Stralis',
+    'Renault T High',
+    'Peterbilt 579',
+    'Kenworth T680',
+    'Freightliner Cascadia',
+    'Mack Anthem',
+    'Western Star 5700XE',
+    'Hino 500',
+    'Isuzu Giga',
+    'Mitsubishi Fuso Super Great',
+    'UD Quon',
+    'Tata Prima',
+    'Ashok Leyland Captain',
+    'International Lonestar',
+    'Volvo VNL',
+    'Hyundai Xcient',
+    'Mercedes-Benz Arocs',
+    'Kenworth W900',
+    'Mack Pinnacle',
+    'Scania S730',
+  ];
+
+  const randomNumber = Math.floor(Math.random() * modelosCamiones.length);
+  return `${modelosCamiones[randomNumber]}`;
+};
+
+const getRandomLetter = () => {
+  const letters = 'abcdefghijklmnopqrstuvwxyz'.toUpperCase();
+  return letters[Math.floor(Math.random() * letters.length)];
+};
+
+exports.getRandomString = (cantidad) => {
+  let result = '';
+  for (let i = 0; i < cantidad; i++) {
+    result += getRandomLetter();
+  }
+  return result;
 };

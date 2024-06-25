@@ -1,7 +1,6 @@
 const { DataTypes } = require('sequelize');
 const db = require('../config/db');
-const ClienteEmpresas = require('./ClienteEmpresas');
-const Ubicaciones = require('./Ubicaciones');
+const { Obras, Empresas } = require('.');
 
 const ContactoEmpresas = db.define(
   'ContactoEmpresas',
@@ -15,11 +14,6 @@ const ContactoEmpresas = db.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    cedula: {
-      type: DataTypes.STRING(8),
-      unique: true,
-      allowNull: true,
-    },
     descripcion: DataTypes.STRING,
     email: {
       type: DataTypes.STRING,
@@ -27,19 +21,19 @@ const ContactoEmpresas = db.define(
         isEmail: true,
       },
     },
-    clienteEmpresaId: {
+    empresaId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: ClienteEmpresas,
+        model: Empresas,
         key: 'id',
       },
     },
-    ubicacionId: {
+    obraId: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: Ubicaciones,
+        model: Obras,
         key: 'id',
       },
     },

@@ -2,23 +2,25 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
 const { randomUUID, getRandomValues } = require('crypto');
-const { getRandomDetalleResiduos, getRandomDireccion, getRandomInt, getRandomName, getRandomEmail, getRandomPhone } = require('./utilsPrecarga');
-const { Ubicaciones, ClienteParticulares, ContactoEmpresas, ClienteEmpresas, Jornales, Servicios, Camiones, Empleados, Telefonos, Usuarios, HistoricoUsoCamion } = require('../models');
+const { getRandomModelo, getRandomString, getRandomDetalleResiduos, getRandomDireccion, getRandomInt, getRandomName, getRandomEmail, getRandomPhone } = require('./utilsPrecarga');
+const { Obras, ObraDetalles, Particulares, ContactoEmpresas, Empresas, Jornales, Servicios, Camiones, Empleados, Telefonos, Usuarios, HistoricoUsoCamion } = require('../models');
 
 exports.precargarDatos = async () => {
   try {
     // Verificar si hay datos existentes
     const existingEmpleados = await Empleados.count();
-    const existingUbicaciones = await Ubicaciones.count();
+    const existingUbicaciones = await Obras.count();
     const existingCamiones = await Camiones.count();
     const existingUsuarios = await Usuarios.count();
     const existingTelefonos = await Telefonos.count();
     const existingHistorico = await HistoricoUsoCamion.count();
     const existingServicios = await Servicios.count();
     const existingJornales = await Jornales.count();
-    const existingClienteEmpresas = await ClienteEmpresas.count();
-    const existingClienteParticulares = await ClienteParticulares.count();
+    const existingClienteEmpresas = await Empresas.count();
+    const existingClienteParticulares = await Particulares.count();
     const existingContactoEmpresas = await ContactoEmpresas.count();
+    const existingObras = await Obras.count();
+    const existingObraDetalles = await ObraDetalles.count();
 
     if (
       existingClienteEmpresas > 0 ||
@@ -31,174 +33,221 @@ exports.precargarDatos = async () => {
       existingTelefonos > 0 ||
       existingHistorico > 0 ||
       existingServicios > 0 ||
-      existingJornales > 0
+      existingJornales > 0 ||
+      existingObras > 0 ||
+      existingObraDetalles > 0
     ) {
       console.log('Datos ya existen. No se realizará la precarga.');
       return;
     }
 
     // Precargar datos de ejemplo
+    //Arrays para la precarga:
+    const empresas = [];
+    const particulares = [];
+    const obrasData = [];
+    const obrasDetalle = [];
+    const contactos = [];
+    const telefonos = [];
+    const camiones = [];
+    const empleados = [];
+    const servicios = [];
+    const jornales = [];
+
+    for (let i = 1; i < 20; i++) {
+      //EMPRESAS
+      const apellido = getRandomName('apellido');
+      const nombreEmpresa = `Empresa ${i} de ${apellido}`;
+      const rut = getRandomInt(123456789012, 934567890123) + '';
+      const razonSocial = `${apellido}${i} SRL`;
+      empresas.push({
+        nombre: nombreEmpresa,
+        rut,
+        razonSocial,
+        descripcion: `Descripción de ${razonSocial} con RUT: ${rut}`,
+      });
+
+      //PARTICULARES
+      const nombre = getRandomName();
+      const email = `${nombre}@particular.com`.replaceAll(' ', '');
+      particulares.push({
+        nombre,
+        cedula: getRandomInt(10000000, 60000000) + '',
+        descripcion: `Descripción de ${nombre}`,
+        email,
+      });
+
+      const id = getRandomInt(1, 19);
+      const mes = getRandomInt(1, 9);
+      const dia = getRandomInt(10, 29);
+      const fecha = `20${id + 4}-0${mes}-${dia}`;
+      const fechaSalida = `2023-0${mes}-${dia}`;
+      empleados.push({
+        nombre: nombre,
+        cedula: getRandomInt(10000000, 60000000) + '',
+        rol: i > 6 ? 'chofer' : 'normal',
+        fechaEntrada: new Date(fecha),
+        fechaSalida: i > 17 ? new Date(fechaSalida) : null,
+        habilitado: i > 17 ? false : true,
+      });
+      //TELEFONOS
+      const tipo = i > 10 ? 'telefono' : 'celular';
+      telefonos.push({
+        telefono: getRandomPhone(tipo),
+        tipo,
+        extension: i > 10 ? getRandomInt(100, 9000) : null,
+        empleadoId: id,
+        contactoEmpresaId: null,
+        particularId: null,
+      });
+
+      telefonos.push({
+        telefono: getRandomPhone(tipo),
+        tipo,
+        extension: i > 10 ? getRandomInt(100, 9000) : null,
+        empleadoId: null,
+        contactoEmpresaId: null,
+        particularId: id,
+      });
+      //SERVICIOS-CAMION
+      const modelo = getRandomModelo();
+      const tipoServicios = ['arreglo', 'service', 'chequeo', 'pintura'];
+      const tipoS1 = tipoServicios[Math.floor(Math.random() * tipoServicios.length)];
+      const tipoS2 = tipoServicios[Math.floor(Math.random() * tipoServicios.length)];
+      if (i < 10) {
+        camiones.push({
+          matricula: `${getRandomString(3)}-${getRandomInt(1000, 9999)}`,
+          modelo,
+          anio: getRandomInt(1960, 2024),
+          estado: i < 5 ? 'sano' : 'roto',
+        });
+        servicios.push({
+          camionId: i,
+          fecha: new Date(fecha),
+          tipo: tipoS1,
+          precio: getRandomInt(1, 9000),
+          moneda: i < 5 ? 'peso' : 'dolar',
+          descripcion: `${tipoS1} de ${modelo}`,
+        });
+        servicios.push({
+          camionId: i,
+          fecha: new Date(fechaSalida),
+          tipo: tipoS1,
+          precio: getRandomInt(1, 9000),
+          moneda: i > 5 ? 'peso' : 'dolar',
+          descripcion: `${tipoS2} de ${modelo}`,
+        });
+      }
+      //JORNALES
+      let fechaMes = `2023-05-`;
+      if (i > 9) {
+        fechaMes += i;
+      } else {
+        fechaMes += '0' + i;
+      }
+      const tipoJornal = ['trabajo', 'trabajo', 'licencia', 'enfermedad', 'falta'];
+
+      for (let j = 1; j < 20; j++) {
+        const tipoJ = tipoJornal[Math.floor(Math.random() * tipoJornal.length)];
+        let num = getRandomInt(6, 9);
+        let horasExtra = getRandomInt(1, 4);
+        let entrada = `0${num}:00:00`;
+        let salida = `${num + 8 + horasExtra}:00:00`;
+        if (tipoJ !== 'trabajo') {
+          entrada = null;
+          salida = null;
+          horasExtra = null;
+        }
+
+        jornales.push({
+          creadoPor: 1,
+          empleadoId: j,
+          fecha: Date(fechaMes),
+          entrada,
+          salida,
+          tipo: tipoJ,
+          horasExtra,
+        });
+
+        //CONTACTOS-EMPRESA
+        let particularId = null;
+        let empresaId = null;
+        if (getRandomInt(1, 10) < 5) {
+          //TELEFONOS-CONTACTOSEMPRESA
+          telefonos.push({
+            telefono: getRandomPhone(tipo),
+            tipo,
+            extension: i > 10 ? getRandomInt(100, 9000) : null,
+            empleadoId: null,
+            contactoEmpresaId: getRandomInt(1, 57),
+            particularId: null,
+          });
+          particularId = getRandomInt(1, 19);
+        } else {
+          empresaId = getRandomInt(1, 19);
+        }
+        if (j < 4) {
+          const nombre_contactos = getRandomName();
+          contactos.push({
+            nombre: nombre_contactos,
+            descripcion: `Descripción de ${nombre_contactos}`,
+            email: `${nombre_contactos}@empresa.com`.replaceAll(' ', ''),
+            empresaId: empresaId ? empresaId : particularId,
+          });
+
+          //OBRAS
+          const calle = getRandomDireccion('calle');
+          const esquina = getRandomDireccion('calle');
+          const barrio = getRandomDireccion('barrio');
+          const numeroPuerta = getRandomInt(1000, 9999).toString();
+          obrasData.push({
+            calle,
+            esquina,
+            barrio,
+            coordenadas: 'placeholder',
+            numeroPuerta,
+            descripcion: `Obra en ${calle} ${numeroPuerta}, esquina ${esquina}`,
+            particularId,
+            empresaId,
+          });
+
+          //OBRAS-DETALLE
+          obrasDetalle.push({
+            obraId: j * 1,
+            detalleResiduos: getRandomDetalleResiduos(),
+            residuosMezclados: Math.random() < 0.5,
+            residuosReciclados: Math.random() < 0.5,
+            frecuenciaSemanal: [getRandomInt(1, 3), getRandomInt(4, 7)],
+            dias: 'A SOLICITUD',
+            destinoFinal: 'USINA 8',
+          });
+        }
+      }
+    }
     // --------------------EMPLEADOS--------------------
     await Empleados.bulkCreate([
       { nombre: 'Carolina Garcia', cedula: getRandomInt(10000000, 60000000) + '', rol: 'admin', fechaEntrada: moment('2024-06-02').toDate() },
       { nombre: 'Ana Gomez', cedula: getRandomInt(10000000, 60000000) + '', rol: 'normal', fechaEntrada: moment('2024-06-03').toDate() },
-      { nombre: 'Juan Pedro', cedula: getRandomInt(10000000, 60000000) + '', rol: 'chofer', fechaEntrada: moment('2024-06-04').toDate() },
-      { nombre: 'Roberto Gonzalez', cedula: getRandomInt(10000000, 60000000) + '', rol: 'chofer', fechaEntrada: moment('2024-06-05').toDate() },
-      { nombre: 'Jose Rios', cedula: getRandomInt(10000000, 60000000) + '', rol: 'chofer', fechaEntrada: moment('2024-06-01').toDate() },
-      { nombre: 'Pedro Varela', cedula: getRandomInt(10000000, 60000000) + '', rol: 'chofer', fechaEntrada: moment('2024-06-03').toDate() },
     ]);
-
+    await Empleados.bulkCreate(empleados);
     // --------------------CAMIONES--------------------
-    await Camiones.bulkCreate([
-      { matricula: 'SBB-2310', modelo: 'Mercedes', anio: 2020, estado: 'roto' },
-      { matricula: 'XYZ-789', modelo: 'Chevrolet', anio: 2019, estado: 'sano' },
-      { matricula: 'ABC-123', modelo: 'Volvo', anio: 2018, estado: 'sano' },
-      { matricula: 'DEF-456', modelo: 'Scania', anio: 2021, estado: 'roto' },
-      { matricula: 'GHI-789', modelo: 'MAN', anio: 2017, estado: 'sano' },
-      { matricula: 'JKL-012', modelo: 'Iveco', anio: 2022, estado: 'sano' },
-    ]);
-
+    await Camiones.bulkCreate(camiones);
     // --------------------USUARIOS--------------------
     await Usuarios.bulkCreate([
       { empleadoId: 1, email: 'carola@example.com', password: await bcrypt.hash('1', 10), rol: 'admin', activo: true },
       { empleadoId: 2, email: 'ana@example.com', password: await bcrypt.hash('1', 10), rol: 'normal' },
     ]);
-
     // --------------------CLIENTE EMPRESA--------------------
-    await ClienteEmpresas.bulkCreate([
-      {
-        rut: '123456789012',
-        nombre: 'Empresa A',
-        descripcion: 'Descripción de Empresa A',
-      },
-      {
-        rut: '234567890123',
-        nombre: 'Empresa B',
-        descripcion: 'Descripción de Empresa B',
-      },
-      {
-        rut: '345678901234',
-        nombre: 'Empresa C',
-        descripcion: 'Descripción de Empresa C',
-      },
-      {
-        rut: '456789012345',
-        nombre: 'Empresa D',
-        descripcion: 'Descripción de Empresa D',
-      },
-      {
-        rut: '567890123456',
-        nombre: 'Empresa E',
-        descripcion: 'Descripción de Empresa E',
-      },
-      {
-        rut: '678901234567',
-        nombre: 'Empresa F',
-        descripcion: 'Descripción de Empresa F',
-      },
-      {
-        rut: '789012345678',
-        nombre: 'Empresa G',
-        descripcion: 'Descripción de Empresa G',
-      },
-      {
-        rut: '890123456789',
-        nombre: 'Empresa H',
-        descripcion: 'Descripción de Empresa H',
-      },
-      {
-        rut: '901234567890',
-        nombre: 'Empresa I',
-        descripcion: 'Descripción de Empresa I',
-      },
-      {
-        rut: '012345678901',
-        nombre: 'Empresa J',
-        descripcion: 'Descripción de Empresa J',
-      },
-    ]);
-
+    await Empresas.bulkCreate(empresas);
     // --------------------CLIENTE PARTICULAR--------------------
-    const clienteParticulares = [];
-    for (let i = 0; i < 10; i++) {
-      const nombre = getRandomName();
-      const email = `${nombre}@particular.com`.replaceAll(' ', '');
-      clienteParticulares.push({
-        nombre,
-        cedula: getRandomInt(10000000, 60000000) + '',
-        descripcion: `Descripción de ${nombre}`,
-        email,
-      });
-    }
-    await ClienteParticulares.bulkCreate(clienteParticulares);
-
+    await Particulares.bulkCreate(particulares);
     // --------------------UBICACIONES--------------------
-    const ubicacionesData = [];
-    for (let i = 0; i < 10; i++) {
-      let clienteParticularId = null;
-      let clienteEmpresaId = null;
-      if (i > 5) {
-        clienteEmpresaId = getRandomInt(1, 10);
-      } else {
-        clienteParticularId = getRandomInt(1, 10);
-      }
-
-      ubicacionesData.push({
-        calle: getRandomDireccion('calle'),
-        esquina: getRandomDireccion('calle'),
-        barrio: getRandomDireccion('barrio'),
-        coordenadas: 'placeholder',
-        numeroPuerta: getRandomInt(1000, 9999).toString(),
-        descripcion: `descripcion falsa ${i}`,
-        detalleResiduos: getRandomDetalleResiduos(),
-        residuosMezclados: Math.random() < 0.5,
-        residuosReciclados: Math.random() < 0.5,
-        frecuenciaSemanal: getRandomInt(1, 7).toString(),
-        dias: 'A SOLICITUD',
-        destinoFinal: 'USINA 8',
-        clienteParticularId,
-        clienteEmpresaId,
-      });
-    }
-    await Ubicaciones.bulkCreate(ubicacionesData);
-
+    await Obras.bulkCreate(obrasData);
+    await ObraDetalles.bulkCreate(obrasDetalle);
     // --------------------CONTACTO EMPRESA--------------------
-    const personasEmpresas = [];
-    for (let i = 0; i < 10; i++) {
-      const nombre = getRandomName();
-      const email = `${nombre}@empresa.com`;
-      personasEmpresas.push({
-        nombre,
-        cedula: getRandomInt(10000000, 60000000) + '',
-        descripcion: `Descripción de ${nombre}`,
-        email,
-        clienteEmpresaId: getRandomInt(1, 10),
-      });
-    }
-    await ContactoEmpresas.bulkCreate(personasEmpresas);
-
+    await ContactoEmpresas.bulkCreate(contactos);
     // --------------------TELEFONOS--------------------
-    await Telefonos.bulkCreate([
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
-      { telefono: getRandomPhone('telefono'), tipo: 'telefono', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: getRandomInt(1, 5), contactoEmpresaId: null, clienteParticularId: null },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: null, clienteParticularId: getRandomInt(1, 5) },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
-      { telefono: getRandomPhone('celular'), tipo: 'celular', extension: getRandomInt(100, 9000), empleadoId: null, contactoEmpresaId: getRandomInt(1, 5), clienteParticularId: null },
-    ]);
-
+    await Telefonos.bulkCreate(telefonos);
     // --------------------HISTORICO-USO-CAMION--------------------
     await HistoricoUsoCamion.bulkCreate([
       { empleadoId: 3, camionId: 1, fechaInicio: new Date('2024-06-01') },
@@ -216,38 +265,10 @@ exports.precargarDatos = async () => {
     ]);
 
     // --------------------SERVICIOS-CAMION--------------------
-    await Servicios.bulkCreate([
-      { camionId: 1, fecha: new Date('2024-06-01'), tipo: 'arreglo', precio: 1200, moneda: 'peso', descripcion: 'arreglo de pintura' },
-      { camionId: 1, fecha: new Date('2020-02-01'), tipo: 'service', precio: 100, moneda: 'peso', descripcion: 'pinchazo' },
-      { camionId: 2, fecha: new Date('2010-02-01'), tipo: 'chequeo', precio: 0, moneda: 'peso', descripcion: 'chequeo en general de todo' },
-      { camionId: 3, fecha: new Date('2024-07-01'), tipo: 'service', precio: 800, moneda: 'peso', descripcion: 'cambio de aceite' },
-      { camionId: 4, fecha: new Date('2024-07-10'), tipo: 'arreglo', precio: 1500, moneda: 'peso', descripcion: 'reparación de motor' },
-      { camionId: 5, fecha: new Date('2024-08-15'), tipo: 'service', precio: 200, moneda: 'peso', descripcion: 'revisión de frenos' },
-      { camionId: 6, fecha: new Date('2024-09-01'), tipo: 'chequeo', precio: 0, moneda: 'dolar', descripcion: 'inspección general' },
-      { camionId: 1, fecha: new Date('2024-10-01'), tipo: 'arreglo', precio: 300, moneda: 'dolar', descripcion: 'reemplazo de neumáticos' },
-      { camionId: 2, fecha: new Date('2024-11-01'), tipo: 'service', precio: 250, moneda: 'dolar', descripcion: 'ajuste de suspensión' },
-      { camionId: 3, fecha: new Date('2024-12-01'), tipo: 'chequeo', precio: 700, moneda: 'dolar', descripcion: 'limpieza del sistema de combustible' },
-      { camionId: 4, fecha: new Date('2024-12-15'), tipo: 'pintura', precio: 1000, moneda: 'dolar', descripcion: 'pintura completa' },
-      { camionId: 5, fecha: new Date('2024-11-20'), tipo: 'pintura', precio: 1200, moneda: 'dolar', descripcion: 'pintura de cabina' },
-      { camionId: 6, fecha: new Date('2024-10-10'), tipo: 'arreglo', precio: 500, moneda: 'dolar', descripcion: 'arreglo de puertas' },
-    ]);
+    await Servicios.bulkCreate(servicios);
 
     // --------------------JORNALES--------------------
-    await Jornales.bulkCreate([
-      { creadoPor: 1, empleadoId: 1, fecha: moment('2024-06-01').toDate(), entrada: '08:00:00', salida: '17:00:00', tipo: 'trabajo', horasExtra: 1 },
-      { creadoPor: 1, empleadoId: 1, fecha: moment('2024-06-02').toDate(), entrada: '08:00:00', salida: '17:30:00', tipo: 'trabajo', horasExtra: 1.5 },
-      { creadoPor: 1, empleadoId: 2, fecha: moment('2024-06-01').toDate(), entrada: '09:00:00', salida: '18:00:00', tipo: 'trabajo', horasExtra: 1 },
-      { creadoPor: 1, empleadoId: 2, fecha: moment('2024-06-02').toDate(), entrada: '09:00:00', salida: '17:00:00', tipo: 'trabajo', horasExtra: 0 },
-      { creadoPor: 1, empleadoId: 3, fecha: moment('2024-06-01').toDate(), entrada: '07:00:00', salida: '16:00:00', tipo: 'trabajo', horasExtra: 1 },
-      { creadoPor: 1, empleadoId: 3, fecha: moment('2024-06-02').toDate(), entrada: '07:30:00', salida: '17:00:00', tipo: 'trabajo', horasExtra: 1.5 },
-      { creadoPor: 1, empleadoId: 4, fecha: moment('2024-06-01').toDate(), entrada: '10:00:00', salida: '19:00:00', tipo: 'trabajo', horasExtra: 1 },
-      { creadoPor: 1, empleadoId: 4, fecha: moment('2024-06-02').toDate(), entrada: '10:30:00', salida: '19:30:00', tipo: 'trabajo', horasExtra: 1 },
-      { creadoPor: 1, empleadoId: 5, fecha: moment('2024-06-03').toDate(), entrada: '08:00:00', salida: '17:00:00', tipo: 'trabajo', horasExtra: 1 },
-      { creadoPor: 1, empleadoId: 5, fecha: moment('2024-06-04').toDate(), entrada: '09:00:00', salida: '18:00:00', tipo: 'trabajo', horasExtra: 1 },
-      { creadoPor: 1, empleadoId: 6, fecha: moment('2024-06-03').toDate(), entrada: '08:00:00', salida: '17:00:00', tipo: 'trabajo', horasExtra: 1 },
-      { creadoPor: 1, empleadoId: 6, fecha: moment('2024-06-04').toDate(), entrada: '09:00:00', salida: '18:00:00', tipo: 'trabajo', horasExtra: 1 },
-      { creadoPor: 1, empleadoId: 6, fecha: moment('2024-06-04').toDate(), tipo: 'licencia' },
-    ]);
+    await Jornales.bulkCreate(jornales);
 
     console.log('Datos precargados con éxito.');
   } catch (error) {

@@ -15,27 +15,27 @@ const Pedidos = db.define('Pedidos', {
       key: 'id',
     },
   },
-  clienteParticularId: {
+  particularId: {
     type: DataTypes.INTEGER,
     allowNull: true,
     references: {
-      model: 'ClienteParticulares',
+      model: 'Particulares',
       key: 'id',
     },
   },
-  clienteEmpresaId: {
+  empresaId: {
     type: DataTypes.INTEGER,
     allowNull: true,
     references: {
-      model: 'ClienteEmpresas',
+      model: 'Empresas',
       key: 'id',
     },
   },
-  ubicacionId: {
+  obraId: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'Ubicaciones',
+      model: 'Obras',
       key: 'id',
     },
   },

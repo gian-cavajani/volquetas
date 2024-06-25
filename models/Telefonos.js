@@ -27,11 +27,11 @@ const Telefonos = db.define(
         key: 'id',
       },
     },
-    clienteParticularId: {
+    particularId: {
       type: Sequelize.INTEGER,
       allowNull: true,
       references: {
-        model: 'ClienteParticulares',
+        model: 'Particulares',
         key: 'id',
       },
       contactoEmpresaId: {
