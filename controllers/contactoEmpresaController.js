@@ -1,6 +1,5 @@
 const { Obras, Empresas, ContactoEmpresas, Telefonos } = require('../models');
 const validator = require('validator');
-const { ObjIsEmpty } = require('../utils/utils');
 
 exports.createContactoEmpresa = async (req, res) => {
   const { nombre, descripcion, email, empresaId, obraId } = req.body;

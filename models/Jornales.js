@@ -50,12 +50,22 @@ const Jornales = db.define(
           if (!jornal.entrada || !jornal.salida) {
             throw new Error('Por favor ingrese las horas de entrada y salida.');
           }
+
           const entrada = moment(jornal.entrada, 'HH:mm:ss');
           const salida = moment(jornal.salida, 'HH:mm:ss');
           const horas = salida.diff(entrada, 'hours', true);
 
-          // Calcular las horas extra solo si se trabaja más de 8 horas
-          const horasExtra = Math.max(horas - 8, 0);
+          const fecha = moment(jornal.fecha);
+
+          let limiteHoras = 8; // Límite de horas por defecto
+
+          // Si el día es sábado, ajustar el límite de horas a 4
+          if (fecha.isoWeekday() === 6) {
+            limiteHoras = 4;
+          }
+
+          // Calcular las horas extra basadas en el límite de horas correspondiente
+          const horasExtra = Math.max(horas - limiteHoras, 0);
 
           // Asignar el valor calculado de horasExtra a la columna en la base de datos
           jornal.horasExtra = horasExtra.toFixed(2);

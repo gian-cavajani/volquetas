@@ -80,7 +80,7 @@ exports.precargarDatos = async () => {
       const id = getRandomInt(1, 19);
       const mes = getRandomInt(1, 9);
       const dia = getRandomInt(10, 29);
-      const fecha = `20${id + 4}-0${mes}-${dia}`;
+      const fecha = `20${id < 10 ? '0' + id : id}-0${mes}-${dia}`;
       const fechaSalida = `2023-0${mes}-${dia}`;
       empleados.push({
         nombre: nombre,
@@ -139,15 +139,18 @@ exports.precargarDatos = async () => {
         });
       }
       //JORNALES
-      let fechaMes = `2023-05-`;
-      if (i > 9) {
-        fechaMes += i;
-      } else {
-        fechaMes += '0' + i;
-      }
       const tipoJornal = ['trabajo', 'trabajo', 'licencia', 'enfermedad', 'falta'];
 
       for (let j = 1; j < 20; j++) {
+        let fechaMes = `2024-06-`;
+        if (i > 9) {
+          fechaMes = fechaMes + i;
+        } else {
+          fechaMes = fechaMes + '0' + i;
+        }
+        console.log(fechaMes);
+        console.log(new Date(fechaMes));
+
         const tipoJ = tipoJornal[Math.floor(Math.random() * tipoJornal.length)];
         let num = getRandomInt(6, 9);
         let horasExtra = getRandomInt(1, 4);
@@ -162,7 +165,7 @@ exports.precargarDatos = async () => {
         jornales.push({
           creadoPor: 1,
           empleadoId: j,
-          fecha: Date(fechaMes),
+          fecha: new Date(fechaMes),
           entrada,
           salida,
           tipo: tipoJ,

@@ -15,6 +15,7 @@ const jornalController = require('../controllers/jornalController');
 const empresaController = require('../controllers/empresaController');
 const contactoEmpresaController = require('../controllers/contactoEmpresaController');
 const obrasController = require('../controllers/obrasController');
+const particularController = require('../controllers/particularController');
 
 module.exports = function () {
   //healthcheck
@@ -89,6 +90,13 @@ module.exports = function () {
   router.put('/contacto-empresas/:contactoEmpresaId', validarBodyVacio, verificarToken(), validarId('contactoEmpresaId'), contactoEmpresaController.updateContactoEmpresa);
   router.put('/contacto-empresas/asignar/:contactoEmpresaId', validarBodyVacio, verificarToken(), validarId('contactoEmpresaId'), contactoEmpresaController.asignarObra);
   router.delete('/contacto-empresas/:contactoEmpresaId', verificarToken(true), validarId('contactoEmpresaId'), contactoEmpresaController.deleteContactoEmpresa);
+
+  // Particulares
+  router.post('/particulares', validarBodyVacio, verificarToken(), particularController.createParticular);
+  router.get('/particulares', verificarToken(), particularController.getAllParticulares);
+  router.get('/particulares/:particularId', verificarToken(), validarId('particularId'), particularController.getParticular);
+  router.put('/particulares/:particularId', validarBodyVacio, verificarToken(), validarId('particularId'), particularController.updateParticular);
+  router.delete('/particulares/:particularId', verificarToken(true), validarId('particularId'), particularController.deleteParticular);
 
   // Obras
   router.post('/obras', validarBodyVacio, verificarToken(), obrasController.createObra);

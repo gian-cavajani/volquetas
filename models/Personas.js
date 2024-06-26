@@ -1,8 +1,9 @@
 const { DataTypes } = require('sequelize');
 const db = require('../config/db');
 
-const Particulares = db.define(
-  'Particulares',
+//TODO: PROBAR y preguntar a cliente si es que un contacto de una empresa puede llegar a ser un cliente particular.
+const Personas = db.define(
+  'Personas',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -17,7 +18,7 @@ const Particulares = db.define(
       type: DataTypes.STRING(8),
       unique: {
         args: true,
-        msg: 'Ya hay un cliente con esa cedula',
+        msg: 'Ya hay una persona con esa cedula',
       },
     },
     email: {
@@ -29,9 +30,8 @@ const Particulares = db.define(
     descripcion: DataTypes.STRING,
   },
   {
-    initialAutoIncrement: 10000,
     timestamps: false,
   }
 );
 
-module.exports = Particulares;
+module.exports = Personas;
