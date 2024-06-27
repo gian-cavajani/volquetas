@@ -4,7 +4,7 @@ const db = require('../config/db');
 const Volquetas = db.define(
   'Volquetas',
   {
-    numero: {
+    numeroVolqueta: {
       //numero es la PK
       type: DataTypes.INTEGER,
       primaryKey: true,

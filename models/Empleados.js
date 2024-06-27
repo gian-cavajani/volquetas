@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
 const db = require('../config/db');
+const { Personas } = require('.');
 
 const Empleados = db.define(
   'Empleados',
@@ -36,6 +37,14 @@ const Empleados = db.define(
       type: Sequelize.DATEONLY,
       defaultValue: null,
     },
+    // personaId: {
+    //   type: Sequelize.INTEGER,
+    //   allowNull: false,
+    //   references: {
+    //     model: Personas,
+    //     key: 'id',
+    //   },
+    // },
   },
   {
     timestamps: false,

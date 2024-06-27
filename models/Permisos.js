@@ -8,11 +8,15 @@ const Permisos = db.define(
   'Permisos',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: {
+        args: true,
+        msg: 'El numero del permiso debe ser unico',
+      },
       primaryKey: true,
-      autoIncrement: true,
     },
-    fechaEntrega: {
+    fechaCreacion: {
       type: DataTypes.DATE,
       allowNull: false,
     },
@@ -34,10 +38,6 @@ const Permisos = db.define(
         model: Particulares,
         key: 'id',
       },
-    },
-    numeroSolicitud: {
-      type: DataTypes.STRING,
-      allowNull: false,
     },
   },
   {

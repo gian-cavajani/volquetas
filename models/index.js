@@ -16,8 +16,13 @@ const Volquetas = require('./Volquetas');
 const SeguimientoVolquetas = require('./SeguimientoVolquetas');
 const Cajas = require('./Cajas');
 const Pedidos = require('./Pedidos');
+const Personas = require('./Personas');
 
 // --------- RELACIONES ---------
+
+//Personas - Empleados 1a1 --> Empleados tiene personaId
+// Personas.hasOne(Empleados, { foreignKey: 'personaId' });
+// Empleados.belongsTo(Personas, { foreignKey: 'personaId' });
 
 //Empleados - Usuarios 1a1 --> Usuario tiene empleadoId
 Empleados.hasOne(Usuarios, { foreignKey: 'empleadoId' });
@@ -79,12 +84,12 @@ ContactoEmpresas.hasMany(Telefonos, { foreignKey: 'contactoEmpresaId' });
 
 //------------------VOLQUETAS------------------//
 // Relación Volquetas - SeguimientoVolquetas
-Volquetas.hasMany(SeguimientoVolquetas, { foreignKey: 'numeroVolqueta' });
-SeguimientoVolquetas.belongsTo(Volquetas, { foreignKey: 'numeroVolqueta' });
+// Volquetas.hasMany(SeguimientoVolquetas, { foreignKey: 'numeroVolqueta' });
+// SeguimientoVolquetas.belongsTo(Volquetas, { foreignKey: 'numeroVolqueta' });
 
 // Relación Obras - SeguimientoVolquetas
-Obras.hasMany(SeguimientoVolquetas, { foreignKey: 'obraId' });
-SeguimientoVolquetas.belongsTo(Obras, { foreignKey: 'obraId' });
+// Obras.hasMany(SeguimientoVolquetas, { foreignKey: 'obraId' });
+// SeguimientoVolquetas.belongsTo(Obras, { foreignKey: 'obraId' });
 
 //------------------CAJAS------------------//
 // Relación Empleados - Cajas
@@ -104,15 +109,15 @@ Obras.hasMany(Cajas, { foreignKey: 'obraDelCliente' });
 Cajas.belongsTo(Obras, { foreignKey: 'obraDelCliente' });
 
 //------------------PEDIDOS------------------//
-Pedidos.belongsTo(Usuarios, { foreignKey: 'usuarioId', as: 'creador' });
-Pedidos.belongsTo(Particulares, { foreignKey: 'particularId', as: 'particular' });
-Pedidos.belongsTo(Empresas, { foreignKey: 'empresaId', as: 'empresa' });
-Pedidos.belongsTo(Obras, { foreignKey: 'obraId', as: 'obra' });
-Pedidos.belongsTo(Empleados, { foreignKey: 'choferEntregaId', as: 'choferEntrega' });
-Pedidos.belongsTo(Empleados, { foreignKey: 'choferLevanteId', as: 'choferLevante' });
-Pedidos.belongsTo(Permisos, { foreignKey: 'permisoId', as: 'permiso' });
-Pedidos.belongsTo(Volquetas, { foreignKey: 'volquetaId', as: 'volqueta' });
-Pedidos.belongsTo(Pedidos, { foreignKey: 'referenciaId', as: 'referencia' });
+// Pedidos.belongsTo(Usuarios, { foreignKey: 'usuarioId', as: 'creador' });
+// Pedidos.belongsTo(Particulares, { foreignKey: 'particularId', as: 'particular' });
+// Pedidos.belongsTo(Empresas, { foreignKey: 'empresaId', as: 'empresa' });
+// Pedidos.belongsTo(Obras, { foreignKey: 'obraId', as: 'obra' });
+// Pedidos.belongsTo(Empleados, { foreignKey: 'choferEntregaId', as: 'choferEntrega' });
+// Pedidos.belongsTo(Empleados, { foreignKey: 'choferLevanteId', as: 'choferLevante' });
+// Pedidos.belongsTo(Permisos, { foreignKey: 'permisoId', as: 'permiso' });
+// Pedidos.belongsTo(Volquetas, { foreignKey: 'volquetaId', as: 'volqueta' });
+// Pedidos.belongsTo(Pedidos, { foreignKey: 'referenciaId', as: 'referencia' });
 
 module.exports = {
   db,
@@ -133,4 +138,5 @@ module.exports = {
   Cajas,
   Pedidos,
   ObraDetalles,
+  Personas,
 };

@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
+const sanitizeData = require('../utils/sanitize');
 
 //Middleware para validar el id de los parametros
 const validarId = (paramName) => (req, res, next) => {
@@ -47,10 +49,11 @@ const verificarToken = (requireAdmin) => (req, res, next) => {
   }
 };
 
-const validarBodyVacio = (req, res, next) => {
+const validarBodyVacioYSanitizar = (req, res, next) => {
   if (Object.keys(req.body).length === 0) {
     return res.status(400).json({ error: 'El cuerpo de la solicitud está vacío' });
   }
+  req.body = sanitizeData(req.body);
   next();
 };
 
@@ -58,5 +61,5 @@ module.exports = {
   validarId,
   validarFechaParams,
   verificarToken,
-  validarBodyVacio,
+  validarBodyVacioYSanitizar,
 };

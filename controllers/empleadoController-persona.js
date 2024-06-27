@@ -1,11 +1,10 @@
-const { Empleados, Telefonos, Usuarios } = require('../models');
+const { Empleados, Telefonos, Usuarios, Personas } = require('../models');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
-const validator = require('validator');
+const { crearPersona } = require('./personaController');
 
 exports.nuevoEmpleado = async (req, res) => {
-  const { nombre, cedula, rol, fechaEntrada, fechaSalida } = req.body;
-
+  const { nombre, cedula, rol, fechaEntrada, fechaSalida, descripcion } = req.body;
   try {
     //validaciones
     if (!fechaEntrada || isNaN(Date.parse(fechaEntrada))) {
@@ -15,12 +14,11 @@ exports.nuevoEmpleado = async (req, res) => {
       return res.status(400).json({ error: 'La fecha de salida debe ser válida' });
     }
 
-    if (cedula.length !== 8) {
-      return res.status(400).json({ error: 'Cedula invalida, deben ser 8 numeros' });
-    }
-
     if (!['admin', 'normal', 'chofer'].includes(rol)) return res.status(400).json({ error: 'Rol inválido' });
 
+    const nuevaPersona = await crearPersona({ nombre, cedula, descripcion });
+
+    console.log({ nuevaPersona });
     // Crear el empleado
     const nuevoEmpleado = await Empleados.create({
       nombre,
@@ -28,13 +26,19 @@ exports.nuevoEmpleado = async (req, res) => {
       rol,
       fechaEntrada,
       fechaSalida,
+      personaId: nuevaPersona.id,
     });
 
     res.status(201).json(nuevoEmpleado);
   } catch (error) {
     console.error('Error al crear empleado:', error);
     const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
-    res.status(500).json({ error: 'Error al crear empleado', detalle: errorsSequelize });
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al crear empleado:', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al crear empleado:', detalle: error.message });
+    }
   }
 };
 
@@ -60,11 +64,16 @@ exports.getEmpleados = async (req, res) => {
 exports.getEmpleado = async (req, res) => {
   try {
     const empleado = await Empleados.findByPk(req.params.empleadoId, {
-      include: {
-        model: Telefonos,
-        required: false,
-        attributes: ['id', 'tipo', 'telefono', 'extension'],
-      },
+      include: [
+        {
+          model: Telefonos,
+          required: false,
+          attributes: ['id', 'tipo', 'telefono', 'extension'],
+        },
+        {
+          model: Personas,
+        },
+      ],
     });
 
     if (!empleado) return res.status(404).json({ error: 'Empleado no encontrado' });
