@@ -9,8 +9,7 @@ exports.registrarUsoCamion = async (req, res) => {
     //validar que empleado o chofer existan
     if (!camion || !chofer) throw Error('Camion o Chofer no existe');
     //validar que empleado sea chofer
-    if (chofer.rol !== 'chofer')
-      throw Error('Empleado debe ser de tipo chofer'); // Buscar el registro activo del camión
+    if (chofer.rol !== 'chofer') throw Error('Empleado debe ser de tipo chofer'); // Buscar el registro activo del camión
 
     const registroActivo = await HistoricoUsoCamion.findOne({
       where: {
@@ -22,8 +21,7 @@ exports.registrarUsoCamion = async (req, res) => {
     if (registroActivo) {
       if (registroActivo.fechaInicio >= Date.parse(fechaInicio)) {
         return res.status(400).json({
-          error:
-            'Fecha de inicio de uso del camion no puede ser anterior a la ultima fecha de inicio de uso',
+          error: 'Fecha de inicio de uso del camion no puede ser anterior a la ultima fecha de inicio de uso',
         });
       }
       // Actualizar la fecha de finalización del registro activo
@@ -56,7 +54,17 @@ exports.obtenerAsignacionesActuales = async (req, res) => {
       where: {
         fechaFin: null,
       },
-      include: [{ model: Empleados }, { model: Camiones }],
+      include: [
+        {
+          model: Empleados,
+          attributes: ['nombre'],
+        },
+
+        {
+          model: Camiones,
+          attributes: ['matricula'],
+        },
+      ],
     });
 
     res.status(200).json(asignacionesActuales);
@@ -84,7 +92,7 @@ exports.obtenerHistoricoPorCamionOEmpleado = async (req, res) => {
         },
         include: [
           { model: Empleados, attributes: ['nombre'] },
-          { model: Camiones, attributes: ['matricula'] },
+          // { model: Camiones, attributes: ['matricula'] },
         ],
       });
     } else if (empleadoId) {
@@ -94,7 +102,7 @@ exports.obtenerHistoricoPorCamionOEmpleado = async (req, res) => {
           empleadoId,
         },
         include: [
-          { model: Empleados, attributes: ['nombre'] },
+          // { model: Empleados, attributes: ['nombre'] },
           { model: Camiones, attributes: ['matricula'] },
         ],
       });
@@ -108,8 +116,6 @@ exports.obtenerHistoricoPorCamionOEmpleado = async (req, res) => {
     res.status(200).json(historico);
   } catch (error) {
     console.error('Error al obtener el historial:', error);
-    res
-      .status(500)
-      .json({ error: 'Error al obtener el historial', detalle: error.message });
+    res.status(500).json({ error: 'Error al obtener el historial', detalle: error.message });
   }
 };
