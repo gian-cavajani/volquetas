@@ -130,6 +130,17 @@ exports.getJornalesPorEmpleado = async (req, res) => {
     });
     if (!jornales || jornales.length === 0) return res.status(404).json({ error: 'No hay jornales' });
 
+    res.status(200).json(jornales);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener los jornales', error });
+  }
+};
+
+exports.getDatosPorEmpleado = async (req, res) => {
+  const { empleadoId, fechaInicio, fechaFin } = req.params;
+
+  try {
     const datos = await Jornales.findAll({
       where: {
         empleadoId: empleadoId,
@@ -149,24 +160,18 @@ exports.getJornalesPorEmpleado = async (req, res) => {
       group: ['empleadoId'],
       raw: true,
     });
-    res.status(200).json({ datos, jornales });
+    res.status(200).json(...datos);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al obtener los jornales', error });
   }
 };
 
-exports.getAllJornalesPorPeriodo = async (req, res) => {
+exports.getAllDatosPorPeriodo = async (req, res) => {
+  //datos
   const { fechaInicio, fechaFin } = req.params;
 
   try {
-    const jornales = await Jornales.findAll({
-      where: {
-        fecha: { [Op.and]: [{ [Op.gte]: new Date(fechaInicio) }, { [Op.lte]: new Date(fechaFin) }] },
-      },
-    });
-    if (!jornales || jornales.length === 0) return res.status(404).json({ error: 'No hay jornales' });
-
     const datos = await Jornales.findAll({
       where: {
         fecha: { [Op.and]: [{ [Op.gte]: new Date(fechaInicio) }, { [Op.lte]: new Date(fechaFin) }] },
@@ -185,7 +190,7 @@ exports.getAllJornalesPorPeriodo = async (req, res) => {
       group: ['empleadoId'],
       raw: true,
     });
-    res.status(200).json({ datos, jornales });
+    res.status(200).json(datos);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al obtener los jornales' });

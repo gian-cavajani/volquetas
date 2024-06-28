@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const moment = require('moment');
 const { randomUUID, getRandomValues } = require('crypto');
 const { getRandomModelo, getRandomString, getRandomDetalleResiduos, getRandomDireccion, getRandomInt, getRandomName, getRandomEmail, getRandomPhone } = require('./utilsPrecarga');
-const { Permisos, Obras, ObraDetalles, Particulares, ContactoEmpresas, Empresas, Jornales, Servicios, Camiones, Empleados, Telefonos, Usuarios, HistoricoUsoCamion } = require('../models');
+const { Permisos, Obras, ObraDetalles, Particulares, ContactoEmpresas, Empresas, Jornales, Servicios, Camiones, Empleados, Telefonos, Usuarios, HistoricoUsoCamion, Volquetas } = require('../models');
 
 exports.precargarDatos = async () => {
   try {
@@ -22,6 +22,7 @@ exports.precargarDatos = async () => {
     const existingObras = await Obras.count();
     const existingObraDetalles = await ObraDetalles.count();
     const existingPermisos = await Permisos.count();
+    const existingvolquetas = await Volquetas.count();
 
     if (
       existingClienteEmpresas > 0 ||
@@ -37,6 +38,7 @@ exports.precargarDatos = async () => {
       existingJornales > 0 ||
       existingObras > 0 ||
       existingPermisos > 0 ||
+      existingvolquetas > 0 ||
       existingObraDetalles > 0
     ) {
       console.log('Datos ya existen. No se realizará la precarga.');
@@ -56,8 +58,16 @@ exports.precargarDatos = async () => {
     const servicios = [];
     const jornales = [];
     const permisos = [];
+    const volquetas = [];
 
     for (let i = 1; i < 20; i++) {
+      //VOLQUETAS
+      volquetas.push({
+        numeroVolqueta: i,
+        estado: i > 2 ? 'ok' : 'perdida',
+        tipo: i > 18 ? 'chica' : 'grande',
+      });
+
       //EMPRESAS
       const apellido = getRandomName('apellido');
       const nombreEmpresa = `Empresa ${i} de ${apellido}`;
@@ -195,7 +205,7 @@ exports.precargarDatos = async () => {
           permisos.push({
             id: getRandomInt(1, 699999),
             fechaCreacion: new Date(fechaMes),
-            fechaVencimiento: `2023-0${getRandomInt(1, 9)}-30T00:00:00.000Z`,
+            fechaVencimiento: `2024-0${getRandomInt(1, 9)}-30T00:00:00.000Z`,
             empresaId: getRandomInt(1, 19),
             particularId: null,
           });
@@ -295,6 +305,8 @@ exports.precargarDatos = async () => {
     await Jornales.bulkCreate(jornales);
     // --------------------PERMISOS--------------------
     await Permisos.bulkCreate(permisos);
+    // --------------------VOLQUETAS--------------------
+    await Volquetas.bulkCreate(volquetas);
 
     console.log('Datos precargados con éxito.');
   } catch (error) {

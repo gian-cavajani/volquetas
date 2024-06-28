@@ -30,7 +30,6 @@ exports.crearPermiso = async (req, res) => {
     }
   }
 };
-
 exports.obtenerPermisos = async (req, res) => {
   try {
     const permisos = await Permisos.findAll();
@@ -39,20 +38,55 @@ exports.obtenerPermisos = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener los permisos', detalle: error.message });
   }
 };
-
 exports.obtenerPermisosPorEmpresa = async (req, res) => {
   try {
     const { empresaId } = req.params;
+    const { activo } = req.query;
+
+    let whereCondition = { empresaId };
+
+    if (activo && activo.toLowerCase() === 'si') {
+      // Filtrar por permisos activos (fechaVencimiento > fecha actual)
+      whereCondition.fechaVencimiento = {
+        [Op.gt]: new Date(),
+      };
+    }
+
     const permisos = await Permisos.findAll({
-      where: { empresaId },
+      where: whereCondition,
       attributes: ['id', 'fechaCreacion', 'fechaVencimiento'],
     });
+
     res.status(200).json(permisos);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Error al obtener los permisos por empresa', detalle: error.message });
   }
 };
+exports.obtenerPermisosPorParticular = async (req, res) => {
+  try {
+    const { particularId } = req.params;
+    const { activo } = req.query;
 
+    let whereCondition = { particularId };
+
+    if (activo && activo.toLowerCase() === 'si') {
+      whereCondition.fechaVencimiento = {
+        [Op.gt]: new Date(),
+      };
+    }
+
+    const permisos = await Permisos.findAll({
+      where: whereCondition,
+      attributes: ['id', 'fechaCreacion', 'fechaVencimiento'],
+    });
+
+    res.status(200).json(permisos);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener los permisos por particular', detalle: error.message });
+  }
+};
 exports.actualizarPermiso = async (req, res) => {
   try {
     const { permisoId } = req.params;
@@ -69,7 +103,6 @@ exports.actualizarPermiso = async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar el permiso', detalle: error.message });
   }
 };
-
 exports.eliminarPermiso = async (req, res) => {
   try {
     const { permisoId } = req.params;

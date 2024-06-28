@@ -1,4 +1,5 @@
 const { Servicios, Camiones } = require('../models');
+const { Op, Sequelize } = require('sequelize');
 const validator = require('validator');
 
 exports.nuevoServicio = async (req, res) => {
@@ -36,9 +37,9 @@ exports.nuevoServicio = async (req, res) => {
 exports.getServicios = async (req, res) => {
   try {
     const servicios = await Servicios.findAll({
-      include: {
-        model: Camiones,
-      },
+      // include: {
+      //   model: Camiones,
+      // },
     });
     res.status(200).json(servicios);
   } catch (error) {
@@ -52,6 +53,39 @@ exports.getServicioPorCamion = async (req, res) => {
     const servicios = await Servicios.findAll({
       where: { camionId: req.params.camionId },
     });
+    res.status(200).json(servicios);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener los servicios' });
+  }
+};
+
+exports.getServiciosPorCamionMensual = async (req, res) => {
+  const { month, year, camionId } = req.query; // Se esperan los parámetros 'month', 'year' y 'camionId' en la query
+
+  if (!month || isNaN(month) || month < 1 || month > 12) {
+    return res.status(400).json({ error: 'Mes inválido. Debe ser un número entre 1 y 12.' });
+  }
+
+  if (!year || isNaN(year) || year < 1900 || year > new Date().getFullYear()) {
+    return res.status(400).json({ error: 'Año inválido.' });
+  }
+
+  try {
+    let whereClause = {
+      fecha: {
+        [Op.and]: [Sequelize.literal(`EXTRACT(MONTH FROM fecha) = ${month}`), Sequelize.literal(`EXTRACT(YEAR FROM fecha) = ${year}`)],
+      },
+    };
+
+    if (camionId) {
+      whereClause.camionId = camionId;
+    }
+
+    const servicios = await Servicios.findAll({
+      where: whereClause,
+    });
+
     res.status(200).json(servicios);
   } catch (error) {
     console.error(error);

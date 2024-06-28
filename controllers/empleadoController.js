@@ -41,13 +41,13 @@ exports.nuevoEmpleado = async (req, res) => {
 exports.getEmpleados = async (req, res) => {
   try {
     const empleados = await Empleados.findAll({
-      include: [
-        {
-          model: Telefonos,
-          required: false,
-          attributes: ['id', 'tipo', 'telefono', 'extension'],
-        },
-      ],
+      // include: [
+      //   {
+      //     model: Telefonos,
+      //     required: false,
+      //     attributes: ['id', 'tipo', 'telefono', 'extension'],
+      //   },
+      // ],
     });
 
     res.status(200).json(empleados);

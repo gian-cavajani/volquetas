@@ -18,6 +18,7 @@ const obrasController = require('../controllers/obrasController');
 const particularController = require('../controllers/particularController');
 const permisoController = require('../controllers/permisoController');
 const volquetaController = require('../controllers/volquetaController');
+const pedidoController = require('../controllers/pedidoController');
 
 module.exports = function () {
   //healthcheck
@@ -65,6 +66,7 @@ module.exports = function () {
   //Servicios
   router.post('/servicios', validarBodyVacioYSanitizar, verificarToken(), servicioController.nuevoServicio);
   router.get('/servicios', verificarToken(), servicioController.getServicios);
+  router.get('/servicios/mensuales', verificarToken(), servicioController.getServiciosPorCamionMensual);
   router.get('/servicios/:camionId', verificarToken(), validarId('camionId'), servicioController.getServicioPorCamion);
   router.delete('/servicios/:servicioId', verificarToken(true), validarId('servicioId'), servicioController.deleteServicio);
 
@@ -73,10 +75,11 @@ module.exports = function () {
   router.get('/jornales/:jornalId', verificarToken(), validarId('jornalId'), jornalController.getJornal);
   router.delete('/jornales/:jornalId', verificarToken(true), validarId('jornalId'), jornalController.borrarJornal);
   router.put('/jornales/:jornalId', validarBodyVacioYSanitizar, verificarToken(true), validarId('jornalId'), jornalController.editarJornal);
-
-  //router.get('/jornales/horas/:empleadoId/:fechaInicio/:fechaFin', verificarToken(), validarFechaParams, jornalController.getHorasPorEmpleado);
-  router.get('/jornales/todos/:fechaInicio/:fechaFin', verificarToken(), validarFechaParams, jornalController.getAllJornalesPorPeriodo);
   router.get('/jornales/:empleadoId/:fechaInicio/:fechaFin', verificarToken(), validarFechaParams, jornalController.getJornalesPorEmpleado);
+
+  //Datos de Jornales
+  router.get('/datos/todos/:fechaInicio/:fechaFin', verificarToken(), validarFechaParams, jornalController.getAllDatosPorPeriodo);
+  router.get('/datos/:empleadoId/:fechaInicio/:fechaFin', verificarToken(), validarFechaParams, jornalController.getDatosPorEmpleado);
 
   // Empresas
   router.post('/empresas', validarBodyVacioYSanitizar, verificarToken(), empresaController.createEmpresa);
@@ -112,6 +115,7 @@ module.exports = function () {
   router.post('/permisos', verificarToken(), validarBodyVacioYSanitizar, permisoController.crearPermiso);
   router.get('/permisos', verificarToken(), permisoController.obtenerPermisos);
   router.get('/permisos/empresa/:empresaId', verificarToken(), validarId('empresaId'), permisoController.obtenerPermisosPorEmpresa);
+  router.get('/permisos/particular/:particularId', verificarToken(), validarId('particularId'), permisoController.obtenerPermisosPorParticular);
   router.put('/permisos/:permisoId', verificarToken(), validarBodyVacioYSanitizar, validarId('permisoId'), permisoController.actualizarPermiso);
   router.delete('/permisos/:permisoId', verificarToken(true), validarId('permisoId'), permisoController.eliminarPermiso);
 
@@ -121,6 +125,10 @@ module.exports = function () {
   router.get('/volquetas/:numeroVolqueta', verificarToken(), validarId('numeroVolqueta'), volquetaController.getVolquetaById);
   router.put('/volquetas/:numeroVolqueta', verificarToken(), validarBodyVacioYSanitizar, validarId('numeroVolqueta'), volquetaController.updateVolquetaById);
   router.delete('/volquetas/:numeroVolqueta', verificarToken(true), validarId('numeroVolqueta'), volquetaController.deleteVolquetaById);
+
+  //Pedidos
+  router.post('/pedidos/nuevo', verificarToken(), validarBodyVacioYSanitizar, pedidoController.createPedidoNuevo);
+  router.get('/pedidos', verificarToken(), pedidoController.getPedidos);
 
   return router;
 };
