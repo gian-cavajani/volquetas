@@ -1,5 +1,6 @@
 const { Obras, Telefonos, Particulares } = require('../models');
 const validator = require('validator');
+const { Op } = require('sequelize');
 
 exports.createParticular = async (req, res) => {
   const { nombre, cedula, descripcion, email } = req.body;
@@ -63,6 +64,36 @@ exports.getAllParticulares = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al obtener los Clientes Particulares' });
+  }
+};
+
+exports.buscarParticular = async (req, res) => {
+  try {
+    const { nombre, email, cedula } = req.query;
+
+    const searchCriteria = {};
+
+    if (nombre) {
+      searchCriteria.nombre = { [Op.iLike]: `%${nombre}%` };
+    }
+    if (email) {
+      searchCriteria.email = { [Op.iLike]: `%${email}%` };
+    }
+    if (cedula) {
+      searchCriteria.cedula = { [Op.iLike]: `%${cedula}%` };
+    }
+
+    if (!nombre && !email && !cedula) {
+      return res.status(400).json({ error: 'Debe proporcionar al menos un parámetro de búsqueda (nombre, email, cedula).' });
+    }
+
+    const particulares = await Particulares.findAll({
+      where: searchCriteria,
+    });
+
+    res.status(200).json(particulares);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al buscar particulares', detalle: error.message });
   }
 };
 

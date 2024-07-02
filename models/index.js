@@ -17,6 +17,7 @@ const Movimientos = require('./Movimientos');
 const Sugerencias = require('./Sugerencias');
 const Cajas = require('./Cajas');
 const Pedidos = require('./Pedidos');
+const PagoPedidos = require('./PagoPedidos');
 const Personas = require('./Personas');
 
 // --------- RELACIONES ---------
@@ -121,8 +122,11 @@ Pedidos.belongsTo(Permisos, { foreignKey: 'permisoId' });
 Pedidos.hasMany(Movimientos, { foreignKey: 'pedidoId' });
 Pedidos.hasMany(Sugerencias, { foreignKey: 'pedidoId' });
 
+//Pago-Pedidos 1an -> pagoPedidos puede tener multiples pedidos (en caso multiple todos los pedidos tienen el mismo pago pedido)
+PagoPedidos.hasMany(Pedidos, { foreignKey: 'pagoPedidoId', as: 'pedidos' });
+Pedidos.belongsTo(PagoPedidos, { foreignKey: 'pagoPedidoId', as: 'pagoPedido' });
 //------------------SUGERENCIAS------------------//
-Sugerencias.belongsTo(Empleados, { foreignKey: 'choferSugerenciaId' });
+Sugerencias.belongsTo(Empleados, { foreignKey: 'choferSugeridoId' });
 Sugerencias.belongsTo(Pedidos, { foreignKey: 'pedidoId' });
 
 module.exports = {
@@ -142,6 +146,7 @@ module.exports = {
   Volquetas,
   Cajas,
   Pedidos,
+  PagoPedidos,
   Movimientos,
   Sugerencias,
   ObraDetalles,

@@ -84,6 +84,7 @@ module.exports = function () {
   // Empresas
   router.post('/empresas', validarBodyVacioYSanitizar, verificarToken(), empresaController.createEmpresa);
   router.get('/empresas', verificarToken(), empresaController.getAllEmpresas);
+  router.get('/empresas/buscar', verificarToken(), empresaController.buscarEmpresa);
   router.get('/empresas/:empresaId', verificarToken(), validarId('empresaId'), empresaController.getEmpresa);
   router.put('/empresas/:empresaId', validarBodyVacioYSanitizar, verificarToken(), validarId('empresaId'), empresaController.updateEmpresa);
   router.delete('/empresas/:empresaId', verificarToken(true), validarId('empresaId'), empresaController.deleteEmpresa);
@@ -99,6 +100,7 @@ module.exports = function () {
   // Particulares
   router.post('/particulares', validarBodyVacioYSanitizar, verificarToken(), particularController.createParticular);
   router.get('/particulares', verificarToken(), particularController.getAllParticulares);
+  router.get('/particulares/buscar', verificarToken(), particularController.buscarParticular);
   router.get('/particulares/:particularId', verificarToken(), validarId('particularId'), particularController.getParticular);
   router.put('/particulares/:particularId', validarBodyVacioYSanitizar, verificarToken(), validarId('particularId'), particularController.updateParticular);
   router.delete('/particulares/:particularId', verificarToken(true), validarId('particularId'), particularController.deleteParticular);
@@ -129,6 +131,7 @@ module.exports = function () {
   //Pedidos
   router.post('/pedidos/nuevo', verificarToken(), validarBodyVacioYSanitizar, pedidoController.createPedidoNuevo);
   router.get('/pedidos', verificarToken(), pedidoController.getPedidos);
+  router.get('/pedidos/:pedidoId', verificarToken(), validarId('pedidoId'), pedidoController.getPedidoId);
 
   return router;
 };

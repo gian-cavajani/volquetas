@@ -203,7 +203,7 @@ exports.precargarDatos = async () => {
           particularId = getRandomInt(1, 19);
           //PERMISSOS
           permisos.push({
-            id: getRandomInt(1, 699999),
+            id: `2${i + 12}${j + 12}`,
             fechaCreacion: new Date(fechaMes),
             fechaVencimiento: `2024-0${getRandomInt(1, 9)}-30T00:00:00.000Z`,
             empresaId: getRandomInt(1, 19),
@@ -213,13 +213,14 @@ exports.precargarDatos = async () => {
           empresaId = getRandomInt(1, 19);
           //PERMISSOS
           permisos.push({
-            id: getRandomInt(1, 699999),
+            id: `1${i + 13}${j + 13}`,
             fechaCreacion: new Date(fechaMes),
             fechaVencimiento: `2024-0${getRandomInt(1, 9)}-30T00:00:00.000Z`,
             empresaId: null,
             particularId: getRandomInt(1, 19),
           });
         }
+
         if (j < 4) {
           const nombre_contactos = getRandomName();
           contactos.push({

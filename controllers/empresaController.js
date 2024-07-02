@@ -1,5 +1,6 @@
 const { Empresas, Obras, ContactoEmpresas, Telefonos } = require('../models');
 const validator = require('validator');
+const { Op } = require('sequelize');
 
 exports.createEmpresa = async (req, res) => {
   const { rut, nombre, descripcion, razonSocial } = req.body;
@@ -84,6 +85,35 @@ exports.getAllEmpresas = async (req, res) => {
   }
 };
 
+exports.buscarEmpresa = async (req, res) => {
+  try {
+    const { rut, nombre, razonSocial } = req.query;
+
+    const searchCriteria = {};
+
+    if (rut) {
+      searchCriteria.rut = { [Op.iLike]: `%${rut}%` };
+    }
+    if (nombre) {
+      searchCriteria.nombre = { [Op.iLike]: `%${nombre}%` };
+    }
+    if (razonSocial) {
+      searchCriteria.razonSocial = { [Op.iLike]: `%${razonSocial}%` };
+    }
+
+    if (!rut && !nombre && !razonSocial) {
+      return res.status(400).json({ error: 'Debe proporcionar al menos un parámetro de búsqueda (rut, nombre, razonSocial).' });
+    }
+
+    const empresas = await Empresas.findAll({
+      where: searchCriteria,
+    });
+
+    res.status(200).json(empresas);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al buscar empresas', detalle: error.message });
+  }
+};
 exports.updateEmpresa = async (req, res) => {
   const { rut, nombre, descripcion, razonSocial } = req.body;
   if (rut && !validator.isLength(rut, { min: 12, max: 12 })) return res.status(400).json({ error: 'El RUT debe tener 12 caracteres.' });

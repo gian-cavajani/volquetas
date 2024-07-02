@@ -47,17 +47,13 @@ const Pedidos = db.define('Pedidos', {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  precio: {
-    type: DataTypes.FLOAT,
-    allowNull: true,
-  },
-  pagado: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
-  },
-  remito: {
+  pagoPedidoId: {
     type: DataTypes.INTEGER,
     allowNull: true,
+    references: {
+      model: 'PagoPedidos',
+      key: 'id',
+    },
   },
   referenciaId: {
     type: DataTypes.INTEGER,
