@@ -129,7 +129,10 @@ module.exports = function () {
   router.delete('/volquetas/:numeroVolqueta', verificarToken(true), validarId('numeroVolqueta'), volquetaController.deleteVolquetaById);
 
   //Pedidos
+  router.post('/pedidos/multiple', verificarToken(), validarBodyVacioYSanitizar, pedidoController.createPedidoMultiple);
   router.post('/pedidos/nuevo', verificarToken(), validarBodyVacioYSanitizar, pedidoController.createPedidoNuevo);
+  router.post('/pedidos/entrega-levante', verificarToken(), validarBodyVacioYSanitizar, pedidoController.createPedidoNuevo);
+  router.post('/pedidos/recambio', verificarToken(), validarBodyVacioYSanitizar, pedidoController.createPedidoNuevo);
   router.get('/pedidos', verificarToken(), pedidoController.getPedidos);
   router.get('/pedidos/:pedidoId', verificarToken(), validarId('pedidoId'), pedidoController.getPedidoId);
 

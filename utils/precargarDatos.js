@@ -278,6 +278,16 @@ exports.precargarDatos = async () => {
     // --------------------CLIENTE PARTICULAR--------------------
     await Particulares.bulkCreate(particulares);
     // --------------------UBICACIONES--------------------
+    obrasData.unshift({
+      calle: 'calle 1',
+      esquina: 'calle 2',
+      barrio: 'barrio1',
+      coordenadas: 'placeholder',
+      numeroPuerta: 1,
+      descripcion: `Obra 1`,
+      particularId: null,
+      empresaId: 1,
+    });
     await Obras.bulkCreate(obrasData);
     await ObraDetalles.bulkCreate(obrasDetalle);
     // --------------------CONTACTO EMPRESA--------------------
@@ -305,6 +315,13 @@ exports.precargarDatos = async () => {
     // --------------------JORNALES--------------------
     await Jornales.bulkCreate(jornales);
     // --------------------PERMISOS--------------------
+    permisos.push({
+      id: 1,
+      fechaCreacion: `2023-07-30T00:00:00.000Z`,
+      fechaVencimiento: `2024-07-30T00:00:00.000Z`,
+      empresaId: 1,
+      particularId: null,
+    });
     await Permisos.bulkCreate(permisos);
     // --------------------VOLQUETAS--------------------
     await Volquetas.bulkCreate(volquetas);
