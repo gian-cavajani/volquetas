@@ -4,7 +4,7 @@ const Op = Sequelize.Op;
 const validator = require('validator');
 
 exports.nuevoEmpleado = async (req, res) => {
-  const { nombre, cedula, rol, fechaEntrada, fechaSalida } = req.body;
+  const { nombre, cedula, rol, fechaEntrada, fechaSalida, direccion } = req.body;
 
   try {
     //validaciones
@@ -28,6 +28,7 @@ exports.nuevoEmpleado = async (req, res) => {
       rol,
       fechaEntrada,
       fechaSalida,
+      direccion,
     });
 
     res.status(201).json(nuevoEmpleado);
@@ -140,7 +141,7 @@ exports.cambiarEstadoEmpleado = async (req, res) => {
 
 exports.modificarEmpleado = async (req, res) => {
   const { empleadoId } = req.params;
-  const { nombre, cedula, rol, habilitado, fechaEntrada, fechaSalida } = req.body;
+  const { nombre, cedula, rol, habilitado, fechaEntrada, fechaSalida, direccion } = req.body;
 
   try {
     // Buscar el empleado por ID
@@ -173,6 +174,7 @@ exports.modificarEmpleado = async (req, res) => {
       habilitado: habilitado !== undefined ? habilitado : empleado.habilitado,
       fechaEntrada: fechaEntrada ? fechaEntrada : empleado.fechaEntrada,
       fechaSalida: fechaSalida ? fechaSalida : empleado.fechaSalida,
+      direccion: direccion ? direccion : empleado.direccion,
     });
 
     res.status(200).json(nuevoEmpleado);

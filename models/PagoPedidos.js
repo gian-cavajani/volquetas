@@ -22,7 +22,7 @@ const PagoPedidos = db.define(
       allowNull: true,
     },
     tipoPago: {
-      type: DataTypes.ENUM('credito', 'debito', 'efectivo', 'cheque', 'otros'),
+      type: DataTypes.ENUM('transferencia', 'efectivo', 'cheque'),
     },
   },
   {

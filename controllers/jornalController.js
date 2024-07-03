@@ -120,12 +120,11 @@ exports.getJornal = async (req, res) => {
 
 exports.getJornalesPorEmpleado = async (req, res) => {
   const { empleadoId, fechaInicio, fechaFin } = req.params;
-
   try {
     const jornales = await Jornales.findAll({
       where: {
         empleadoId,
-        fecha: { [Op.and]: [{ [Op.gte]: new Date(fechaInicio) }, { [Op.lte]: new Date(fechaFin) }] },
+        fecha: { [Op.and]: [{ [Op.gte]: fechaInicio }, { [Op.lte]: fechaFin }] },
       },
     });
     if (!jornales || jornales.length === 0) return res.status(404).json({ error: 'No hay jornales' });
@@ -144,7 +143,7 @@ exports.getDatosPorEmpleado = async (req, res) => {
     const datos = await Jornales.findAll({
       where: {
         empleadoId: empleadoId,
-        fecha: { [Op.and]: [{ [Op.gte]: new Date(fechaInicio) }, { [Op.lte]: new Date(fechaFin) }] },
+        fecha: { [Op.and]: [{ [Op.gte]: fechaInicio }, { [Op.lte]: fechaFin }] },
       },
       attributes: [
         'empleadoId',
@@ -174,7 +173,7 @@ exports.getAllDatosPorPeriodo = async (req, res) => {
   try {
     const datos = await Jornales.findAll({
       where: {
-        fecha: { [Op.and]: [{ [Op.gte]: new Date(fechaInicio) }, { [Op.lte]: new Date(fechaFin) }] },
+        fecha: { [Op.and]: [{ [Op.gte]: fechaInicio }, { [Op.lte]: fechaFin }] },
       },
       attributes: [
         'empleadoId',

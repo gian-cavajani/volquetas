@@ -40,8 +40,8 @@ const crearPedido = async (req, res, creadoComo) => {
 
   if (precio && !validator.isFloat(precio.toString())) throw new Error('El campo precio debe ser un número válido.');
   if (!obraId || !validator.isInt(obraId.toString())) throw new Error('Debe tener una obra y debe ser valida');
-  if (tipoPago && !['credito', 'debito', 'efectivo', 'cheque', 'otros'].includes(tipoPago)) {
-    throw new Error("Tipo de pago debe ser valido, opciones: ('credito', 'debito', 'efectivo', 'cheque', 'otros')");
+  if (tipoPago && !['transferencia', 'efectivo', 'cheque'].includes(tipoPago)) {
+    throw new Error("Tipo de pago debe ser valido, opciones: ('transferencia', 'efectivo', 'cheque')");
   }
   if (horarioSugerido && isNaN(Date.parse(horarioSugerido))) throw new Error('Horario sugerido debe ser una fecha válida');
   if (horarioSugerido && Date.parse(horarioSugerido) < Date.now()) throw new Error('Horario sugerido debe ser una fecha válida en el futuro');
@@ -83,37 +83,49 @@ const crearPedido = async (req, res, creadoComo) => {
 
   const pedido = { creadoPor, obraId, descripcion, estado: 'iniciado', creadoComo, permisoId, pagoPedidoId: nuevoPago.id };
   const nuevoPedido = await Pedidos.create(pedido);
-  const nuevaSugerencia = await Sugerencias.create({
-    pedidoId: nuevoPedido.id,
-    horarioSugerido,
-    tipoSugerido: 'entrega',
-    choferSugeridoId,
-  });
+  let nuevaSugerencia;
+  let sugerencia;
+  if (horarioSugerido || choferSugeridoId) {
+    sugerencia = { pedidoId: nuevoPedido.id, horarioSugerido, tipoSugerido: 'entrega', choferSugeridoId };
+    nuevaSugerencia = await Sugerencias.create(sugerencia);
+  }
 
   if (creadoComo === 'recambio') {
+    //PEDIDO RECAMBIO --------------------
     nuevoPedido.referenciaId = referenciaId;
     nuevoPedido.save();
   } else if (creadoComo === 'multiple') {
+    //PEDIDOS MULTIPLES --------------------
     nuevoPedido.referenciaId = nuevoPedido.id;
+    const obraLugar = obra.calle;
+    nuevoPedido.descripcion = `Pedido Multiple Nro 1 en ${obraLugar}: ${descripcion} `;
     nuevoPedido.save();
-    const multiples = [];
+    let multiples = [];
 
     for (let i = 1; i < cantidadMultiple; i++) {
-      pedido.referenciaId = nuevoPedido.id;
-      pedido.pagoPedidoId = nuevoPago.id;
-      multiples.push(pedido);
+      const pedidoIteracion = {
+        ...pedido,
+        referenciaId: nuevoPedido.id,
+        pagoPedidoId: nuevoPago.id,
+        descripcion: `Pedido Multiple Nro ${i + 1} en ${obraLugar}: ${descripcion}`,
+      };
+      multiples.push(pedidoIteracion);
     }
 
     const pedidosMultiples = await Pedidos.bulkCreate(multiples);
+
+    for (let i = 1; i < cantidadMultiple; i++) {
+      sugerencia.pedidoId = pedidosMultiples[i - 1].id;
+      await Sugerencias.create(sugerencia);
+    }
     pedidosMultiples.push(nuevoPedido);
-    console.log(pedidosMultiples);
+    // console.log(pedidosMultiples);
     return pedidosMultiples;
   }
 
   return { nuevaSugerencia, nuevoPedido, nuevoPago };
 };
 
-// Controlador para crear un pedido
 exports.createPedidoNuevo = async (req, res) => {
   try {
     let nuevoPedidoYSugerencia;
@@ -144,13 +156,13 @@ exports.createPedidoMultiple = async (req, res) => {
 
     res.status(201).json(nuevoPedidoYSugerencia);
   } catch (error) {
-    console.error('Error al crear el pedido:', error);
+    console.error('Error al crear los pedidos:', error);
     const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
 
     if (errorsSequelize.length > 0) {
-      res.status(500).json({ error: 'Error al crear el pedido', detalle: errorsSequelize });
+      res.status(500).json({ error: 'Error al crear los pedidos', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear el pedido', detalle: error.message });
+      res.status(500).json({ error: 'Error al crear los pedidos', detalle: error.message });
     }
   }
 };

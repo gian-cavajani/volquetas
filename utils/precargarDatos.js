@@ -103,6 +103,7 @@ exports.precargarDatos = async () => {
         fechaEntrada: new Date(fecha),
         fechaSalida: i > 17 ? new Date(fechaSalida) : null,
         habilitado: i > 17 ? false : true,
+        direccion: getRandomDireccion('calle'),
       });
 
       //TELEFONOS

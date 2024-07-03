@@ -37,14 +37,7 @@ const Empleados = db.define(
       type: Sequelize.DATEONLY,
       defaultValue: null,
     },
-    // personaId: {
-    //   type: Sequelize.INTEGER,
-    //   allowNull: false,
-    //   references: {
-    //     model: Personas,
-    //     key: 'id',
-    //   },
-    // },
+    direccion: Sequelize.STRING,
   },
   {
     timestamps: false,
