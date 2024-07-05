@@ -70,7 +70,7 @@ exports.precargarDatos = async () => {
 
       //EMPRESAS
       const apellido = getRandomName('apellido');
-      const nombreEmpresa = `Empresa ${i} de ${apellido}`;
+      const nombreEmpresa = `${apellido}'s Company ${i}`;
       const rut = getRandomInt(123456789012, 934567890123) + '';
       const razonSocial = `${apellido}${i} SRL`;
       empresas.push({

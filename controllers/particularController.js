@@ -69,7 +69,7 @@ exports.getAllParticulares = async (req, res) => {
 
 exports.buscarParticular = async (req, res) => {
   try {
-    const { nombre, email, cedula } = req.query;
+    const { nombre, email, cedula, letraInicial } = req.query;
 
     const searchCriteria = {};
 
@@ -82,8 +82,12 @@ exports.buscarParticular = async (req, res) => {
     if (cedula) {
       searchCriteria.cedula = { [Op.iLike]: `%${cedula}%` };
     }
+    if (letraInicial) {
+      if (letraInicial.length !== 1) return res.status(400).json({ error: 'La búsqueda por letra inicial debe tener solo una letra' });
+      searchCriteria.nombre = { [Op.iLike]: `${letraInicial}%` };
+    }
 
-    if (!nombre && !email && !cedula) {
+    if (!nombre && !email && !cedula && !letraInicial) {
       return res.status(400).json({ error: 'Debe proporcionar al menos un parámetro de búsqueda (nombre, email, cedula).' });
     }
 

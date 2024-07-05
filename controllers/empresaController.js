@@ -87,7 +87,7 @@ exports.getAllEmpresas = async (req, res) => {
 
 exports.buscarEmpresa = async (req, res) => {
   try {
-    const { rut, nombre, razonSocial } = req.query;
+    const { rut, nombre, razonSocial, letraInicial } = req.query;
 
     const searchCriteria = {};
 
@@ -100,9 +100,12 @@ exports.buscarEmpresa = async (req, res) => {
     if (razonSocial) {
       searchCriteria.razonSocial = { [Op.iLike]: `%${razonSocial}%` };
     }
-
-    if (!rut && !nombre && !razonSocial) {
-      return res.status(400).json({ error: 'Debe proporcionar al menos un parámetro de búsqueda (rut, nombre, razonSocial).' });
+    if (letraInicial) {
+      if (letraInicial.length !== 1) return res.status(400).json({ error: 'La búsqueda por letra inicial debe tener solo una letra' });
+      searchCriteria.nombre = { [Op.iLike]: `${letraInicial}%` };
+    }
+    if (!rut && !nombre && !razonSocial && !letraInicial) {
+      return res.status(400).json({ error: 'Debe proporcionar al menos un parámetro de búsqueda (rut, nombre, razonSocial, letraInicial).' });
     }
 
     const empresas = await Empresas.findAll({
