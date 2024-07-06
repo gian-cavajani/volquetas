@@ -11,7 +11,7 @@ const Movimientos = db.define(
     },
     numeroVolqueta: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'Volquetas',
         key: 'numeroVolqueta',
@@ -28,16 +28,6 @@ const Movimientos = db.define(
     horario: {
       type: DataTypes.DATE,
       allowNull: false,
-    },
-    choferSugeridoId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Empleados',
-        key: 'id',
-      },
-    },
-    horarioSugerido: {
-      type: DataTypes.DATE,
     },
     tipo: {
       type: DataTypes.ENUM('entrega', 'levante'),

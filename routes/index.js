@@ -136,5 +136,9 @@ module.exports = function () {
   router.get('/pedidos', verificarToken(), pedidoController.getPedidos);
   router.get('/pedidos/:pedidoId', verificarToken(), validarId('pedidoId'), pedidoController.getPedidoId);
 
+  //Movimientos (Entrega/Levante)
+  router.post('/movimiento/entrega', verificarToken(), validarBodyVacioYSanitizar, pedidoController.nuevoMovimiento);
+  router.post('/movimiento/levante', verificarToken(), validarBodyVacioYSanitizar, pedidoController.nuevoMovimiento);
+
   return router;
 };

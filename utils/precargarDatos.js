@@ -275,6 +275,11 @@ exports.precargarDatos = async () => {
       { empleadoId: 2, email: 'ana@example.com', password: await bcrypt.hash('1', 10), rol: 'normal' },
     ]);
     // --------------------CLIENTE EMPRESA--------------------
+    empresas.unshift({
+      nombre: 'Volketas 10',
+      rut: '1',
+      razonSocial: 'Volketas 10 SRL',
+    });
     await Empresas.bulkCreate(empresas);
     // --------------------CLIENTE PARTICULAR--------------------
     await Particulares.bulkCreate(particulares);
@@ -319,7 +324,14 @@ exports.precargarDatos = async () => {
     permisos.push({
       id: 1,
       fechaCreacion: `2023-07-30T00:00:00.000Z`,
-      fechaVencimiento: `2024-07-30T00:00:00.000Z`,
+      fechaVencimiento: `2025-07-30T00:00:00.000Z`,
+      empresaId: 1,
+      particularId: null,
+    });
+    permisos.push({
+      id: 663920,
+      fechaCreacion: `2023-07-30T00:00:00.000Z`,
+      fechaVencimiento: `2025-07-30T00:00:00.000Z`,
       empresaId: 1,
       particularId: null,
     });

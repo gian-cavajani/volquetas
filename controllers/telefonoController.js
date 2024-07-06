@@ -70,7 +70,10 @@ exports.getTelefono = async (req, res) => {
 };
 
 exports.updateTelefono = async (req, res) => {
+  const { telefono, tipo } = req.body;
   try {
+    if (telefono.length !== 8 && tipo == 'telefono') return res.status(400).json({ error: 'Telefono debe incluir 8 numeros' });
+    if (telefono.length !== 9 && tipo == 'celular') return res.status(400).json({ error: 'Celular debe incluir 9 numeros' });
     const [updated] = await Telefonos.update(req.body, { where: { id: req.params.telefonoId } });
     if (!updated) {
       return res.status(404).json({ error: 'Teléfono no encontrado' });

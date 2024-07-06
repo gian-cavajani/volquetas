@@ -17,6 +17,10 @@ const Volquetas = db.define(
       type: DataTypes.ENUM('grande', 'chica'),
       allowNull: false,
     },
+    ocupada: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     timestamps: false,
