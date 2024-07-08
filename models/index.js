@@ -19,6 +19,7 @@ const Cajas = require('./Cajas');
 const Pedidos = require('./Pedidos');
 const PagoPedidos = require('./PagoPedidos');
 const Personas = require('./Personas');
+const Config = require('./Config');
 
 // --------- RELACIONES ---------
 
@@ -151,4 +152,5 @@ module.exports = {
   Sugerencias,
   ObraDetalles,
   Personas,
+  Config,
 };

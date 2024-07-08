@@ -3,7 +3,23 @@ const bcrypt = require('bcryptjs');
 const moment = require('moment');
 const { randomUUID, getRandomValues } = require('crypto');
 const { getRandomModelo, getRandomString, getRandomDetalleResiduos, getRandomDireccion, getRandomInt, getRandomName, getRandomEmail, getRandomPhone } = require('./utilsPrecarga');
-const { Permisos, Obras, ObraDetalles, Particulares, ContactoEmpresas, Empresas, Jornales, Servicios, Camiones, Empleados, Telefonos, Usuarios, HistoricoUsoCamion, Volquetas } = require('../models');
+const {
+  Config,
+  Permisos,
+  Obras,
+  ObraDetalles,
+  Particulares,
+  ContactoEmpresas,
+  Empresas,
+  Jornales,
+  Servicios,
+  Camiones,
+  Empleados,
+  Telefonos,
+  Usuarios,
+  HistoricoUsoCamion,
+  Volquetas,
+} = require('../models');
 
 exports.precargarDatos = async () => {
   try {
@@ -164,8 +180,6 @@ exports.precargarDatos = async () => {
         } else {
           fechaMes = fechaMes + '0' + i;
         }
-        console.log(fechaMes);
-        console.log(new Date(fechaMes));
 
         const tipoJ = tipoJornal[Math.floor(Math.random() * tipoJornal.length)];
         let num = getRandomInt(6, 9);
@@ -338,6 +352,8 @@ exports.precargarDatos = async () => {
     await Permisos.bulkCreate(permisos);
     // --------------------VOLQUETAS--------------------
     await Volquetas.bulkCreate(volquetas);
+    // --------------------CONFIG--------------------
+    await Config.create({ anio: 2024, precioSinIva: 3000, horasDeTrabajo: 8, configActiva: true });
 
     console.log('Datos precargados con éxito.');
   } catch (error) {

@@ -19,6 +19,10 @@ const particularController = require('../controllers/particularController');
 const permisoController = require('../controllers/permisoController');
 const volquetaController = require('../controllers/volquetaController');
 const pedidoController = require('../controllers/pedidoController');
+const movimientoController = require('../controllers/movimientoController');
+const configController = require('../controllers/configController');
+const pagoController = require('../controllers/pagoController');
+const sugerenciaController = require('../controllers/sugerenciaController');
 
 module.exports = function () {
   //healthcheck
@@ -135,10 +139,30 @@ module.exports = function () {
   router.post('/pedidos/recambio', verificarToken(), validarBodyVacioYSanitizar, pedidoController.createPedidoNuevo);
   router.get('/pedidos', verificarToken(), pedidoController.getPedidos);
   router.get('/pedidos/:pedidoId', verificarToken(), validarId('pedidoId'), pedidoController.getPedidoId);
+  router.put('/pedidos/:pedidoId', verificarToken(), validarBodyVacioYSanitizar, validarId('pedidoId'), pedidoController.modificarPedido);
+  router.delete('/pedidos/:pedidoId', verificarToken(), validarBodyVacioYSanitizar, validarId('pedidoId'), pedidoController.eliminarPedido);
 
   //Movimientos (Entrega/Levante)
-  router.post('/movimiento/entrega', verificarToken(), validarBodyVacioYSanitizar, pedidoController.nuevoMovimiento);
-  router.post('/movimiento/levante', verificarToken(), validarBodyVacioYSanitizar, pedidoController.nuevoMovimiento);
+  router.post('/movimientos', verificarToken(), validarBodyVacioYSanitizar, movimientoController.nuevoMovimiento);
+  router.put('/movimientos/:movimientoId', verificarToken(), validarId('movimientoId'), validarBodyVacioYSanitizar, movimientoController.modificarMovimiento);
+  router.get('/movimientos', verificarToken(), movimientoController.getMovimientos);
+  router.delete('/movimientos/:movimientoId', verificarToken(), validarId('movimientoId'), movimientoController.eliminarMovimiento);
+  router.get('/movimientos-chofer/:choferId', verificarToken(), validarId('choferId'), movimientoController.countMovimientosPorChofer);
+
+  //Sugerencias
+  router.post('/sugerencias', verificarToken(), validarBodyVacioYSanitizar, sugerenciaController.createSugerencia);
+  router.put('/sugerencias/:sugerenciaId', verificarToken(), validarId('sugerenciaId'), validarBodyVacioYSanitizar, sugerenciaController.updateSugerencia);
+  router.delete('/sugerencias/:sugerenciaId', verificarToken(), validarId('sugerenciaId'), sugerenciaController.deleteSugerencia);
+
+  //Pagos - Pedido
+  router.put('/pago-pedidos/:pagoPedidoId', verificarToken(), validarBodyVacioYSanitizar, validarId('pagoPedidoId'), pagoController.modificarPago);
+
+  //Config
+  router.post('/config', verificarToken(true), validarBodyVacioYSanitizar, configController.createConfig);
+  router.get('/config', verificarToken(true), configController.getConfigs);
+  router.get('/config-activa', verificarToken(true), configController.getConfigActiva);
+  router.get('/config/:configId', verificarToken(true), validarId('configId'), configController.getConfigId);
+  router.put('/config/:configId', verificarToken(true), validarBodyVacioYSanitizar, configController.updateConfig);
 
   return router;
 };

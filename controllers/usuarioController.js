@@ -129,7 +129,7 @@ exports.confirmarUsuario = async (req, res) => {
     if (user.activo) return res.status(400).json({ error: 'Usuario ya esta activado' });
 
     user.activo = true;
-    user.save();
+    await user.save();
     res.status(202).json({
       detalle: `Usuario con mail: ${user.email} activado exitosamente`,
     });

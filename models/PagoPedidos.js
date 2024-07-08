@@ -18,7 +18,7 @@ const PagoPedidos = db.define(
       defaultValue: false,
     },
     remito: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
     tipoPago: {

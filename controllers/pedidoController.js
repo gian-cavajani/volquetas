@@ -1,6 +1,6 @@
 const { where } = require('sequelize');
 const { Permisos, PagoPedidos, Pedidos, Movimientos, Sugerencias, Obras, Particulares, Empresas, Empleados, Volquetas } = require('../models');
-const validator = require('validator'); // Usamos validator para validaciones y sanitización
+const validator = require('validator');
 
 const validarPedido = async (req, creadoComo) => {
   const {
@@ -116,12 +116,12 @@ const crearPedido = async (req, creadoComo) => {
 
   if (creadoComo === 'recambio') {
     nuevoPedido.referenciaId = referenciaId;
-    nuevoPedido.save();
+    await nuevoPedido.save();
   } else if (creadoComo === 'multiple') {
     nuevoPedido.referenciaId = nuevoPedido.id;
     const obraLugar = obra.calle;
     nuevoPedido.descripcion = `Pedido Multiple Nro 1 en ${obraLugar}: ${descripcion} `;
-    nuevoPedido.save();
+    await nuevoPedido.save();
     let multiples = [];
 
     for (let i = 1; i < cantidadMultiple; i++) {
@@ -254,7 +254,7 @@ exports.getPedidoId = async (req, res) => {
         {
           model: Sugerencias,
           required: false,
-          attributes: ['id', 'tipoSugerido', 'horarioSugerido'],
+          // attributes: ['id', 'tipoSugerido', 'horarioSugerido'],
         },
         {
           model: Movimientos,
@@ -264,7 +264,7 @@ exports.getPedidoId = async (req, res) => {
         {
           model: Obras,
           required: false,
-          attributes: ['id'],
+          attributes: ['id', 'calle', 'esquina', 'barrio', 'numeroPuerta', 'descripcion'],
           include: [
             {
               model: Particulares,
@@ -300,64 +300,90 @@ exports.getPedidoId = async (req, res) => {
   }
 };
 
-const validarMovimiento = async (req, pedido, volqueta) => {
-  const { pedidoId, choferId, horario, numeroVolqueta, tipo } = req.body;
+exports.modificarPedido = async (req, res) => {
+  const { pedidoId } = req.params;
+  const { descripcion, permisoId, nroPesada, obraId } = req.body;
+  try {
+    const pedido = await Pedidos.findByPk(pedidoId);
+    if (!pedido) {
+      return res.status(404).json({ error: 'Pedido no existe' });
+    }
 
-  if (!(tipo === 'entrega' || tipo === 'levante')) {
-    return res.status(400).json({ error: 'Tipo solo puede ser "entrega" o "levante"' });
-  }
-  if (!choferId) throw new Error('Movimiento debe tener Chofer');
-  if (!pedidoId) throw new Error('Movimiento debe tener Pedido');
-  if (!horario) throw new Error('Movimiento debe tener horario');
-  if (!volqueta && numeroVolqueta) throw new Error('Volqueta no existe');
+    if (obraId) {
+      if (permisoId) return res.status(400).json({ error: 'No se pueden modificar la obra y el permiso en simultaneo.' });
+      if (pedido.permisoId !== null) return res.status(400).json({ error: 'Pedido tiene un permiso vinculado, eliminelo y luego modifique la obra' });
+      const obra = await Obras.findByPk(obraId);
+      if (!obra) return res.status(400).json({ error: 'Obra no existe' });
+      if (!obra.activa) return res.status(400).json({ error: 'Obra no esta activa' });
+      //const numMovimientos = await pedido.getCountMovimientos;
+      //if (numMovimientos > 0) return res.status(400).json({ error: 'No se puede modificar el pedido ya que tiene (entrega y/o levante), eliminelos y luego modifique la obra' });
 
-  if (pedido) {
-    const numMovimientos = pedido.Movimientos.length;
-    if (tipo === 'entrega') {
-      if (numMovimientos !== 0) throw new Error('Para crear la entrega el pedido no debe tener movimientos');
-      if (volqueta && volqueta.ocupada) throw new Error('Volqueta esta siendo utilizada en otro lugar');
-    } else if (tipo === 'levante') {
-      if (numMovimientos !== 1) throw new Error('Para crear el levante el pedido debe tener 1 movimiento(Entrega)');
-      if (pedido.Movimientos[0].numeroVolqueta) {
-        if (pedido.Movimientos[0].numeroVolqueta !== numeroVolqueta) throw new Error('Volqueta del levante debe ser la misma que la de la entrega');
+      pedido.obraId = obraId;
+      await pedido.save();
+    }
+
+    const obra = await Obras.findByPk(pedido.obraId);
+    if (permisoId) {
+      const permiso = await Permisos.findByPk(permisoId);
+      if (!permiso) throw new Error('Permiso no válido');
+      if (permiso.fechaVencimiento < Date.now()) throw new Error('Permiso Vencido, puede dejar este campo en blanco y agregar un permiso luego');
+      if (obra.particularId !== null) {
+        //si la obra es de un particular
+        const volketas10 = await Empresas.findOne({ where: { nombre: 'Volketas 10' } });
+        if (permiso.empresaId !== volketas10.id) throw new Error('El Permiso de un particular, debe ser el vigente de Volketas 10');
       } else {
-        if (numeroVolqueta) throw new Error('Para asignar volqueta al levante, la entrega debe tener una');
+        //si la obra es de una empresa
+        if (obra.empresaId !== permiso.empresaId) throw new Error('Obra y Permiso tienen diferente Empresa vinculada');
       }
     }
-  } else {
-    throw new Error('Pedido no existe');
-  }
-};
 
-exports.nuevoMovimiento = async (req, res) => {
-  const { pedidoId, tipo, numeroVolqueta } = req.body;
-  try {
-    const pedido = await Pedidos.findByPk(pedidoId, { include: [Movimientos] });
-    const volqueta = await Volquetas.findByPk(numeroVolqueta);
-
-    await validarMovimiento(req, pedido, volqueta);
-    const nuevoMovimiento = await Movimientos.create({ ...req.body });
-
-    if (tipo === 'entrega') {
-      pedido.estado = 'entregado';
-      if (volqueta) volqueta.ocupada = true;
+    if (permisoId === null) {
+      pedido.permisoId = null;
     } else {
-      pedido.estado = 'levantado';
-      if (volqueta) volqueta.ocupada = false;
+      pedido.permisoId = permisoId ? permisoId : pedido.permisoId;
     }
+    pedido.descripcion = descripcion ? descripcion : pedido.descripcion;
+    pedido.nroPesada = nroPesada ? nroPesada : pedido.nroPesada;
 
-    pedido.save();
-    if (volqueta) volqueta.save(); //To do: hacer el movimiento doble(entrega y levante a la misma vez)
-
-    res.status(201).json(nuevoMovimiento);
+    await pedido.save();
+    res.status(202).json(pedido);
   } catch (error) {
-    console.error('Error al crear el movimiento:', error);
+    console.error('Error al modificar el pedido:', error);
     const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
-
     if (errorsSequelize.length > 0) {
-      res.status(500).json({ error: 'Error al crear el movimiento', detalle: errorsSequelize });
+      res.status(500).json({ error: 'Error al modificar el pedido', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear el movimiento', detalle: error.message });
+      res.status(500).json({ error: 'Error al modificar el pedido', detalle: error.message });
     }
   }
 };
+
+exports.eliminarPedido = async (req, res) => {
+  try {
+    const { pedidoId } = req.params;
+
+    // Validar si el pedido existe
+    const pedido = await Pedidos.findByPk(pedidoId);
+    if (!pedido) {
+      return res.status(404).json({ error: 'Pedido no encontrado' });
+    }
+
+    const numMovimientos = await pedido.getCountMovimientos;
+    if (numMovimientos > 0) return res.status(400).json({ error: 'Error al eliminar el Pedido, tiene movimientos vinculados' });
+
+    // Eliminar sugerencias vinculadas
+    await Sugerencias.destroy({ where: { pedidoId: pedidoId } });
+
+    // Eliminar pagoPedido vinculado
+    if (pedido.pagoPedidoId) await PagoPedidos.destroy({ where: { id: pedido.pagoPedidoId } });
+
+    // Eliminar el pedido
+    await pedido.destroy();
+
+    res.status(200).json({ detalle: 'Pedido eliminado exitosamente' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al eliminar el pedido', detalle: error.message });
+  }
+};
+
+//deberia hacer un cancelar pedido?? complica las cosas para el conteo de viajes por empleado
