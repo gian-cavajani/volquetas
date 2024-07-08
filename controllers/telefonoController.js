@@ -41,8 +41,14 @@ exports.nuevoTelefono = async (req, res) => {
 
     res.status(201).json({ nuevoTelefono });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al crear el teléfono', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al crear el teléfono', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al crear el teléfono', detalle: error });
+    }
   }
 };
 
@@ -51,8 +57,14 @@ exports.getAllTelefonos = async (req, res) => {
     const telefonos = await Telefonos.findAll({});
     res.status(200).json(telefonos);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener todos los teléfonos', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener los teléfonos', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener los teléfonos', detalle: error });
+    }
   }
 };
 
@@ -64,8 +76,14 @@ exports.getTelefono = async (req, res) => {
     }
     res.status(200).json(telefono);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener el teléfono', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener el teléfono', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener el teléfono', detalle: error });
+    }
   }
 };
 
@@ -81,7 +99,13 @@ exports.updateTelefono = async (req, res) => {
     const updatedTelefono = await Telefonos.findByPk(req.params.telefonoId);
     res.status(200).json(updatedTelefono);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al actualizar el teléfono', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al actualizar el teléfono', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al actualizar el teléfono', detalle: error });
+    }
   }
 };

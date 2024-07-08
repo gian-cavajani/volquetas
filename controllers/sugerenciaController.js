@@ -36,7 +36,14 @@ exports.createSugerencia = async (req, res) => {
 
     res.status(201).json(nuevaSugerencia);
   } catch (error) {
-    res.status(500).json({ error: 'Error al crear la sugerencia', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al crear la sugerencia', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al crear la sugerencia', detalle: error });
+    }
   }
 };
 
@@ -66,7 +73,14 @@ exports.updateSugerencia = async (req, res) => {
 
     res.status(202).json(sugerencia);
   } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar la sugerencia', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al actualizar la sugerencia', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al actualizar la sugerencia', detalle: error });
+    }
   }
 };
 
@@ -79,6 +93,13 @@ exports.deleteSugerencia = async (req, res) => {
 
     res.status(200).json({ message: 'Sugerencia eliminada exitosamente' });
   } catch (error) {
-    res.status(500).json({ error: 'Error al eliminar la sugerencia', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al borrar la sugerencia', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al borrar la sugerencia', detalle: error });
+    }
   }
 };

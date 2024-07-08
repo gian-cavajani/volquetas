@@ -48,7 +48,7 @@ const verificarToken = (requireAdmin) => (req, res, next) => {
     return res.status(401).json({ error: 'Token inválido, inicie sesión nuevamente' });
   }
 };
-
+//Valida que las requests que deben tener body no vengan vacias, y sanitiza los datos
 const validarBodyVacioYSanitizar = (req, res, next) => {
   if (Object.keys(req.body).length === 0) {
     return res.status(400).json({ error: 'El cuerpo de la solicitud está vacío' });

@@ -382,7 +382,14 @@ exports.eliminarPedido = async (req, res) => {
 
     res.status(200).json({ detalle: 'Pedido eliminado exitosamente' });
   } catch (error) {
-    res.status(500).json({ error: 'Error al eliminar el pedido', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al eliminar el pedido', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al eliminar el pedido', detalle: error });
+    }
   }
 };
 

@@ -260,8 +260,14 @@ exports.countMovimientosPorChofer = async (req, res) => {
       total: totalCount,
     });
   } catch (error) {
-    console.error('Error al contar los movimientos:', error);
-    res.status(500).json({ error: 'Error al contar los movimientos', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al contar los movimientos', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al contar los movimientos', detalle: error });
+    }
   }
 };
 

@@ -35,9 +35,17 @@ exports.obtenerPermisos = async (req, res) => {
     const permisos = await Permisos.findAll();
     res.status(200).json(permisos);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener los permisos', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener los permisos', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener los permisos', detalle: error });
+    }
   }
 };
+
 exports.obtenerPermisosPorEmpresa = async (req, res) => {
   try {
     const { empresaId } = req.params;
@@ -59,10 +67,17 @@ exports.obtenerPermisosPorEmpresa = async (req, res) => {
 
     res.status(200).json(permisos);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener los permisos por empresa', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener los permisos por empresa', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener los permisos por empresa', detalle: error });
+    }
   }
 };
+
 exports.obtenerPermisosPorParticular = async (req, res) => {
   try {
     const { particularId } = req.params;
@@ -83,10 +98,17 @@ exports.obtenerPermisosPorParticular = async (req, res) => {
 
     res.status(200).json(permisos);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener los permisos por particular', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener los permisos por particular', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener los permisos por particular', detalle: error });
+    }
   }
 };
+
 exports.actualizarPermiso = async (req, res) => {
   try {
     const { permisoId } = req.params;
@@ -100,9 +122,17 @@ exports.actualizarPermiso = async (req, res) => {
       res.status(404).json({ error: 'Permiso no encontrado' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar el permiso', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al actualizar el permiso', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al actualizar el permiso', detalle: error });
+    }
   }
 };
+
 exports.eliminarPermiso = async (req, res) => {
   try {
     const { permisoId } = req.params;
@@ -115,6 +145,13 @@ exports.eliminarPermiso = async (req, res) => {
       res.status(404).json({ error: 'Permiso no encontrado' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Error al eliminar el permiso', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al eliminar el permiso', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al eliminar el permiso', detalle: error });
+    }
   }
 };

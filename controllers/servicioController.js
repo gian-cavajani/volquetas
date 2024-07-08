@@ -10,27 +10,28 @@ exports.nuevoServicio = async (req, res) => {
     //validar que camion exista
     if (!camion) throw Error('Camion no existe');
 
-    //sanitizar
-    const sanitizeddescripcion = validator.escape(descripcion); // Crear el nuevo registro de histórico de uso de camión
-    const sanitizedMoneda = validator.escape(moneda);
-    const sanitizedTipo = validator.escape(tipo);
-
-    if (!['arreglo', 'service', 'chequeo', 'pintura'].includes(sanitizedTipo)) return res.status(400).json({ error: 'Tipo inválido' });
-    if (!['peso', 'dolar'].includes(sanitizedMoneda)) return res.status(400).json({ error: 'Moneda inválida' });
+    if (!['arreglo', 'service', 'chequeo', 'pintura'].includes(tipo)) return res.status(400).json({ error: 'Tipo inválido' });
+    if (!['peso', 'dolar'].includes(moneda)) return res.status(400).json({ error: 'Moneda inválida' });
 
     const nuevoServicio = await Servicios.create({
       camionId,
       fecha,
-      descripcion: sanitizeddescripcion,
-      tipo: sanitizedTipo,
+      descripcion,
+      tipo,
       precio,
-      moneda: sanitizedMoneda,
+      moneda,
     });
 
     res.status(201).json(nuevoServicio);
   } catch (error) {
-    console.error('Error al crear Servicio de camión:', error);
-    res.status(500).json({ error: 'Error al Servicio de camión', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al crear el servicio', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al crear el servicio', detalle: error });
+    }
   }
 };
 
@@ -43,8 +44,14 @@ exports.getServicios = async (req, res) => {
     });
     res.status(200).json(servicios);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener los servicios' });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener los servicios', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener los servicios', detalle: error });
+    }
   }
 };
 
@@ -55,8 +62,14 @@ exports.getServicioPorCamion = async (req, res) => {
     });
     res.status(200).json(servicios);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener los servicios' });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener los servicios por camion', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener los servicios por camion', detalle: error });
+    }
   }
 };
 
@@ -88,8 +101,14 @@ exports.getServiciosPorCamionMensual = async (req, res) => {
 
     res.status(200).json(servicios);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener los servicios' });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener los servicios', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener los servicios', detalle: error });
+    }
   }
 };
 
@@ -105,6 +124,12 @@ exports.deleteServicio = async (req, res) => {
     res.status(200).json({ detalle: `El servicio fue eliminado correctamente` });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: 'Error al eliminar el servicio', detalle: error });
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al eliminar el servicio', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al eliminar el servicio', detalle: error });
+    }
   }
 };

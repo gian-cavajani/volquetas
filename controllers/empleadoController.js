@@ -33,9 +33,14 @@ exports.nuevoEmpleado = async (req, res) => {
 
     res.status(201).json(nuevoEmpleado);
   } catch (error) {
-    console.error('Error al crear empleado:', error);
+    console.error(error.message);
     const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
-    res.status(500).json({ error: 'Error al crear empleado', detalle: errorsSequelize });
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al crear el empleado', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al crear el empleado', detalle: error });
+    }
   }
 };
 
@@ -53,8 +58,14 @@ exports.getEmpleados = async (req, res) => {
 
     res.status(200).json(empleados);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener los empleados', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener los empleados', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener los empleados', detalle: error });
+    }
   }
 };
 
@@ -72,8 +83,14 @@ exports.getEmpleado = async (req, res) => {
 
     res.status(200).json(empleado);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener el empleado', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener el empleado', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener el empleado', detalle: error });
+    }
   }
 };
 
@@ -102,8 +119,14 @@ exports.eliminarEmpleado = async (req, res) => {
 
     res.status(200).json({ detalle: 'Empleado eliminado exitosamente' });
   } catch (error) {
-    console.error('Error al eliminar empleado:', error);
-    res.status(500).json({ error: 'Error al eliminar empleado', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al eliminar el empleado', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al eliminar el empleado', detalle: error });
+    }
   }
 };
 
@@ -134,8 +157,14 @@ exports.cambiarEstadoEmpleado = async (req, res) => {
       detalle: `Empleado ${empleado.nombre} con CI: ${empleado.cedula} fue ${empleado.habilitado ? 'habilitado' : 'deshabilitado'} exitosamente`,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al habilitar/deshabilitar al empleado', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al habilitar/deshabilitar el empleado', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al habilitar/deshabilitar el empleado', detalle: error });
+    }
   }
 };
 
@@ -179,8 +208,14 @@ exports.modificarEmpleado = async (req, res) => {
 
     res.status(200).json(nuevoEmpleado);
   } catch (error) {
-    console.error('Error al modificar el empleado:', error);
-    res.status(500).json({ error: 'Error al modificar el empleado', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al modificar el empleado', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al modificar el empleado', detalle: error });
+    }
   }
 };
 
@@ -201,7 +236,13 @@ exports.getEmpleadosActivosYSinUsuario = async (req, res) => {
     const empleadosSinUsuario = empleados.filter((empleado) => !empleado.Usuario).map((e) => ({ id: e.id, nombre: e.nombre }));
     res.status(200).json(empleadosSinUsuario);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: 'Error al obtener empleados sin usuario y activos', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener los empleados', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener los empleados', detalle: error });
+    }
   }
 };

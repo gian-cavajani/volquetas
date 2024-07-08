@@ -1,4 +1,4 @@
-const { Config } = require('../models'); // Asegúrate de que la ruta sea correcta
+const { Config } = require('../models');
 const { Op } = require('sequelize');
 
 exports.createConfig = async (req, res) => {
@@ -19,7 +19,14 @@ exports.createConfig = async (req, res) => {
 
     res.status(201).json(newConfig);
   } catch (error) {
-    res.status(500).json({ error: 'Error al crear la configuración', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al crear la configuración', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al crear la configuración', detalle: error });
+    }
   }
 };
 
@@ -33,7 +40,14 @@ exports.getConfigId = async (req, res) => {
 
     res.status(200).json(config);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener la configuración', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener la configuración', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener la configuración', detalle: error });
+    }
   }
 };
 
@@ -42,7 +56,14 @@ exports.getConfigs = async (req, res) => {
     const configs = await Config.findAll();
     res.status(200).json(configs);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener las configuraciones', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener la configuración', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener la configuración', detalle: error });
+    }
   }
 };
 
@@ -51,7 +72,14 @@ exports.getConfigActiva = async (req, res) => {
     const configActivada = await Config.findOne({ where: { configActiva: true } });
     res.status(200).json(configActivada);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener la configuracion Activa', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener la configuración activa', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener la configuración activa', detalle: error });
+    }
   }
 };
 
@@ -64,7 +92,6 @@ exports.updateConfig = async (req, res) => {
       return res.status(404).json({ error: 'Configuración no encontrada' });
     }
 
-    // Si configActiva es true, asegurarse de que no haya otra configuración activa
     if (configActiva) {
       await Config.update({ configActiva: false }, { where: { configActiva: true } });
     }
@@ -78,6 +105,13 @@ exports.updateConfig = async (req, res) => {
 
     res.status(200).json(config);
   } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar la configuración', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al actualizar la configuración', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al actualizar la configuración', detalle: error });
+    }
   }
 };

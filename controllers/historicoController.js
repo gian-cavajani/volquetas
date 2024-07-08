@@ -38,11 +38,14 @@ exports.registrarUsoCamion = async (req, res) => {
 
     res.status(201).json(nuevoHistorico);
   } catch (error) {
-    console.error('Error al crear histórico de uso de camión:', error);
-    res.status(500).json({
-      error: 'Error al crear histórico de uso de camión',
-      detalle: error.message,
-    });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al crear el historico-camion', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al crear el historico-camion', detalle: error });
+    }
   }
 };
 
@@ -69,11 +72,14 @@ exports.obtenerAsignacionesActuales = async (req, res) => {
 
     res.status(200).json(asignacionesActuales);
   } catch (error) {
-    console.error('Error al obtener la asignación actual:', error);
-    res.status(500).json({
-      error: 'Error al obtener la asignación actual',
-      detalle: error.message,
-    });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener el historico-camion', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener el historico-camion', detalle: error });
+    }
   }
 };
 
@@ -115,7 +121,13 @@ exports.obtenerHistoricoPorCamionOEmpleado = async (req, res) => {
 
     res.status(200).json(historico);
   } catch (error) {
-    console.error('Error al obtener el historial:', error);
-    res.status(500).json({ error: 'Error al obtener el historial', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener el historico-camion', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener el historico-camion', detalle: error });
+    }
   }
 };

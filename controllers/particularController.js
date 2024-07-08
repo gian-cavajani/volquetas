@@ -27,7 +27,13 @@ exports.createParticular = async (req, res) => {
     res.status(201).json(nuevoParticular);
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: 'Error al crear el Cliente Particular', detalle: error });
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al crear el particular', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al crear el particular', detalle: error });
+    }
   }
 };
 
@@ -46,8 +52,14 @@ exports.getParticular = async (req, res) => {
     }
     res.status(200).json(particular);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener el particular', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener el particular', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener el particular', detalle: error });
+    }
   }
 };
 
@@ -62,8 +74,14 @@ exports.getAllParticulares = async (req, res) => {
     });
     res.status(200).json(particulares);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener los Clientes Particulares' });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener los particulares', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener los particulares', detalle: error });
+    }
   }
 };
 
@@ -97,7 +115,14 @@ exports.buscarParticular = async (req, res) => {
 
     res.status(200).json(particulares);
   } catch (error) {
-    res.status(500).json({ error: 'Error al buscar particulares', detalle: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al buscar los particulares', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al buscar los particulares', detalle: error });
+    }
   }
 };
 
@@ -110,8 +135,14 @@ exports.updateParticular = async (req, res) => {
     const updatedParticular = await Particulares.findByPk(req.params.particularId);
     res.status(200).json(updatedParticular);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al actualizar el particular', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al actualizar el particular', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al actualizar el particular', detalle: error });
+    }
   }
 };
 
@@ -127,6 +158,12 @@ exports.deleteParticular = async (req, res) => {
     res.status(200).json({ detalle: `Particular con nombre ${particular.nombre} fue eliminado correctamente` });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: 'Error al eliminar el particular', detalle: error });
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al eliminar el particular', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al eliminar el particular', detalle: error });
+    }
   }
 };

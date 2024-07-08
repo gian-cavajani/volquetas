@@ -46,7 +46,6 @@ exports.createObra = async (req, res) => {
       particularId: sanitizedParticularId,
       empresaId: sanitizedEmpresaId,
     });
-    console.log(frecuenciaSemanal);
     const obraDetalles = await ObraDetalles.create({
       obraId: obra.id,
       detalleResiduos: sanitizedDetalleResiduos,
@@ -63,7 +62,13 @@ exports.createObra = async (req, res) => {
     res.status(201).json(fullObra);
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: 'Error al crear la Obra', detalle: error });
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al crear la obra', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al crear la obra', detalle: error });
+    }
   }
 };
 
@@ -92,8 +97,14 @@ exports.getAllObras = async (req, res) => {
     });
     res.status(200).json(obras);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener las obras' });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener las obras', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener las obras', detalle: error });
+    }
   }
 };
 
@@ -136,8 +147,14 @@ exports.getObra = async (req, res) => {
     }
     res.status(200).json(obra);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener la Obra', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener la obra', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener la obra', detalle: error });
+    }
   }
 };
 
@@ -150,8 +167,14 @@ exports.updateObra = async (req, res) => {
     const updatedObra = await Obras.findByPk(req.params.obraId);
     res.status(200).json(updatedObra);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al actualizar la Obra', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al actualizar la obra', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al actualizar la obra', detalle: error });
+    }
   }
 };
 
@@ -164,8 +187,14 @@ exports.updateObraDetalles = async (req, res) => {
     const updatedObra = await Obras.findByPk(req.params.obraId, { include: [{ model: ObraDetalles }] });
     res.status(200).json(updatedObra);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al actualizar los detalles de la Obra', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al actualizar los detalles de la obra', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al actualizar los detalles de la obra', detalle: error });
+    }
   }
 };
 
@@ -181,6 +210,12 @@ exports.deleteObra = async (req, res) => {
     res.status(200).json({ detalle: `Obra en la calle ${obra.calle} ${obra.numeroPuerta} eliminada correctamente` });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: 'Error al eliminar la Obra', detalle: error });
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al eliminar la obra', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al eliminar la obra', detalle: error });
+    }
   }
 };

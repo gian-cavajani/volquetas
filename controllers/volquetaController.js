@@ -29,7 +29,14 @@ exports.getVolquetaById = async (req, res) => {
     }
     res.json(volqueta);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener la volqueta', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener la volqueta', detalle: error });
+    }
   }
 };
 
@@ -38,7 +45,14 @@ exports.getAllVolquetas = async (req, res) => {
     const volquetas = await Volquetas.findAll();
     res.json(volquetas);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener las volquetas', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener las volquetas', detalle: error });
+    }
   }
 };
 
@@ -54,7 +68,14 @@ exports.updateVolquetaById = async (req, res) => {
     const updatedVolqueta = await Volquetas.findByPk(numeroVolqueta);
     res.json(updatedVolqueta);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al actualizar la volqueta', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al actualizar la volqueta', detalle: error });
+    }
   }
 };
 
@@ -69,6 +90,13 @@ exports.deleteVolquetaById = async (req, res) => {
     }
     res.status(204).json({ detalle: 'Volqueta eliminada' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al borrar la volqueta', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al borrar la volqueta', detalle: error });
+    }
   }
 };

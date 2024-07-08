@@ -9,11 +9,6 @@ exports.createContactoEmpresa = async (req, res) => {
   if (email && !validator.isEmail(email)) return res.status(400).json({ error: 'El email no es válido' });
   if (!empresaId) return res.status(400).json({ error: 'El id de la empresa es obligatorio' });
 
-  // Sanitización
-  const sanitizedNombre = validator.escape(nombre);
-  const sanitizedDescripcion = descripcion ? validator.escape(descripcion) : null;
-  const sanitizedEmail = email ? validator.normalizeEmail(email) : null;
-
   try {
     const empresa = await Empresas.findByPk(empresaId);
     if (!empresa) return res.status(404).json({ error: 'Cliente de tipo empresa no existe' });
@@ -24,16 +19,22 @@ exports.createContactoEmpresa = async (req, res) => {
     }
 
     const nuevoContacto = await ContactoEmpresas.create({
-      nombre: sanitizedNombre,
-      descripcion: sanitizedDescripcion,
-      email: sanitizedEmail,
+      nombre,
+      descripcion,
+      email,
       empresaId,
       obraId,
     });
     res.status(201).json(nuevoContacto);
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: 'Error al crear el contacto', detalle: error });
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al crear el contacto empresa', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al crear el contacto empresa', detalle: error });
+    }
   }
 };
 
@@ -53,8 +54,14 @@ exports.getContactoEmpresa = async (req, res) => {
     }
     res.status(200).json(contacto);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener el contacto', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener el contacto empresa', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener el contacto empresa', detalle: error });
+    }
   }
 };
 
@@ -69,8 +76,14 @@ exports.getAllContactoEmpresas = async (req, res) => {
     });
     res.status(200).json(contactosEmpresas);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener los contactos de empresas' });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener los contactos empresa', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener los contactos empresa', detalle: error });
+    }
   }
 };
 
@@ -105,7 +118,13 @@ exports.asignarObra = async (req, res) => {
     res.status(200).json({ detalle: `Obra ${output} correctamente al contacto de empresa` });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: 'Error al asignar la obra al contacto de la empresa', detalle: error });
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al asignar la obra al contacto de la empresa', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al asignar la obra al contacto de la empresa', detalle: error });
+    }
   }
 };
 
@@ -118,8 +137,14 @@ exports.updateContactoEmpresa = async (req, res) => {
     const updatedContacto = await ContactoEmpresas.findByPk(req.params.contactoEmpresaId);
     res.status(200).json(updatedContacto);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al actualizar el contacto', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al actualizar contacto empresa', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al actualizar contacto empresa', detalle: error });
+    }
   }
 };
 
@@ -135,6 +160,12 @@ exports.deleteContactoEmpresa = async (req, res) => {
     res.status(200).json({ detalle: `Contacto con nombre ${contacto.nombre} fue eliminado correctamente` });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: 'Error al eliminar el contacto', detalle: error });
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al actualizar el contacto de la empresa', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al actualizar el contacto de la empresa', detalle: error });
+    }
   }
 };

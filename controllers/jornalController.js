@@ -9,9 +9,6 @@ exports.nuevoJornal = async (req, res) => {
   let { empleadoId, fecha, entrada, salida, tipo } = req.body;
   const usuarioId = req.user.id;
 
-  //sanitizar:
-  const sanitizedTipo = tipo ? validator.escape(tipo) : '';
-
   // Validaciones
   if (!empleadoId) {
     return res.status(400).json({ error: 'El empleadoId es obligatorio' });
@@ -54,8 +51,14 @@ exports.nuevoJornal = async (req, res) => {
 
     res.status(201).json(jornal);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al crear el jornal', detalle: error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al crear el jornal', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al crear el jornal', detalle: error });
+    }
   }
 };
 
@@ -69,8 +72,14 @@ exports.borrarJornal = async (req, res) => {
     await jornal.destroy();
     res.status(200).json({ message: 'Jornal borrado exitosamente' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al borrar el jornal' });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al borrar el jornal', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al borrar el jornal', detalle: error });
+    }
   }
 };
 
@@ -99,8 +108,14 @@ exports.editarJornal = async (req, res) => {
     jornal = await jornal.update({ empleadoId, fecha, entrada, salida, tipo });
     res.status(200).json(jornal);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al editar el jornal' });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al editar el jornal', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al editar el jornal', detalle: error });
+    }
   }
 };
 
@@ -113,8 +128,14 @@ exports.getJornal = async (req, res) => {
     }
     res.status(200).json(jornal);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener el jornal' });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener el jornal', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener el jornal', detalle: error });
+    }
   }
 };
 
@@ -131,8 +152,14 @@ exports.getJornalesPorEmpleado = async (req, res) => {
 
     res.status(200).json(jornales);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener los jornales', error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener los jornales', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener los jornales', detalle: error });
+    }
   }
 };
 
@@ -161,8 +188,14 @@ exports.getDatosPorEmpleado = async (req, res) => {
     });
     res.status(200).json(...datos);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener los jornales', error });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener los datos', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener los datos', detalle: error });
+    }
   }
 };
 
@@ -191,7 +224,13 @@ exports.getAllDatosPorPeriodo = async (req, res) => {
     });
     res.status(200).json(datos);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener los jornales' });
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener los datos', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener los datos', detalle: error });
+    }
   }
 };
