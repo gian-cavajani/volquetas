@@ -241,38 +241,52 @@ exports.getPedidos = async (req, res) => {
 };
 
 exports.getPedidosConFiltro = async (req, res) => {
-  const { estado, pagado, fechaInicio, fechaFin } = req.query;
+  const { estado, pagado, fechaInicio, fechaFin, empresaId, particularId, tipoHorario, obraId } = req.query;
 
   let whereClause = {};
   let pagoWhereClause = {};
   let sugerenciaWhereClause = {};
+  let movimientoWhereClause = {};
+  let obraWhereClause = {};
 
-  if (estado) {
-    if (!['cancelado', 'iniciado', 'entregado', 'levantado'].includes(estado)) {
-      return res.status(400).json({ error: "Los tipos de estado de pedidos solo pueden ser: ('cancelado', 'iniciado', 'entregado','levantado')" });
-    }
-
-    whereClause.estado = estado;
-  }
-
-  if (pagado !== undefined) {
-    pagoWhereClause.pagado = pagado === 'true';
+  if (!['movimientoEntrega', 'movimientoLevante', 'sugerenciaEntrega', 'sugerenciaLevante', 'creacion'].includes(tipoHorario)) {
+    return res.status(400).json({ error: "Los tipos de horario solo pueden ser: ('movimientoEntrega', 'movimientoLevante', 'sugerenciaEntrega', 'sugerenciaLevante', 'creacion')" });
   }
 
   if (fechaInicio && fechaFin) {
     const startDate = new Date(fechaInicio);
     const endDate = new Date(fechaFin);
-    if (estado === 'iniciado') {
-      //si el estado es iniciado busca horario sugerido
-      sugerenciaWhereClause.horarioSugerido = {
-        [Op.between]: [startDate, endDate],
-      };
-    } else {
-      whereClause.createdAt = {
-        [Op.between]: [startDate, endDate],
-      };
+
+    if (tipoHorario === 'sugerenciaEntrega') {
+      sugerenciaWhereClause.horarioSugerido = { [Op.between]: [startDate, endDate] };
+      sugerenciaWhereClause.tipoSugerido = 'entrega';
+    } else if (tipoHorario === 'sugerenciaLevante') {
+      sugerenciaWhereClause.horarioSugerido = { [Op.between]: [startDate, endDate] };
+      sugerenciaWhereClause.tipoSugerido = 'levante';
+    } else if (tipoHorario === 'movimientoEntrega') {
+      movimientoWhereClause.horario = { [Op.between]: [startDate, endDate] };
+      movimientoWhereClause.tipo = 'entrega';
+    } else if (tipoHorario === 'movimientoLevante') {
+      movimientoWhereClause.horario = { [Op.between]: [startDate, endDate] };
+      movimientoWhereClause.tipo = 'levante';
+    } else if (tipoHorario === 'creacion') {
+      whereClause.createdAt = { [Op.between]: [startDate, endDate] };
     }
+  } else {
+    return res.status(400).json({ error: 'Debe ingresar fecha de inicio y fecha de fin' });
   }
+
+  if (estado) {
+    if (!['cancelado', 'iniciado', 'entregado', 'levantado'].includes(estado)) {
+      return res.status(400).json({ error: "Los tipos de estado de pedidos solo pueden ser: ('cancelado', 'iniciado', 'entregado', 'levantado')" });
+    }
+    whereClause.estado = estado;
+  }
+
+  if (pagado !== undefined) pagoWhereClause.pagado = pagado === 'true';
+  if (obraId) obraWhereClause.id = obraId;
+  if (empresaId) obraWhereClause.empresaId = empresaId;
+  if (particularId) obraWhereClause.particularId = particularId;
 
   try {
     const pedidos = await Pedidos.findAll({
@@ -282,18 +296,36 @@ exports.getPedidosConFiltro = async (req, res) => {
           model: PagoPedidos,
           where: pagoWhereClause,
           as: 'pagoPedido',
+          // required: false, //necesario?
         },
         {
           model: Sugerencias,
           where: sugerenciaWhereClause,
+          // required: false, //necesario?
+        },
+        {
+          model: Movimientos,
+          where: movimientoWhereClause,
+          // required: false, //necesario?
+        },
+        {
+          model: Obras,
+          where: obraWhereClause,
+          // required: false, //necesario?
         },
       ],
     });
 
     res.json(pedidos);
   } catch (error) {
-    console.error('Error al obtener los pedidos:', error);
-    res.status(500).json({ error: 'Error al obtener los pedidos', detalle: error.message });
+    console.error(error);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener pedido', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener pedido', detalle: error });
+    }
   }
 };
 
@@ -326,13 +358,13 @@ exports.getPedidoId = async (req, res) => {
             {
               model: Particulares,
               required: false,
-              attributes: ['id'],
+              attributes: ['id', 'nombre'],
               as: 'particular',
             },
             {
               model: Empresas,
               required: false,
-              attributes: ['id'],
+              attributes: ['id', 'nombre'],
               as: 'empresa',
             },
           ],
