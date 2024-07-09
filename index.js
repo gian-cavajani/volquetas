@@ -2,6 +2,7 @@ const express = require('express');
 const router = require('./routes');
 const { db } = require('./models');
 const cors = require('cors');
+const unescapeMiddleware = require('./middleware/unescapeMiddleware');
 
 //variables de desarrollo
 require('dotenv').config({ path: 'variables.env' });
@@ -11,6 +12,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use(unescapeMiddleware); //desanitiza los valores al devolverlos
 app.use('/api', router());
 
 (async () => {
@@ -23,9 +25,9 @@ app.use('/api', router());
 
     // Iniciar el servidor
     app.listen(process.env.PORT, () => {
-      console.log(`Server is running on port ${process.env.PORT}`);
+      console.log(`Servidor corriendo en el puerto: ${process.env.PORT}`);
     });
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    console.error('Error al conectar a la DB:', error);
   }
 })();

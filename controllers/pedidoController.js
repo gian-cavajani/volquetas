@@ -1,4 +1,4 @@
-const { where } = require('sequelize');
+const { where, Op } = require('sequelize');
 const { Permisos, PagoPedidos, Pedidos, Movimientos, Sugerencias, Obras, Particulares, Empresas, Empleados, Volquetas } = require('../models');
 const validator = require('validator');
 
@@ -237,6 +237,63 @@ exports.getPedidos = async (req, res) => {
     } else {
       res.status(500).json({ error: 'Error al obtener pedidos', detalle: error });
     }
+  }
+};
+
+exports.getPedidosConFiltro = async (req, res) => {
+  const { estado, pagado, fechaInicio, fechaFin } = req.query;
+
+  let whereClause = {};
+  let pagoWhereClause = {};
+  let sugerenciaWhereClause = {};
+
+  if (estado) {
+    if (!['cancelado', 'iniciado', 'entregado', 'levantado'].includes(estado)) {
+      return res.status(400).json({ error: "Los tipos de estado de pedidos solo pueden ser: ('cancelado', 'iniciado', 'entregado','levantado')" });
+    }
+
+    whereClause.estado = estado;
+  }
+
+  if (pagado !== undefined) {
+    pagoWhereClause.pagado = pagado === 'true';
+  }
+
+  if (fechaInicio && fechaFin) {
+    const startDate = new Date(fechaInicio);
+    const endDate = new Date(fechaFin);
+    if (estado === 'iniciado') {
+      //si el estado es iniciado busca horario sugerido
+      sugerenciaWhereClause.horarioSugerido = {
+        [Op.between]: [startDate, endDate],
+      };
+    } else {
+      whereClause.createdAt = {
+        [Op.between]: [startDate, endDate],
+      };
+    }
+  }
+
+  try {
+    const pedidos = await Pedidos.findAll({
+      where: whereClause,
+      include: [
+        {
+          model: PagoPedidos,
+          where: pagoWhereClause,
+          as: 'pagoPedido',
+        },
+        {
+          model: Sugerencias,
+          where: sugerenciaWhereClause,
+        },
+      ],
+    });
+
+    res.json(pedidos);
+  } catch (error) {
+    console.error('Error al obtener los pedidos:', error);
+    res.status(500).json({ error: 'Error al obtener los pedidos', detalle: error.message });
   }
 };
 

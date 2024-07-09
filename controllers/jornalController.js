@@ -13,7 +13,7 @@ exports.nuevoJornal = async (req, res) => {
   if (!empleadoId) {
     return res.status(400).json({ error: 'El empleadoId es obligatorio' });
   }
-  if (!['trabajo', 'licencia', 'enfermedad', 'falta'].includes(sanitizedTipo)) return res.status(400).json({ error: 'Tipo inválido' });
+  if (!['trabajo', 'licencia', 'enfermedad', 'falta'].includes(tipo)) return res.status(400).json({ error: 'Tipo inválido' });
   if (!fecha || isNaN(Date.parse(fecha))) {
     return res.status(400).json({ error: 'La fecha es obligatoria y debe ser válida' });
   }

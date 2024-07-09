@@ -1,4 +1,4 @@
-const { Volquetas, Empresas, Particulares } = require('../models');
+const { Volquetas } = require('../models');
 
 exports.createVolqueta = async (req, res) => {
   const { numeroVolqueta, estado, tipo } = req.body;

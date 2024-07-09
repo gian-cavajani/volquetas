@@ -144,6 +144,8 @@ exports.updateEmpresa = async (req, res) => {
       return res.status(404).json({ error: 'Empresa no encontrada' });
     }
     const updatedEmpresa = await Empresas.findByPk(req.params.empresaId);
+
+    // updatedEmpresa.nombre = validator.unescape(updatedEmpresa.nombre);
     res.status(200).json(updatedEmpresa);
   } catch (error) {
     const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
