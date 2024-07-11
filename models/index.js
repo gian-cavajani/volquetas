@@ -122,6 +122,7 @@ Pedidos.belongsTo(Obras, { foreignKey: 'obraId' });
 Pedidos.belongsTo(Permisos, { foreignKey: 'permisoId' });
 Pedidos.hasMany(Movimientos, { foreignKey: 'pedidoId' });
 Pedidos.hasMany(Sugerencias, { foreignKey: 'pedidoId' });
+Obras.hasMany(Pedidos, { foreignKey: 'obraId' });
 
 //Pago-Pedidos 1an -> pagoPedidos puede tener multiples pedidos (en caso multiple todos los pedidos tienen el mismo pago pedido)
 PagoPedidos.hasMany(Pedidos, { foreignKey: 'pagoPedidoId', as: 'pedidos' });

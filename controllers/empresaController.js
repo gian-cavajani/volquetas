@@ -1,4 +1,4 @@
-const { Empresas, Obras, ContactoEmpresas, Telefonos } = require('../models');
+const { Empresas, Obras, ContactoEmpresas, Telefonos, Permisos, Pedidos, PagoPedidos } = require('../models');
 const validator = require('validator');
 const { Op } = require('sequelize');
 
@@ -40,6 +40,7 @@ exports.getEmpresa = async (req, res) => {
           as: 'obras',
           required: false,
           attributes: ['id', 'calle', 'esquina', 'numeroPuerta', 'activa'],
+          //include: [{ model: Pedidos, attributes: ['id', 'estado'], include: [{ model: PagoPedidos, attributes: ['pagado'], as: 'pagoPedido' }] }],
         },
         {
           model: ContactoEmpresas,
@@ -48,6 +49,7 @@ exports.getEmpresa = async (req, res) => {
           attributes: ['id', 'nombre', 'descripcion', 'email', 'obraId'],
           include: [{ model: Telefonos, attributes: ['tipo', 'telefono', 'extension'] }],
         },
+        { model: Permisos, required: false, attributes: ['id', 'fechaCreacion', 'fechaVencimiento'] },
       ],
     });
 

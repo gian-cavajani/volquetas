@@ -1,4 +1,4 @@
-const { Obras, Empresas, Particulares, ContactoEmpresas, ObraDetalles, Telefonos } = require('../models');
+const { Obras, Empresas, Particulares, ContactoEmpresas, ObraDetalles, Telefonos, Pedidos } = require('../models');
 const validator = require('validator');
 
 exports.createObra = async (req, res) => {

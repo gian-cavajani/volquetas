@@ -1,7 +1,7 @@
 const { where, Op } = require('sequelize');
 const { Permisos, PagoPedidos, Pedidos, Movimientos, Sugerencias, Obras, Particulares, Empresas, Empleados, Volquetas } = require('../models');
 const validator = require('validator');
-
+const db = require('../config/db');
 const validarPedido = async (req, creadoComo) => {
   const {
     obraId,
@@ -33,7 +33,7 @@ const validarPedido = async (req, creadoComo) => {
   if (!obraId || !validator.isInt(obraId.toString())) {
     throw new Error('Debe tener una obra y debe ser valida');
   }
-  if (tipoPago && !['transferencia', 'efectivo', 'cheque'].includes(tipoPago)) {
+  if (!['transferencia', 'efectivo', 'cheque'].includes(tipoPago)) {
     throw new Error("Tipo de pago debe ser válido, opciones: ('transferencia', 'efectivo', 'cheque')");
   }
   if (horarioSugerido && isNaN(Date.parse(horarioSugerido))) {
@@ -241,14 +241,13 @@ exports.getPedidos = async (req, res) => {
 };
 
 exports.getPedidosConFiltro = async (req, res) => {
-  const { estado, pagado, fechaInicio, fechaFin, empresaId, particularId, tipoHorario, obraId } = req.query;
+  const { estado, pagado, fechaInicio, fechaFin, empresaId, particularId, tipoHorario, obraId, choferId, choferSugeridoId } = req.query;
 
   let whereClause = {};
   let pagoWhereClause = {};
   let sugerenciaWhereClause = {};
   let movimientoWhereClause = {};
   let obraWhereClause = {};
-
   if (!['movimientoEntrega', 'movimientoLevante', 'sugerenciaEntrega', 'sugerenciaLevante', 'creacion'].includes(tipoHorario)) {
     return res.status(400).json({ error: "Los tipos de horario solo pueden ser: ('movimientoEntrega', 'movimientoLevante', 'sugerenciaEntrega', 'sugerenciaLevante', 'creacion')" });
   }
@@ -287,32 +286,46 @@ exports.getPedidosConFiltro = async (req, res) => {
   if (obraId) obraWhereClause.id = obraId;
   if (empresaId) obraWhereClause.empresaId = empresaId;
   if (particularId) obraWhereClause.particularId = particularId;
+  if (choferId) movimientoWhereClause.choferId = choferId;
+  if (choferSugeridoId) sugerenciaWhereClause.choferSugeridoId = choferSugeridoId;
+
+  let objPago = { model: PagoPedidos, as: 'pagoPedido', attributes: [] };
+  let objSugerencia = { model: Sugerencias, attributes: [] };
+  let objMovimiento = { model: Movimientos, attributes: [] };
+  let objObra = { model: Obras, attributes: [] };
+  if (Object.keys(pagoWhereClause).length !== 0) objPago.where = pagoWhereClause;
+  if (Object.keys(sugerenciaWhereClause).length !== 0) objSugerencia.where = sugerenciaWhereClause;
+  if (Object.keys(movimientoWhereClause).length !== 0) objMovimiento.where = movimientoWhereClause;
+  if (Object.keys(obraWhereClause).length !== 0) objObra.where = obraWhereClause;
 
   try {
-    const pedidos = await Pedidos.findAll({
+    const idPedidos = await Pedidos.findAll({
+      limit: 50,
       where: whereClause,
+      attributes: ['id'],
+      include: [objPago, objSugerencia, objMovimiento, objObra],
+    });
+    if (idPedidos.length === 0) return res.json(idPedidos);
+
+    const pedidos = await Pedidos.findAll({
+      where: { id: { [Op.in]: idPedidos.map((p) => p.id) } },
+      attributes: ['id', 'createdAt', 'descripcion', 'estado'],
       include: [
         {
           model: PagoPedidos,
-          where: pagoWhereClause,
           as: 'pagoPedido',
-          // required: false, //necesario?
-        },
-        {
-          model: Sugerencias,
-          where: sugerenciaWhereClause,
-          // required: false, //necesario?
-        },
-        {
-          model: Movimientos,
-          where: movimientoWhereClause,
-          // required: false, //necesario?
+          attributes: ['id', 'precio', 'pagado'],
         },
         {
           model: Obras,
-          where: obraWhereClause,
-          // required: false, //necesario?
+          attributes: ['id', 'calle', 'esquina', 'numeroPuerta'],
+          include: [
+            { model: Particulares, as: 'particular', required: false, attributes: ['id', 'nombre'] },
+            { model: Empresas, as: 'empresa', required: false, attributes: ['id', 'nombre'] },
+          ],
         },
+        { model: Movimientos, attributes: ['id', 'tipo', 'horario', 'choferId'] },
+        { model: Sugerencias, attributes: ['id', 'tipoSugerido', 'horarioSugerido', 'choferSugeridoId'] },
       ],
     });
 
