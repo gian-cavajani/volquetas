@@ -171,3 +171,21 @@ exports.getRandomString = (cantidad) => {
   }
   return result;
 };
+exports.getRandomDate = (year) => {
+  const start = new Date(year, 0, 1);
+  const end = new Date(year, 11, 31);
+
+  const date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+  return date.toISOString();
+};
+exports.fechaAleatoriaEnMesAnio = (mes, anio) => {
+  const diasEnMes = new Date(anio, mes, 0).getDate();
+
+  const diaAleatorio = Math.floor(Math.random() * diasEnMes) + 1;
+
+  const fechaAleatoria = new Date(anio, mes - 1, diaAleatorio);
+
+  const isoFecha = fechaAleatoria.toISOString();
+
+  return isoFecha;
+};

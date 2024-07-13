@@ -18,14 +18,10 @@ const Sugerencias = require('./Sugerencias');
 const Cajas = require('./Cajas');
 const Pedidos = require('./Pedidos');
 const PagoPedidos = require('./PagoPedidos');
-const Personas = require('./Personas');
 const Config = require('./Config');
+const Facturas = require('./Facturas');
 
 // --------- RELACIONES ---------
-
-//Personas - Empleados 1a1 --> Empleados tiene personaId
-// Personas.hasOne(Empleados, { foreignKey: 'personaId' });
-// Empleados.belongsTo(Personas, { foreignKey: 'personaId' });
 
 //Empleados - Usuarios 1a1 --> Usuario tiene empleadoId
 Empleados.hasOne(Usuarios, { foreignKey: 'empleadoId' });
@@ -125,11 +121,16 @@ Pedidos.hasMany(Sugerencias, { foreignKey: 'pedidoId' });
 Obras.hasMany(Pedidos, { foreignKey: 'obraId' });
 
 //Pago-Pedidos 1an -> pagoPedidos puede tener multiples pedidos (en caso multiple todos los pedidos tienen el mismo pago pedido)
-PagoPedidos.hasMany(Pedidos, { foreignKey: 'pagoPedidoId', as: 'pedidos' });
+PagoPedidos.hasMany(Pedidos, { foreignKey: 'pagoPedidoId', as: 'pedido' });
 Pedidos.belongsTo(PagoPedidos, { foreignKey: 'pagoPedidoId', as: 'pagoPedido' });
+
 //------------------SUGERENCIAS------------------//
 Sugerencias.belongsTo(Empleados, { foreignKey: 'choferSugeridoId' });
 Sugerencias.belongsTo(Pedidos, { foreignKey: 'pedidoId' });
+
+//------------------FACTURAS------------------//
+Facturas.hasMany(PagoPedidos, { foreignKey: 'facturaId' });
+PagoPedidos.belongsTo(Facturas, { foreignKey: 'facturaId' });
 
 module.exports = {
   db,
@@ -152,6 +153,6 @@ module.exports = {
   Movimientos,
   Sugerencias,
   ObraDetalles,
-  Personas,
   Config,
+  Facturas,
 };

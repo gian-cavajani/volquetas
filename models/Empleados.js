@@ -1,6 +1,5 @@
 const Sequelize = require('sequelize');
 const db = require('../config/db');
-const { Personas } = require('.');
 
 const Empleados = db.define(
   'Empleados',

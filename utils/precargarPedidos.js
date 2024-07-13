@@ -1,7 +1,4 @@
-const bcrypt = require('bcryptjs');
-const moment = require('moment');
-const { randomUUID, getRandomValues } = require('crypto');
-const { getRandomModelo, getRandomString, getRandomDetalleResiduos, getRandomDireccion, getRandomInt, getRandomName, getRandomEmail, getRandomPhone } = require('./utilsPrecarga');
+const { fechaAleatoriaEnMesAnio, getRandomDate, getRandomInt } = require('./utilsPrecarga');
 
 const axios = require('axios');
 
@@ -19,42 +16,60 @@ const pedidosData = [];
 const pedidosMultiplesData = [];
 const entregasData = [];
 const levantesData = [];
+const facturasData = [];
 
-for (let i = 1; i < 40; i++) {
-  let randomObra = getRandomInt(1, 50);
-  let randomFecha = `2024-${getRandomInt(10, 12)}-${getRandomInt(10, 29)}T${getRandomInt(10, 19)}:00:00`;
-  let bool = randomObra > 20;
-  let randomChofer = getRandomInt(9, 14);
-  let movimiento;
+//77 obras
+for (let i = 1; i < 78; i++) {
+  let cincoseissiete = getRandomInt(5, 7);
+  let bool = cincoseissiete > 6;
+  let randomFecha = fechaAleatoriaEnMesAnio(cincoseissiete, 2025);
+  let fecha = new Date(randomFecha);
+  let fechaMasUnDia = new Date(fecha.setDate(fecha.getDate() + 1)).toISOString();
+  let randomFechaDos = fechaAleatoriaEnMesAnio(cincoseissiete - 1, 2025);
+  let randomChofer = cincoseissiete + 5;
 
   //pedidos normales:
   pedidosData.push({
-    obraId: randomObra,
+    obraId: i,
     descripcion: `Descripción del pedido nuevo numero: ${i}`, //OPCIONAL
     permisoId: null, //OPCIONAL -> se puede agregar luego (permisoId 1 pertenece a volketas 10, por lo que los particulares usan este permiso)
 
     //campos de PAGOPEDIDOS
     precio: '3200.50',
-    pagado: bool, // OPCIONAL, si no va pagado:false, si va pagado:true
-    tipoPago: bool ? 'efectivo' : 'transferencia', //tipos: 'transferencia', 'efectivo', 'cheque'
+    pagado: false, // OPCIONAL, si no va pagado:false, si va pagado:true
+    tipoPago: 'efectivo', //tipos: 'transferencia', 'efectivo', 'cheque'
 
     //campos de SUGERENCIA son opcionales:
     horarioSugerido: randomFecha,
+    choferSugeridoId: randomChofer,
+  });
+  pedidosData.push({
+    obraId: i,
+    descripcion: `Descripción del pedido nuevo numero: ${i + 1}`, //OPCIONAL
+    permisoId: null, //OPCIONAL -> se puede agregar luego (permisoId 1 pertenece a volketas 10, por lo que los particulares usan este permiso)
+
+    //campos de PAGOPEDIDOS
+    precio: `2${cincoseissiete}00`,
+    pagado: false, // OPCIONAL, si no va pagado:false, si va pagado:true
+    tipoPago: 'transferencia', //tipos: 'transferencia', 'efectivo', 'cheque'
+
+    //campos de SUGERENCIA son opcionales:
+    horarioSugerido: randomFechaDos,
     choferSugeridoId: randomChofer,
   });
 
   if (i > 35) {
     //pedidos multiples:
     pedidosMultiplesData.push({
-      obraId: randomObra,
+      obraId: i,
       descripcion: `Descripción de pedidos multiples ${i}`,
       permisoId: null, //OPCIONAL -> se puede agregar luego
       cantidadMultiple: getRandomInt(2, 4), //solo debe estar en tipo multiple
 
       //campos de PAGOPEDIDOS
       precio: '3200.50',
-      pagado: bool,
-      tipoPago: bool ? 'efectivo' : 'transferencia',
+      pagado: true,
+      tipoPago: 'efectivo',
 
       //campos de SUGERENCIA son opcionales, en pedido multiple todos tendran la misma sugerencia de entrega:
       horarioSugerido: randomFecha,
@@ -68,7 +83,6 @@ for (let i = 1; i < 40; i++) {
       horario: randomFecha, //obligatorio
       numeroVolqueta: i < 20 ? i : null, //opcional
       tipo: 'entrega', //obligatorio, solo puede ser "entrega" o "levante"
-      // "tipo": "levante"
     });
 
     if (bool) {
@@ -76,12 +90,33 @@ for (let i = 1; i < 40; i++) {
       levantesData.push({
         pedidoId: i, //obligatorio
         choferId: randomChofer, //obligatorio
-        horario: randomFecha, //obligatorio
+        horario: fechaMasUnDia, //obligatorio
         numeroVolqueta: i < 20 ? i : null, //opcional
         tipo: 'levante',
       });
     }
   }
+}
+
+for (let i = 1; i < 6; i += 2) {
+  facturasData.push({
+    pedidosIds: [i, i + 1], //obligatorio
+    empresaId: 1, //obligatorio
+    particularId: null, //obligatorio
+    tipo: i > 2 ? 'credito' : 'contado', //obligatorio
+    descripcion: `Factura para empresa 1`, //OPCIONAL
+    //  "fechaPago": "2024-12-09",//OPCIONAL
+    numeracion: 'A' + i, //OPCIONAL
+  });
+  facturasData.push({
+    pedidosIds: [10 + i, 10 + i + 1], //obligatorio
+    empresaId: 2, //obligatorio
+    particularId: null, //obligatorio
+    tipo: i > 2 ? 'recibo' : 'contado', //obligatorio
+    descripcion: `Factura para empresa 2`, //OPCIONAL
+    //  "fechaPago": "2024-12-09",//OPCIONAL
+    numeracion: 'A' + i + 10, //OPCIONAL
+  });
 }
 
 // Función para precargar pedidos
@@ -142,6 +177,20 @@ const precargarLevantes = async (token) => {
     console.error('Error al precargar Levantes:', error.response ? error.response.data : error.message);
   }
 };
+const precargarFacturas = async (token) => {
+  try {
+    for (const factura of facturasData) {
+      const response = await axios.post('http://localhost:3000/api/facturas', factura, {
+        headers: {
+          Authorization: token,
+        },
+      });
+      console.log(`Factura creado con éxito: ${response.data.id}`);
+    }
+  } catch (error) {
+    console.error('Error al precargar Fac:', error.response ? error.response.data : error.message);
+  }
+};
 
 const precargaFull = async () => {
   try {
@@ -150,6 +199,7 @@ const precargaFull = async () => {
     await precargarPedidosMultiples(token);
     await precargarEntregas(token);
     await precargarLevantes(token);
+    await precargarFacturas(token);
   } catch (error) {}
 };
 

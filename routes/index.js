@@ -23,6 +23,7 @@ const movimientoController = require('../controllers/movimientoController');
 const configController = require('../controllers/configController');
 const pagoController = require('../controllers/pagoController');
 const sugerenciaController = require('../controllers/sugerenciaController');
+const facturaController = require('../controllers/facturaController');
 
 module.exports = function () {
   //healthcheck
@@ -164,6 +165,15 @@ module.exports = function () {
   router.get('/config-activa', verificarToken(true), configController.getConfigActiva);
   router.get('/config/:configId', verificarToken(true), validarId('configId'), configController.getConfigId);
   router.put('/config/:configId', verificarToken(true), validarBodyVacioYSanitizar, configController.updateConfig);
+
+  //Facturas
+  router.post('/facturas', verificarToken(), validarBodyVacioYSanitizar, facturaController.crearFactura);
+  router.get('/facturas', verificarToken(), facturaController.getFacturas);
+  router.get('/facturas/:facturaId', verificarToken(), validarId('facturaId'), facturaController.getFactura);
+  router.put('/facturas/:facturaId', verificarToken(), validarId('facturaId'), validarBodyVacioYSanitizar, facturaController.modificarFactura);
+  router.put('/facturas-estado/:facturaId', verificarToken(), validarId('facturaId'), validarBodyVacioYSanitizar, facturaController.cambiarEstadoFactura);
+  router.put('/facturas-recalcular/:facturaId', verificarToken(), validarId('facturaId'), validarBodyVacioYSanitizar, facturaController.recalcularMonto);
+  router.delete('/facturas/:facturaId', verificarToken(true), validarId('facturaId'), facturaController.eliminarFactura);
 
   return router;
 };

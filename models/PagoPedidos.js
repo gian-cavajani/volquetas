@@ -24,6 +24,14 @@ const PagoPedidos = db.define(
     tipoPago: {
       type: DataTypes.ENUM('transferencia', 'efectivo', 'cheque'),
     },
+    facturaId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'Facturas',
+        key: 'id',
+      },
+    },
   },
   {
     timestamps: false,

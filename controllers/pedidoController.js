@@ -1,7 +1,7 @@
-const { where, Op } = require('sequelize');
-const { Permisos, PagoPedidos, Pedidos, Movimientos, Sugerencias, Obras, Particulares, Empresas, Empleados, Volquetas } = require('../models');
+const { Op } = require('sequelize');
+const { Permisos, PagoPedidos, Pedidos, Movimientos, Sugerencias, Obras, Particulares, Empresas, Empleados } = require('../models');
 const validator = require('validator');
-const db = require('../config/db');
+
 const validarPedido = async (req, creadoComo) => {
   const {
     obraId,
@@ -56,7 +56,10 @@ const validarPedido = async (req, creadoComo) => {
     if (obra.particularId !== null) {
       //si la obra es de un particular
       const volketas10 = await Empresas.findOne({ where: { nombre: 'Volketas 10' } });
-      if (permiso.empresaId !== volketas10.id) throw new Error('El Permiso de un particular, debe ser el vigente de Volketas 10');
+      let chequeo = 0;
+      if (permiso.particularId === obra.particularId) chequeo += 1;
+      if (permiso.empresaId === volketas10.id) chequeo += 1;
+      if (chequeo === 0) throw new Error('El permiso debe pertenecer al cliente particular o ser el vigente de Volketas 10');
     } else {
       //si la obra es de una empresa
       if (obra.empresaId !== permiso.empresaId) throw new Error('Obra y Permiso tienen diferente Empresa vinculada');
@@ -241,13 +244,17 @@ exports.getPedidos = async (req, res) => {
 };
 
 exports.getPedidosConFiltro = async (req, res) => {
-  const { estado, pagado, fechaInicio, fechaFin, empresaId, particularId, tipoHorario, obraId, choferId, choferSugeridoId } = req.query;
+  const { ultimos, estado, pagado, fechaInicio, fechaFin, empresaId, particularId, tipoHorario, obraId, choferId, choferSugeridoId } = req.query;
 
   let whereClause = {};
   let pagoWhereClause = {};
   let sugerenciaWhereClause = {};
   let movimientoWhereClause = {};
   let obraWhereClause = {};
+
+  if (ultimos) {
+    if (ultimos > 50) return res.status(400).json({ error: 'No se pueden traer mas de 50 Pedidos a la vez' });
+  }
   if (!['movimientoEntrega', 'movimientoLevante', 'sugerenciaEntrega', 'sugerenciaLevante', 'creacion'].includes(tipoHorario)) {
     return res.status(400).json({ error: "Los tipos de horario solo pueden ser: ('movimientoEntrega', 'movimientoLevante', 'sugerenciaEntrega', 'sugerenciaLevante', 'creacion')" });
   }
@@ -300,14 +307,16 @@ exports.getPedidosConFiltro = async (req, res) => {
 
   try {
     const idPedidos = await Pedidos.findAll({
-      limit: 50,
+      order: [['createdAt', 'DESC']],
+      limit: ultimos ? ultimos : 50,
       where: whereClause,
-      attributes: ['id'],
+      attributes: ['id', 'createdAt'],
       include: [objPago, objSugerencia, objMovimiento, objObra],
     });
     if (idPedidos.length === 0) return res.json(idPedidos);
 
     const pedidos = await Pedidos.findAll({
+      order: [['createdAt', 'DESC']],
       where: { id: { [Op.in]: idPedidos.map((p) => p.id) } },
       attributes: ['id', 'createdAt', 'descripcion', 'estado'],
       include: [
