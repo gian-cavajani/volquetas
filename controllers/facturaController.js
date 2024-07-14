@@ -118,10 +118,8 @@ exports.getFacturas = async (req, res) => {
   if (empresaId) whereClause.empresaId = empresaId;
 
   if (fechaInicio && fechaFin) {
-    const startDate = new Date(fechaInicio);
-    const endDate = new Date(fechaFin);
     if (fechaFin < fechaInicio) return res.status(400).json({ error: 'FechaFin debe ser despues de fechaInicio' });
-    whereClause.createdAt = { [Op.between]: [startDate, endDate] };
+    whereClause.createdAt = { [Op.between]: [fechaInicio, fechaFin] };
   } else {
     return res.status(400).json({ error: 'Debe ingresar fecha de inicio y fecha de fin' });
   }

@@ -222,7 +222,6 @@ exports.countMovimientosPorChofer = async (req, res) => {
 
     const inicio = new Date(fechaInicio);
     const fin = new Date(fechaFin);
-    const finMasUno = fin.setDate(fin.getDate() + 1);
 
     if (isNaN(inicio) || isNaN(fin)) {
       return res.status(400).json({ error: 'Las fechas proporcionadas no son válidas' });
@@ -235,7 +234,7 @@ exports.countMovimientosPorChofer = async (req, res) => {
         choferId,
         tipo: 'entrega',
         horario: {
-          [Op.between]: [inicio, finMasUno],
+          [Op.between]: [fechaInicio, fechaFin],
         },
       },
     });
@@ -246,7 +245,7 @@ exports.countMovimientosPorChofer = async (req, res) => {
         choferId,
         tipo: 'levante',
         horario: {
-          [Op.between]: [inicio, finMasUno],
+          [Op.between]: [fechaInicio, fechaFin],
         },
       },
     });
@@ -271,6 +270,7 @@ exports.countMovimientosPorChofer = async (req, res) => {
   }
 };
 
+// cuenta de todos los choferes:
 // exports.countMovimientosChoferesActivos = async (req, res) => {
 //   try {
 //     const { fechaInicio, fechaFin } = req.query;

@@ -14,24 +14,20 @@ const Cajas = db.define(
       allowNull: false,
     },
     motivo: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    tipo: {
-      type: DataTypes.ENUM('ingreso', 'gasto'),
+      type: DataTypes.ENUM('vale', 'gasto', 'ingreso', 'ingreso pedido', 'ingreso cochera', 'extraccion'),
       allowNull: false,
     },
     descripcion: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    moneda: DataTypes.ENUM('peso', 'dolar'),
+    moneda: {
+      type: DataTypes.ENUM('peso', 'dolar'),
+      allowNull: false,
+    },
     monto: {
       type: DataTypes.FLOAT,
       allowNull: false,
-      validate: {
-        min: 0,
-      },
     },
     empleadoId: {
       type: DataTypes.INTEGER,
@@ -41,49 +37,19 @@ const Cajas = db.define(
         key: 'id',
       },
     },
-    particularId: {
+    pedidoId: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'Particulares',
-        key: 'id',
-      },
-    },
-    empresaId: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'Empresas',
-        key: 'id',
-      },
-    },
-    ubicacionDelCliente: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'Obras',
+        model: 'Pedidos',
         key: 'id',
       },
     },
   },
   {
     timestamps: false,
-    indexes: [{ fields: ['fecha'] }, { fields: ['tipo'] }, { fields: ['empleadoId'] }, { fields: ['particularId'] }, { fields: ['empresaId'] }],
+    //indexes: [{ fields: ['fecha'] }, { fields: ['tipo'] }, { fields: ['empleadoId'] }, { fields: ['particularId'] }, { fields: ['empresaId'] }],
   }
 );
 
 module.exports = Cajas;
-
-//EJEMPLO:
-// Cajas.create({
-//   fecha: new Date(),
-//   motivo: 'Pago de servicios',
-//   tipo: 'gasto',
-//   descripcion: 'Pago de electricidad',
-//   moneda: 'peso',
-//   monto: 100.0,
-//   empleadoId: 1, // ID del empleado
-//   particularId: null,
-//   empresaId: 1, // ID de la empresa
-//   ubicacionDelCliente: 1, // ID de la ubicación
-// });

@@ -24,6 +24,7 @@ const configController = require('../controllers/configController');
 const pagoController = require('../controllers/pagoController');
 const sugerenciaController = require('../controllers/sugerenciaController');
 const facturaController = require('../controllers/facturaController');
+const cajaController = require('../controllers/cajaController');
 
 module.exports = function () {
   //healthcheck
@@ -123,6 +124,7 @@ module.exports = function () {
   router.get('/permisos', verificarToken(), permisoController.obtenerPermisos);
   router.get('/permisos/empresa/:empresaId', verificarToken(), validarId('empresaId'), permisoController.obtenerPermisosPorEmpresa);
   router.get('/permisos/particular/:particularId', verificarToken(), validarId('particularId'), permisoController.obtenerPermisosPorParticular);
+  router.get('/permisos/:permisoId', verificarToken(), validarId('permisoId'), permisoController.obtenerPermiso);
   router.put('/permisos/:permisoId', verificarToken(), validarBodyVacioYSanitizar, validarId('permisoId'), permisoController.actualizarPermiso);
   router.delete('/permisos/:permisoId', verificarToken(true), validarId('permisoId'), permisoController.eliminarPermiso);
 
@@ -174,6 +176,13 @@ module.exports = function () {
   router.put('/facturas-estado/:facturaId', verificarToken(), validarId('facturaId'), validarBodyVacioYSanitizar, facturaController.cambiarEstadoFactura);
   router.put('/facturas-recalcular/:facturaId', verificarToken(), validarId('facturaId'), validarBodyVacioYSanitizar, facturaController.recalcularMonto);
   router.delete('/facturas/:facturaId', verificarToken(true), validarId('facturaId'), facturaController.eliminarFactura);
+
+  //Cajas
+  router.post('/cajas', verificarToken(), validarBodyVacioYSanitizar, cajaController.nuevaCaja);
+  router.get('/cajas', verificarToken(), cajaController.getCajas);
+  router.get('/cajas/:cajaId', verificarToken(), validarId('cajaId'), cajaController.getCaja);
+  router.put('/cajas/:cajaId', verificarToken(), validarId('cajaId'), validarBodyVacioYSanitizar, cajaController.modificarCaja);
+  router.delete('/cajas/:cajaId', verificarToken(), validarId('cajaId'), cajaController.eliminarCaja);
 
   return router;
 };

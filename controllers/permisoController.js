@@ -1,5 +1,5 @@
 // controllers/permisosController.js
-const { Permisos, Empresas, Particulares } = require('../models');
+const { Permisos, Empresas, Particulares, Pedidos, Movimientos, Obras } = require('../models');
 const { Op } = require('sequelize');
 const validator = require('validator');
 
@@ -30,6 +30,7 @@ exports.crearPermiso = async (req, res) => {
     }
   }
 };
+
 exports.obtenerPermisos = async (req, res) => {
   try {
     const permisos = await Permisos.findAll();
@@ -42,6 +43,41 @@ exports.obtenerPermisos = async (req, res) => {
       res.status(500).json({ error: 'Error al obtener los permisos', detalle: errorsSequelize });
     } else {
       res.status(500).json({ error: 'Error al obtener los permisos', detalle: error });
+    }
+  }
+};
+
+exports.obtenerPermiso = async (req, res) => {
+  try {
+    const { permisoId } = req.params;
+    const permiso = await Permisos.findByPk(permisoId, {
+      include: [
+        {
+          model: Pedidos,
+          attributes: ['id', 'descripcion', 'createdAt', 'estado'],
+          include: [
+            {
+              model: Movimientos,
+              attributes: ['id', 'horario'],
+            },
+            {
+              model: Obras,
+              attributes: ['id'],
+            },
+          ],
+        },
+      ],
+    });
+
+    res.status(200).json(permiso);
+  } catch (error) {
+    console.error(error.message);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener el permiso', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener el permiso', detalle: error });
     }
   }
 };

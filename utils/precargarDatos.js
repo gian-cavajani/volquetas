@@ -3,7 +3,18 @@ const bcrypt = require('bcryptjs');
 const moment = require('moment');
 const { randomUUID, getRandomValues } = require('crypto');
 const precargarPedidos = require('./precargarPedidos');
-const { getRandomDate, getRandomModelo, getRandomString, getRandomDetalleResiduos, getRandomDireccion, getRandomInt, getRandomName, getRandomEmail, getRandomPhone } = require('./utilsPrecarga');
+const {
+  fechaAleatoriaEnMesAnio,
+  getRandomDate,
+  getRandomModelo,
+  getRandomString,
+  getRandomDetalleResiduos,
+  getRandomDireccion,
+  getRandomInt,
+  getRandomName,
+  getRandomEmail,
+  getRandomPhone,
+} = require('./utilsPrecarga');
 const {
   Config,
   Permisos,
@@ -20,6 +31,7 @@ const {
   Usuarios,
   HistoricoUsoCamion,
   Volquetas,
+  Cajas,
 } = require('../models');
 
 exports.precargarDatos = async () => {
@@ -40,6 +52,7 @@ exports.precargarDatos = async () => {
     const existingObraDetalles = await ObraDetalles.count();
     const existingPermisos = await Permisos.count();
     const existingvolquetas = await Volquetas.count();
+    const existingCajas = await Cajas.count();
 
     if (
       existingClienteEmpresas > 0 ||
@@ -56,6 +69,7 @@ exports.precargarDatos = async () => {
       existingObras > 0 ||
       existingPermisos > 0 ||
       existingvolquetas > 0 ||
+      existingCajas > 0 ||
       existingObraDetalles > 0
     ) {
       console.log('Datos ya existen. No se realizará la precarga.');
@@ -76,8 +90,29 @@ exports.precargarDatos = async () => {
     const jornales = [];
     const permisos = [];
     const volquetas = [];
+    const cajas = [];
 
     for (let i = 1; i < 20; i++) {
+      //CAJAS
+      cajas.push({
+        fecha: fechaAleatoriaEnMesAnio(6, 2024),
+        motivo: i > 10 ? 'vale' : 'gasto',
+        empleadoId: i > 10 ? getRandomInt(1, 10) : null,
+        pedidoId: null,
+        monto: i > 10 ? getRandomInt(-1, -14000) : getRandomInt(-1, -4000),
+        descripcion: i > 10 ? 'vale para empleado' : 'gasto operativo',
+        moneda: 'peso',
+      });
+      cajas.push({
+        fecha: fechaAleatoriaEnMesAnio(6, 2024),
+        motivo: i > 10 ? 'ingreso' : 'ingreso cochera',
+        empleadoId: null,
+        pedidoId: null,
+        monto: i > 10 ? getRandomInt(1, 14000) : getRandomInt(1, 2000),
+        descripcion: i > 10 ? 'ingreso nuevo en pesos' : '',
+        moneda: i > 10 ? 'peso' : 'dolar',
+      });
+
       //VOLQUETAS
       volquetas.push({
         numeroVolqueta: i,
@@ -318,6 +353,9 @@ exports.precargarDatos = async () => {
     await Volquetas.bulkCreate(volquetas);
     // --------------------CONFIG--------------------
     await Config.create({ anio: 2024, precioSinIva: 3000, horasDeTrabajo: 8, configActiva: true });
+    // --------------------CAJAS--------------------
+    await Cajas.bulkCreate(cajas);
+
     console.log('Datos precargados con éxito.');
   } catch (error) {
     console.error('Error al precargar datos:', error);

@@ -260,23 +260,25 @@ exports.getPedidosConFiltro = async (req, res) => {
   }
 
   if (fechaInicio && fechaFin) {
-    const startDate = new Date(fechaInicio);
-    const endDate = new Date(fechaFin);
-
     if (tipoHorario === 'sugerenciaEntrega') {
-      sugerenciaWhereClause.horarioSugerido = { [Op.between]: [startDate, endDate] };
+      console.log('1', fechaInicio, fechaFin);
+      sugerenciaWhereClause.horarioSugerido = { [Op.between]: [fechaInicio, fechaFin] };
       sugerenciaWhereClause.tipoSugerido = 'entrega';
     } else if (tipoHorario === 'sugerenciaLevante') {
-      sugerenciaWhereClause.horarioSugerido = { [Op.between]: [startDate, endDate] };
+      console.log('2', fechaInicio, fechaFin);
+      sugerenciaWhereClause.horarioSugerido = { [Op.between]: [fechaInicio, fechaFin] };
       sugerenciaWhereClause.tipoSugerido = 'levante';
     } else if (tipoHorario === 'movimientoEntrega') {
-      movimientoWhereClause.horario = { [Op.between]: [startDate, endDate] };
+      console.log('3', fechaInicio, fechaFin);
+      movimientoWhereClause.horario = { [Op.between]: [fechaInicio, fechaFin] };
       movimientoWhereClause.tipo = 'entrega';
     } else if (tipoHorario === 'movimientoLevante') {
-      movimientoWhereClause.horario = { [Op.between]: [startDate, endDate] };
+      console.log('4', fechaInicio, fechaFin);
+      movimientoWhereClause.horario = { [Op.between]: [fechaInicio, fechaFin] };
       movimientoWhereClause.tipo = 'levante';
     } else if (tipoHorario === 'creacion') {
-      whereClause.createdAt = { [Op.between]: [startDate, endDate] };
+      console.log('5', fechaInicio, fechaFin);
+      whereClause.createdAt = { [Op.between]: [fechaInicio, fechaFin] };
     }
   } else {
     return res.status(400).json({ error: 'Debe ingresar fecha de inicio y fecha de fin' });

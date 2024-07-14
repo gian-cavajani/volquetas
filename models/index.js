@@ -95,17 +95,9 @@ ContactoEmpresas.hasMany(Telefonos, { foreignKey: 'contactoEmpresaId' });
 Empleados.hasMany(Cajas, { foreignKey: 'empleadoId' });
 Cajas.belongsTo(Empleados, { foreignKey: 'empleadoId' });
 
-// Relación ClienteParticular - Cajas
-Particulares.hasMany(Cajas, { foreignKey: 'particularId' });
-Cajas.belongsTo(Particulares, { foreignKey: 'particularId' });
-
-// Relación Empresas - Cajas
-Empresas.hasMany(Cajas, { foreignKey: 'empresaId' });
-Cajas.belongsTo(Empresas, { foreignKey: 'empresaId' });
-
-// Relación Obras - Cajas
-Obras.hasMany(Cajas, { foreignKey: 'obraDelCliente' });
-Cajas.belongsTo(Obras, { foreignKey: 'obraDelCliente' });
+// Relación Pedidos - Cajas
+Pedidos.hasMany(Cajas, { foreignKey: 'pedidoId' });
+Cajas.belongsTo(Pedidos, { foreignKey: 'pedidoId' });
 
 //------------------MOVIMIENTOS------------------//
 Movimientos.belongsTo(Volquetas, { foreignKey: 'numeroVolqueta' });
@@ -116,6 +108,7 @@ Movimientos.belongsTo(Empleados, { foreignKey: 'choferId' });
 Pedidos.belongsTo(Usuarios, { foreignKey: 'creadoPor' });
 Pedidos.belongsTo(Obras, { foreignKey: 'obraId' });
 Pedidos.belongsTo(Permisos, { foreignKey: 'permisoId' });
+Permisos.hasMany(Pedidos, { foreignKey: 'permisoId' });
 Pedidos.hasMany(Movimientos, { foreignKey: 'pedidoId' });
 Pedidos.hasMany(Sugerencias, { foreignKey: 'pedidoId' });
 Obras.hasMany(Pedidos, { foreignKey: 'obraId' });

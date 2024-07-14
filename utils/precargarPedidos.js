@@ -17,6 +17,7 @@ const pedidosMultiplesData = [];
 const entregasData = [];
 const levantesData = [];
 const facturasData = [];
+const cajasData = [];
 
 //77 obras
 for (let i = 1; i < 78; i++) {
@@ -95,6 +96,17 @@ for (let i = 1; i < 78; i++) {
         tipo: 'levante',
       });
     }
+
+    //cajas
+    cajasData.push({
+      fecha: getRandomDate(2024),
+      motivo: 'ingreso pedido',
+      empleadoId: randomChofer,
+      pedidoId: i,
+      monto: getRandomInt(2000, 4000),
+      descripcion: 'ingreso de pedido',
+      moneda: 'peso',
+    });
   }
 }
 
@@ -191,6 +203,20 @@ const precargarFacturas = async (token) => {
     console.error('Error al precargar Fac:', error.response ? error.response.data : error.message);
   }
 };
+const precargarCajas = async (token) => {
+  try {
+    for (const caja of cajasData) {
+      const response = await axios.post('http://localhost:3000/api/cajas', caja, {
+        headers: {
+          Authorization: token,
+        },
+      });
+      console.log(`Caja creada con éxito: ${response.data.id}`);
+    }
+  } catch (error) {
+    console.error('Error al precargar CAja:', error.response ? error.response.data : error.message);
+  }
+};
 
 const precargaFull = async () => {
   try {
@@ -200,6 +226,7 @@ const precargaFull = async () => {
     await precargarEntregas(token);
     await precargarLevantes(token);
     await precargarFacturas(token);
+    await precargarCajas(token);
   } catch (error) {}
 };
 
