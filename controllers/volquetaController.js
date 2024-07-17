@@ -1,4 +1,5 @@
-const { Volquetas } = require('../models');
+const { Volquetas, Movimientos, Pedidos } = require('../models');
+const { Op } = require('sequelize');
 
 exports.createVolqueta = async (req, res) => {
   const { numeroVolqueta, estado, tipo } = req.body;
@@ -21,37 +22,64 @@ exports.createVolqueta = async (req, res) => {
 };
 
 exports.getVolquetaById = async (req, res) => {
-  //TODO: aca traer Movimientos de volqueta...
+  const { numeroVolqueta } = req.params;
+  const { fechaInicio, fechaFin } = req.query;
   try {
-    const volqueta = await Volquetas.findByPk(req.params.numeroVolqueta);
-    if (!volqueta) {
-      return res.status(404).json({ error: 'Volqueta no encontrada' });
+    let volquetasInclude = {};
+    if (fechaInicio && fechaFin) {
+      volquetasInclude = {
+        model: Movimientos,
+        where: { horario: { [Op.between]: [fechaInicio, fechaFin] } },
+        required: false,
+      };
+    } else {
+      volquetasInclude = {
+        model: Movimientos,
+        limit: 1,
+        order: [['horario', 'DESC']],
+        required: false,
+      };
     }
-    res.json(volqueta);
+
+    const volqueta = await Volquetas.findByPk(numeroVolqueta, {
+      include: [volquetasInclude],
+    });
+    if (!volqueta) return res.status(404).json({ error: 'Volqueta no encontrada' });
+
+    res.status(200).json(volqueta);
   } catch (error) {
-    console.error(error.message);
+    console.error('Error al obtener movimientos de la volqueta:', error);
     const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
 
     if (errorsSequelize.length > 0) {
-      res.status(500).json({ error: 'Error al obtener la volqueta', detalle: errorsSequelize });
+      res.status(500).json({ error: 'Error al obtener movimientos de la volqueta', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener la volqueta', detalle: error });
+      res.status(500).json({ error: 'Error al obtener movimientos de la volqueta', detalle: error });
     }
   }
 };
 
 exports.getAllVolquetas = async (req, res) => {
   try {
-    const volquetas = await Volquetas.findAll();
-    res.json(volquetas);
+    const volquetas = await Volquetas.findAll({
+      include: [
+        {
+          model: Movimientos,
+          limit: 1,
+          order: [['horario', 'DESC']],
+        },
+      ],
+    });
+
+    res.status(200).json(volquetas);
   } catch (error) {
-    console.error(error.message);
+    console.error('Error al obtener volquetas con sus últimos movimientos:', error);
     const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
 
     if (errorsSequelize.length > 0) {
-      res.status(500).json({ error: 'Error al obtener las volquetas', detalle: errorsSequelize });
+      res.status(500).json({ error: 'Error al obtener volquetas con sus últimos movimientos', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener las volquetas', detalle: error });
+      res.status(500).json({ error: 'Error al obtener volquetas con sus últimos movimientos', detalle: error });
     }
   }
 };

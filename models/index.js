@@ -101,6 +101,7 @@ Cajas.belongsTo(Pedidos, { foreignKey: 'pedidoId' });
 
 //------------------MOVIMIENTOS------------------//
 Movimientos.belongsTo(Volquetas, { foreignKey: 'numeroVolqueta' });
+Volquetas.hasMany(Movimientos, { foreignKey: 'numeroVolqueta' });
 Movimientos.belongsTo(Pedidos, { foreignKey: 'pedidoId' });
 Movimientos.belongsTo(Empleados, { foreignKey: 'choferId' });
 

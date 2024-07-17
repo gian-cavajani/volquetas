@@ -10,6 +10,8 @@ const Volquetas = db.define(
       primaryKey: true,
     },
     estado: {
+      //estado podra ser cualquier cosa que le sirva a la empresa para tener mas info de la volqueta
+      //ejemplo: 'sana', 'en arreglos', 'quemada', 'para pintar', 'etc'
       type: DataTypes.STRING,
       allowNull: true,
     },
