@@ -260,24 +260,20 @@ exports.getPedidosConFiltro = async (req, res) => {
   }
 
   if (fechaInicio && fechaFin) {
+    if (fechaFin < fechaInicio) return res.status(400).json({ error: 'FechaFin debe ser despues de fechaInicio' });
     if (tipoHorario === 'sugerenciaEntrega') {
-      console.log('1', fechaInicio, fechaFin);
       sugerenciaWhereClause.horarioSugerido = { [Op.between]: [fechaInicio, fechaFin] };
       sugerenciaWhereClause.tipoSugerido = 'entrega';
     } else if (tipoHorario === 'sugerenciaLevante') {
-      console.log('2', fechaInicio, fechaFin);
       sugerenciaWhereClause.horarioSugerido = { [Op.between]: [fechaInicio, fechaFin] };
       sugerenciaWhereClause.tipoSugerido = 'levante';
     } else if (tipoHorario === 'movimientoEntrega') {
-      console.log('3', fechaInicio, fechaFin);
       movimientoWhereClause.horario = { [Op.between]: [fechaInicio, fechaFin] };
       movimientoWhereClause.tipo = 'entrega';
     } else if (tipoHorario === 'movimientoLevante') {
-      console.log('4', fechaInicio, fechaFin);
       movimientoWhereClause.horario = { [Op.between]: [fechaInicio, fechaFin] };
       movimientoWhereClause.tipo = 'levante';
     } else if (tipoHorario === 'creacion') {
-      console.log('5', fechaInicio, fechaFin);
       whereClause.createdAt = { [Op.between]: [fechaInicio, fechaFin] };
     }
   } else {

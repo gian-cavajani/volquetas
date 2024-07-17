@@ -48,13 +48,23 @@ exports.obtenerPermisos = async (req, res) => {
 };
 
 exports.obtenerPermiso = async (req, res) => {
+  const { permisoId } = req.params;
+  const { fechaInicio, fechaFin } = req.query;
   try {
-    const { permisoId } = req.params;
+    const pedidosWhere = {};
+
+    if (fechaInicio && fechaFin) {
+      if (fechaFin < fechaInicio) return res.status(400).json({ error: 'FechaFin debe ser despues de fechaInicio' });
+      pedidosWhere.createdAt = { [Op.between]: [fechaInicio, fechaFin] };
+    }
+
     const permiso = await Permisos.findByPk(permisoId, {
       include: [
         {
           model: Pedidos,
           attributes: ['id', 'descripcion', 'createdAt', 'estado'],
+          where: pedidosWhere,
+          required: false,
           include: [
             {
               model: Movimientos,

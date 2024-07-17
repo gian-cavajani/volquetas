@@ -27,6 +27,7 @@ exports.getVolquetaById = async (req, res) => {
   try {
     let volquetasInclude = {};
     if (fechaInicio && fechaFin) {
+      if (fechaFin < fechaInicio) return res.status(400).json({ error: 'FechaFin debe ser despues de fechaInicio' });
       volquetasInclude = {
         model: Movimientos,
         where: { horario: { [Op.between]: [fechaInicio, fechaFin] } },
