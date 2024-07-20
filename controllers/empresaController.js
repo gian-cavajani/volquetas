@@ -47,7 +47,7 @@ exports.getEmpresa = async (req, res) => {
           as: 'contactos',
           required: false,
           attributes: ['id', 'nombre', 'descripcion', 'email', 'obraId'],
-          include: [{ model: Telefonos, attributes: ['tipo', 'telefono', 'extension'] }],
+          include: [{ model: Telefonos, attributes: ['id', 'tipo', 'telefono', 'extension'] }],
         },
         { model: Permisos, required: false, attributes: ['id', 'fechaCreacion', 'fechaVencimiento'] },
       ],

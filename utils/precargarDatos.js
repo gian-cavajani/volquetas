@@ -209,6 +209,15 @@ exports.precargarDatos = async () => {
         particularId: i,
       });
 
+      telefonos.push({
+        telefono: getRandomPhone(tipo),
+        tipo,
+        extension: i > 10 ? getRandomInt(100, 9000) : null,
+        empleadoId: null,
+        contactoEmpresaId: i,
+        particularId: null,
+      });
+
       //SERVICIOS-CAMION
       const modelo = getRandomModelo();
       const tipoServicios = ['arreglo', 'service', 'chequeo', 'pintura'];
