@@ -8,11 +8,11 @@ exports.createParticular = async (req, res) => {
   // Validaciones
   if (!nombre) return res.status(400).json({ error: 'El nombre del Particular es obligatorio' });
   if (email && !validator.isEmail(email)) return res.status(400).json({ error: 'El email no es válido' });
-  if (cedula.length !== 8) return res.status(400).json({ error: 'Cedula invalida, deben ser 8 numeros' });
+  if (cedula && cedula.length !== 8) return res.status(400).json({ error: 'Cedula invalida, deben ser 8 numeros' });
 
   // Sanitización
   const sanitizedNombre = validator.escape(nombre);
-  const sanitizedcedula = cedula ? validator.escape(cedula) : '';
+  const sanitizedcedula = cedula ? validator.escape(cedula) : null;
   const sanitizedEmail = email ? validator.normalizeEmail(email) : null;
   const sanitizedDescripcion = descripcion ? validator.escape(descripcion) : null;
 

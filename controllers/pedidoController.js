@@ -316,7 +316,7 @@ exports.getPedidosConFiltro = async (req, res) => {
     const pedidos = await Pedidos.findAll({
       order: [['createdAt', 'DESC']],
       where: { id: { [Op.in]: idPedidos.map((p) => p.id) } },
-      attributes: ['id', 'createdAt', 'descripcion', 'estado'],
+      attributes: ['id', 'createdAt', 'descripcion', 'estado', 'creadoComo'],
       include: [
         {
           model: PagoPedidos,
