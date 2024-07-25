@@ -6,6 +6,7 @@ exports.createVolqueta = async (req, res) => {
 
   try {
     if (!['grande', 'chica'].includes(tipo)) return res.status(400).json({ error: 'Tipo inválido' });
+    if (!['ok', 'quemada', 'para pintar', 'perdida', 'inutilizable'].includes(estado)) return res.status(400).json({ error: 'Estado inválido' });
     if (!numeroVolqueta) return res.status(400).json({ error: 'Numero de volqueta es obligatorio' });
     const volqueta = await Volquetas.create({ numeroVolqueta, estado, tipo });
 
@@ -87,7 +88,10 @@ exports.getAllVolquetas = async (req, res) => {
 
 exports.updateVolquetaById = async (req, res) => {
   const { numeroVolqueta } = req.params;
+  const { estado, tipo } = req.body;
   try {
+    if (tipo && !['grande', 'chica'].includes(tipo)) return res.status(400).json({ error: 'Tipo inválido' });
+    if (estado && !['ok', 'quemada', 'para pintar', 'perdida', 'inutilizable'].includes(estado)) return res.status(400).json({ error: 'Estado inválido' });
     const [updated] = await Volquetas.update(req.body, {
       where: { numeroVolqueta },
     });

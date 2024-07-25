@@ -128,10 +128,15 @@ const crearPedido = async (req, creadoComo) => {
     let multiples = [];
 
     for (let i = 1; i < cantidadMultiple; i++) {
+      const pagoPedidoIteracion = await PagoPedidos.create({
+        precio,
+        pagado,
+        tipoPago,
+      });
       const pedidoIteracion = {
         ...pedido,
         referenciaId: nuevoPedido.id,
-        pagoPedidoId: nuevoPago.id,
+        pagoPedidoId: pagoPedidoIteracion.id,
         descripcion: `Pedido Multiple Nro ${i + 1} en ${obraLugar}: ${descripcion}`,
       };
       multiples.push(pedidoIteracion);
@@ -411,46 +416,35 @@ exports.getPedidoId = async (req, res) => {
 
 exports.modificarPedido = async (req, res) => {
   const { pedidoId } = req.params;
-  const { descripcion, permisoId, nroPesada, obraId } = req.body;
+  const { descripcion, nroPesada, obraId } = req.body;
   try {
     const pedido = await Pedidos.findByPk(pedidoId);
-    if (!pedido) {
-      return res.status(404).json({ error: 'Pedido no existe' });
-    }
+    if (!pedido) return res.status(404).json({ error: 'Pedido no existe' });
 
     if (obraId) {
-      if (permisoId) return res.status(400).json({ error: 'No se pueden modificar la obra y el permiso en simultaneo.' });
-      if (pedido.permisoId !== null) return res.status(400).json({ error: 'Pedido tiene un permiso vinculado, eliminelo y luego modifique la obra' });
       const obra = await Obras.findByPk(obraId);
       if (!obra) return res.status(400).json({ error: 'Obra no existe' });
       if (!obra.activa) return res.status(400).json({ error: 'Obra no esta activa' });
-      //const numMovimientos = await pedido.getCountMovimientos;
-      //if (numMovimientos > 0) return res.status(400).json({ error: 'No se puede modificar el pedido ya que tiene (entrega y/o levante), eliminelos y luego modifique la obra' });
 
+      if (pedido.permisoId) {
+        const permiso = await Permisos.findByPk(pedido.permisoId);
+        if (obra.particularId !== null) {
+          //si la obra es de un particular
+          let val = 0;
+          const volketas10 = await Empresas.findOne({ where: { nombre: 'Volketas 10' } });
+          if (obra.particularId === permiso.particularId) val = 1;
+          if (permiso.empresaId === volketas10.id) val = 1;
+          if (val === 0) return res.status(400).json({ error: 'Obra y Permiso tienen diferente Cliente vinculado, El permiso puede ser el vigente de Volketas 10 o propio del particular' });
+        } else {
+          //si la obra es de una empresa
+          if (permiso.particularId !== null) return res.status(400).json({ error: 'Obra y Permiso tienen diferente Cliente vinculado' });
+          if (obra.empresaId !== permiso.empresaId) return res.status(400).json({ error: 'Obra y Permiso tienen diferente Empresa vinculada' });
+        }
+      }
       pedido.obraId = obraId;
       await pedido.save();
     }
 
-    const obra = await Obras.findByPk(pedido.obraId);
-    if (permisoId) {
-      const permiso = await Permisos.findByPk(permisoId);
-      if (!permiso) throw new Error('Permiso no válido');
-      if (permiso.fechaVencimiento < Date.now()) throw new Error('Permiso Vencido, puede dejar este campo en blanco y agregar un permiso luego');
-      if (obra.particularId !== null) {
-        //si la obra es de un particular
-        const volketas10 = await Empresas.findOne({ where: { nombre: 'Volketas 10' } });
-        if (permiso.empresaId !== volketas10.id) throw new Error('El Permiso de un particular, debe ser el vigente de Volketas 10');
-      } else {
-        //si la obra es de una empresa
-        if (obra.empresaId !== permiso.empresaId) throw new Error('Obra y Permiso tienen diferente Empresa vinculada');
-      }
-    }
-
-    if (permisoId === null) {
-      pedido.permisoId = null;
-    } else {
-      pedido.permisoId = permisoId ? permisoId : pedido.permisoId;
-    }
     pedido.descripcion = descripcion ? descripcion : pedido.descripcion;
     pedido.nroPesada = nroPesada ? nroPesada : pedido.nroPesada;
 
@@ -463,6 +457,51 @@ exports.modificarPedido = async (req, res) => {
       res.status(500).json({ error: 'Error al modificar el pedido', detalle: errorsSequelize });
     } else {
       res.status(500).json({ error: 'Error al modificar el pedido', detalle: error.message });
+    }
+  }
+};
+
+exports.modificarPermiso = async (req, res) => {
+  const { pedidoId } = req.params;
+  const { permisoId } = req.body;
+
+  try {
+    const pedido = await Pedidos.findByPk(pedidoId);
+    if (!pedido) return res.status(404).json({ error: 'Pedido no existe' });
+
+    if (permisoId !== null) {
+      const permiso = await Permisos.findByPk(permisoId);
+
+      if (!permiso) return res.status(400).json({ error: 'Permiso no existe' });
+      if (permiso.fechaVencimiento < pedido.createdAt) return res.status(400).json({ error: 'Permiso Vencido, antes de la creacion del pedido' });
+
+      const obra = await Obras.findByPk(pedido.obraId);
+      if (obra.particularId !== null) {
+        //si la obra es de un particular
+        let val = 0;
+        const volketas10 = await Empresas.findOne({ where: { nombre: 'Volketas 10' } });
+        if (obra.particularId === permiso.particularId) val = 1;
+        console.log(obra, permiso);
+        if (permiso.empresaId === volketas10.id) val = 1;
+        if (val === 0) return res.status(400).json({ error: 'Obra y Permiso tienen diferente particular vinculado, El permiso puede ser el vigente de Volketas 10 o propio del particular' });
+      } else {
+        //si la obra es de una empresa
+        if (obra.empresaId !== permiso.empresaId) return res.status(400).json({ error: 'Obra y Permiso tienen diferente Empresa vinculada' });
+      }
+      pedido.permisoId = permisoId;
+    } else {
+      pedido.permisoId = null;
+    }
+
+    await pedido.save();
+    res.status(202).json(pedido);
+  } catch (error) {
+    console.error('Error al modificar el pedido:', error);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al modificar el permiso del pedido', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al modificar el permiso del pedido', detalle: error.message });
     }
   }
 };

@@ -114,9 +114,20 @@ exports.precargarDatos = async () => {
       });
 
       //VOLQUETAS
+      let estado;
+      if (i === 1) {
+        estado = 'perdida';
+      } else if (i > 1 && i < 4) {
+        estado = 'inutilizable';
+      } else if (i > 4) {
+        estado = 'ok';
+      } else {
+        estado = 'para pintar';
+      }
+
       volquetas.push({
         numeroVolqueta: i,
-        estado: i > 2 ? 'ok' : 'perdida',
+        estado,
         tipo: i > 18 ? 'chica' : 'grande',
       });
 

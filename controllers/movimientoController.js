@@ -11,6 +11,7 @@ const validarMovimiento = async (req, pedido, volqueta) => {
   if (!pedidoId) throw new Error('Movimiento debe tener Pedido');
   if (!horario) throw new Error('Movimiento debe tener horario');
   if (!volqueta && numeroVolqueta) throw new Error('Volqueta no existe');
+  if (volqueta && volqueta.estado.includes('perdida', 'inutilizable')) throw new Error(`Dado el estado de la volqueta (${volqueta.estado}), esta no se puede utilizar`);
 
   if (choferId) {
     const chofer = await Empleados.findByPk(choferId);
@@ -79,9 +80,6 @@ exports.modificarMovimiento = async (req, res) => {
     if (tipo || pedidoId) return res.status(400).json({ error: 'El Tipo o el Pedido de movimiento no son modificables' });
     if (!(choferId || horario || numeroVolqueta)) return res.status(400).json({ error: 'Debe incluir algun campo valido a modificar (chofer, horario, numero de volqueta)' });
 
-    if (!(tipo === 'entrega' || tipo === 'levante')) {
-      return res.status(400).json({ error: 'Tipo solo puede ser "entrega" o "levante"' });
-    }
     const movimiento = await Movimientos.findByPk(movimientoId);
     if (!movimiento) return res.status(404).json({ error: 'No existe movimiento' });
 
@@ -210,133 +208,3 @@ exports.eliminarMovimiento = async (req, res) => {
     }
   }
 };
-
-exports.countMovimientosPorChofer = async (req, res) => {
-  try {
-    const { choferId } = req.params;
-    const { fechaInicio, fechaFin } = req.query;
-
-    if (!fechaInicio || !fechaFin) {
-      return res.status(400).json({ error: 'Debe proporcionar las fechas de inicio y fin' });
-    }
-
-    const inicio = new Date(fechaInicio);
-    const fin = new Date(fechaFin);
-
-    if (isNaN(inicio) || isNaN(fin)) {
-      return res.status(400).json({ error: 'Las fechas proporcionadas no son válidas' });
-    }
-    if (inicio > fin) return res.status(400).json({ error: 'La fecha de inicio debe ser menor a la de final' });
-
-    // Contar los movimientos de tipo 'entrega'
-    const entregasCount = await Movimientos.count({
-      where: {
-        choferId,
-        tipo: 'entrega',
-        horario: {
-          [Op.between]: [fechaInicio, fechaFin],
-        },
-      },
-    });
-
-    // Contar los movimientos de tipo 'levante'
-    const levantesCount = await Movimientos.count({
-      where: {
-        choferId,
-        tipo: 'levante',
-        horario: {
-          [Op.between]: [fechaInicio, fechaFin],
-        },
-      },
-    });
-
-    // Calcular el total de movimientos
-    const totalCount = entregasCount + levantesCount;
-
-    res.status(200).json({
-      entregas: entregasCount,
-      levantes: levantesCount,
-      total: totalCount,
-    });
-  } catch (error) {
-    console.error(error.message);
-    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
-
-    if (errorsSequelize.length > 0) {
-      res.status(500).json({ error: 'Error al contar los movimientos', detalle: errorsSequelize });
-    } else {
-      res.status(500).json({ error: 'Error al contar los movimientos', detalle: error });
-    }
-  }
-};
-
-// cuenta de todos los choferes:
-// exports.countMovimientosChoferesActivos = async (req, res) => {
-//   try {
-//     const { fechaInicio, fechaFin } = req.query;
-
-//     if (!fechaInicio || !fechaFin) {
-//       return res.status(400).json({ error: 'Debe proporcionar las fechas de inicio y fin' });
-//     }
-
-//     const inicio = new Date(fechaInicio);
-//     const fin = new Date(fechaFin);
-//     const finMasUno = fin.setDate(fin.getDate() + 1);
-//     // const inicio = fechaInicio;
-//     // const fin = fechaFin;
-
-//     if (isNaN(inicio) || isNaN(fin)) {
-//       return res.status(400).json({ error: 'Las fechas proporcionadas no son válidas' });
-//     }
-//     if (inicio > fin) return res.status(400).json({ error: 'La fecha de inicio debe ser menor a la de final' });
-
-//     const choferesActivos = await Empleados.findAll({
-//       where: {
-//         habilitado: true,
-//         rol: 'chofer',
-//       },
-//       attributes: ['id'],
-//     });
-
-//     const choferIds = choferesActivos.map((chofer) => chofer.id);
-
-//     // Contar los movimientos de tipo 'entrega' para choferes activos
-//     const entregasCount = await Movimientos.count({
-//       where: {
-//         choferId: {
-//           [Op.in]: choferIds,
-//         },
-//         tipo: 'entrega',
-//         horario: {
-//           [Op.between]: [inicio, finMasUno],
-//         },
-//       },
-//     });
-
-//     // Contar los movimientos de tipo 'levante' para choferes activos
-//     const levantesCount = await Movimientos.count({
-//       where: {
-//         choferId: {
-//           [Op.in]: choferIds,
-//         },
-//         tipo: 'levante',
-//         horario: {
-//           [Op.between]: [inicio, finMasUno],
-//         },
-//       },
-//     });
-
-//     // Calcular el total de movimientos
-//     const totalCount = entregasCount + levantesCount;
-
-//     // Devolver el resultado en la estructura JSON requerida
-//     res.status(200).json({
-//       entregas: entregasCount,
-//       levantes: levantesCount,
-//       total: totalCount,
-//     });
-//   } catch (error) {
-//     console.error('Error al contar los movimientos:', error);
-//     res.status(500).json({ error: 'Error al contar los movimientos', detalle: error.message });
-//   }
-// };

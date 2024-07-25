@@ -6,6 +6,8 @@ const validator = require('validator');
 exports.crearPermiso = async (req, res) => {
   const { fechaCreacion, fechaVencimiento, empresaId, particularId, id } = req.body;
 
+  console.log(req.body);
+
   if (!fechaCreacion || isNaN(Date.parse(fechaCreacion))) {
     return res.status(400).json({ error: 'La fecha de creacion obligatoria y debe ser válida' });
   }
@@ -16,6 +18,8 @@ exports.crearPermiso = async (req, res) => {
   if (!validator.isLength(id, { min: 1 })) {
     return res.status(400).json({ error: 'Número de solicitud no puede estar vacío.' });
   }
+
+  if (new Date(fechaCreacion) > new Date(fechaVencimiento)) return res.status(400).json({ error: 'Fecha de creacion debe ser anterior a la de vencimiento.' });
 
   try {
     const nuevoPermiso = await Permisos.create(req.body);
@@ -156,17 +160,38 @@ exports.obtenerPermisosPorParticular = async (req, res) => {
 };
 
 exports.actualizarPermiso = async (req, res) => {
+  const { permisoId } = req.params;
+  const { fechaCreacion, fechaVencimiento, empresaId, particularId } = req.body;
+
   try {
-    const { permisoId } = req.params;
-    const [updated] = await Permisos.update(req.body, {
-      where: { id: permisoId },
-    });
-    if (updated) {
-      const updatedPermiso = await Permisos.findOne({ where: { id: permisoId } });
-      res.status(200).json(updatedPermiso);
-    } else {
-      res.status(404).json({ error: 'Permiso no encontrado' });
+    const permiso = await Permisos.findByPk(permisoId);
+    if (!permiso) res.status(404).json({ error: 'Permiso no encontrado' });
+
+    if (fechaCreacion && fechaVencimiento) {
+      if (new Date(fechaCreacion) > new Date(fechaVencimiento)) return res.status(400).json({ error: 'Fecha de creacion debe ser anterior a la de vencimiento.' });
     }
+    if (fechaCreacion) {
+      if (new Date(fechaCreacion) > new Date(permiso.fechaVencimiento)) return res.status(400).json({ error: 'Fecha de creacion debe ser anterior a la de vencimiento.' });
+      permiso.fechaCreacion = fechaCreacion;
+    }
+
+    if (fechaVencimiento) {
+      if (new Date(permiso.fechaCreacion) > new Date(fechaVencimiento)) return res.status(400).json({ error: 'Fecha de creacion debe ser anterior a la de vencimiento.' });
+      permiso.fechaVencimiento = fechaVencimiento;
+    }
+    if (empresaId) {
+      const empresa = await Empresas.findByPk(empresaId);
+      if (!empresa) res.status(404).json({ error: 'Empresa no encontrada' });
+      permiso.empresaId = empresaId;
+    }
+    if (particularId) {
+      const particular = await Particulares.findByPk(particularId);
+      if (!particular) res.status(404).json({ error: 'Particular no encontrado' });
+      permiso.particularId = particularId;
+    }
+
+    permiso.save();
+    return res.status(200).json(permiso);
   } catch (error) {
     console.error(error.message);
     const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];

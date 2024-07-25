@@ -25,6 +25,7 @@ const pagoController = require('../controllers/pagoController');
 const sugerenciaController = require('../controllers/sugerenciaController');
 const facturaController = require('../controllers/facturaController');
 const cajaController = require('../controllers/cajaController');
+const estadisticasController = require('../controllers/estadisticasController');
 
 module.exports = function () {
   //healthcheck
@@ -144,6 +145,7 @@ module.exports = function () {
   router.get('/pedidos-filtro', verificarToken(), pedidoController.getPedidosConFiltro);
   router.get('/pedidos/:pedidoId', verificarToken(), validarId('pedidoId'), pedidoController.getPedidoId);
   router.put('/pedidos/:pedidoId', verificarToken(), validarBodyVacioYSanitizar, validarId('pedidoId'), pedidoController.modificarPedido);
+  router.put('/pedidos-permiso/:pedidoId', verificarToken(), validarBodyVacioYSanitizar, validarId('pedidoId'), pedidoController.modificarPermiso);
   router.delete('/pedidos/:pedidoId', verificarToken(), validarBodyVacioYSanitizar, validarId('pedidoId'), pedidoController.eliminarPedido);
 
   //Movimientos (Entrega/Levante)
@@ -151,7 +153,6 @@ module.exports = function () {
   router.put('/movimientos/:movimientoId', verificarToken(), validarId('movimientoId'), validarBodyVacioYSanitizar, movimientoController.modificarMovimiento);
   router.get('/movimientos', verificarToken(), movimientoController.getMovimientos);
   router.delete('/movimientos/:movimientoId', verificarToken(), validarId('movimientoId'), movimientoController.eliminarMovimiento);
-  router.get('/movimientos-chofer/:choferId', verificarToken(), validarId('choferId'), movimientoController.countMovimientosPorChofer);
 
   //Sugerencias
   router.post('/sugerencias', verificarToken(), validarBodyVacioYSanitizar, sugerenciaController.createSugerencia);
@@ -183,6 +184,14 @@ module.exports = function () {
   router.get('/cajas/:cajaId', verificarToken(), validarId('cajaId'), cajaController.getCaja);
   router.put('/cajas/:cajaId', verificarToken(), validarId('cajaId'), validarBodyVacioYSanitizar, cajaController.modificarCaja);
   router.delete('/cajas/:cajaId', verificarToken(), validarId('cajaId'), cajaController.eliminarCaja);
+
+  //Estadisticas
+  router.get('/estadisticas-movimientos-chofer/:choferId', verificarToken(), validarId('choferId'), estadisticasController.countMovimientosPorChofer);
+  router.get('/estadisticas-movimientos-choferes', verificarToken(), estadisticasController.countMovimientosChoferesActivos);
+  router.get('/estadisticas-cliente', verificarToken(), estadisticasController.getInfoPedidosCliente);
+  router.get('/estadisticas-clientes', verificarToken(), estadisticasController.getInfoPedidosClientes);
+  router.get('/estadisticas-deudores', verificarToken(), estadisticasController.getInfoMayoresDeudores);
+  router.get('/estadisticas-pedidos', verificarToken(), estadisticasController.getInfoPedidos);
 
   return router;
 };

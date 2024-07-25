@@ -17,11 +17,11 @@ const Permisos = db.define(
       primaryKey: true,
     },
     fechaCreacion: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     fechaVencimiento: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
     },
     empresaId: {
       type: DataTypes.INTEGER,

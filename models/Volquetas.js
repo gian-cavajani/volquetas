@@ -11,8 +11,7 @@ const Volquetas = db.define(
     },
     estado: {
       //estado podra ser cualquier cosa que le sirva a la empresa para tener mas info de la volqueta
-      //ejemplo: 'sana', 'en arreglos', 'quemada', 'para pintar', 'etc'
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM('ok', 'quemada', 'para pintar', 'perdida', 'inutilizable'),
       allowNull: true,
     },
     tipo: {
