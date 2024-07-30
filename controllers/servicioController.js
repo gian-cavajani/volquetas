@@ -30,7 +30,7 @@ exports.nuevoServicio = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear el servicio', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear el servicio', detalle: error });
+      res.status(500).json({ error: 'Error al crear el servicio', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -50,7 +50,7 @@ exports.getServicios = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener los servicios', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener los servicios', detalle: error });
+      res.status(500).json({ error: 'Error al obtener los servicios', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -68,7 +68,7 @@ exports.getServicioPorCamion = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener los servicios por camion', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener los servicios por camion', detalle: error });
+      res.status(500).json({ error: 'Error al obtener los servicios por camion', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -107,7 +107,7 @@ exports.getServiciosPorCamionMensual = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener los servicios', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener los servicios', detalle: error });
+      res.status(500).json({ error: 'Error al obtener los servicios', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -129,7 +129,7 @@ exports.deleteServicio = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al eliminar el servicio', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al eliminar el servicio', detalle: error });
+      res.status(500).json({ error: 'Error al eliminar el servicio', detalle: error.message, stack: error.stack });
     }
   }
 };

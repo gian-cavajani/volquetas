@@ -24,7 +24,7 @@ exports.createEmpresa = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear empresa', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear empresa', detalle: error });
+      res.status(500).json({ error: 'Error al crear empresa', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -63,7 +63,7 @@ exports.getEmpresa = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener empresa', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener empresa', detalle: error });
+      res.status(500).json({ error: 'Error al obtener empresa', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -93,7 +93,7 @@ exports.getAllEmpresas = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener empresas', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener empresas', detalle: error });
+      res.status(500).json({ error: 'Error al obtener empresas', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -132,7 +132,7 @@ exports.buscarEmpresa = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al buscar empresas', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al buscar empresas', detalle: error });
+      res.status(500).json({ error: 'Error al buscar empresas', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -155,7 +155,7 @@ exports.updateEmpresa = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al modificar empresa', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al modificar empresa', detalle: error });
+      res.status(500).json({ error: 'Error al modificar empresa', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -176,7 +176,7 @@ exports.deleteEmpresa = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al borrar empresa', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al borrar empresa', detalle: error });
+      res.status(500).json({ error: 'Error al borrar empresa', detalle: error.message, stack: error.stack });
     }
   }
 };

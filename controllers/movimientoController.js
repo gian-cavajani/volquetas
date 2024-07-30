@@ -67,7 +67,7 @@ exports.nuevoMovimiento = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear el movimiento', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear el movimiento', detalle: error.message });
+      res.status(500).json({ error: 'Error al crear el movimiento', detalle: error.message, stack: error.stack.message });
     }
   }
 };
@@ -87,8 +87,10 @@ exports.modificarMovimiento = async (req, res) => {
 
     let entrega = await pedido.getEntrega;
     let levante = await pedido.getLevante;
+    let mod = 0; //si mod 0 -> no hubo modif de volqueta, si mod=1 -> solo se modifico la entrega, si mod=2 -> mod entrega y levante
     if (numeroVolqueta) {
       const volquetaNueva = await Volquetas.findByPk(numeroVolqueta);
+      if (!volquetaNueva) return res.status(400).json({ error: 'Volqueta no existe' });
       if (volquetaNueva.ocupada) return res.status(400).json({ error: 'Volqueta esta en uso' });
       if (entrega.numeroVolqueta) {
         //si tiene volqueta
@@ -99,9 +101,11 @@ exports.modificarMovimiento = async (req, res) => {
 
       entrega.numeroVolqueta = numeroVolqueta;
       await entrega.save();
+      mod = 1;
       if (levante) {
         levante.numeroVolqueta = numeroVolqueta;
         await levante.save();
+        mod = 2;
       } else {
         volquetaNueva.ocupada = true;
       }
@@ -125,7 +129,13 @@ exports.modificarMovimiento = async (req, res) => {
     movimiento.choferId = choferId ? choferId : movimiento.choferId;
     await movimiento.save();
 
-    res.status(200).json({ detalle: 'Movimiento(s) modificados' });
+    if (mod === 1) {
+      res.status(200).json([entrega]);
+    } else if (mod === 2) {
+      res.status(200).json([entrega, levante]);
+    } else {
+      res.status(200).json([movimiento]);
+    }
   } catch (error) {
     console.error('Error al modificar el movimiento:', error);
     const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
@@ -133,7 +143,7 @@ exports.modificarMovimiento = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al modificar el movimiento', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al modificar el movimiento', detalle: error.message });
+      res.status(500).json({ error: 'Error al modificar el movimiento', detalle: error.message, stack: error.stack.message });
     }
   }
 };
@@ -149,7 +159,7 @@ exports.getMovimientos = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener movimientos', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener movimientos', detalle: error });
+      res.status(500).json({ error: 'Error al obtener movimientos', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -204,7 +214,7 @@ exports.eliminarMovimiento = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al eliminar el movimiento', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al eliminar el movimiento', detalle: error.message });
+      res.status(500).json({ error: 'Error al eliminar el movimiento', detalle: error.message, stack: error.stack.message });
     }
   }
 };

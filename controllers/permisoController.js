@@ -30,7 +30,7 @@ exports.crearPermiso = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear el permiso', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear permiso', detalle: error });
+      res.status(500).json({ error: 'Error al crear permiso', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -46,7 +46,7 @@ exports.obtenerPermisos = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener los permisos', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener los permisos', detalle: error });
+      res.status(500).json({ error: 'Error al obtener los permisos', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -91,7 +91,7 @@ exports.obtenerPermiso = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener el permiso', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener el permiso', detalle: error });
+      res.status(500).json({ error: 'Error al obtener el permiso', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -123,7 +123,7 @@ exports.obtenerPermisosPorEmpresa = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener los permisos por empresa', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener los permisos por empresa', detalle: error });
+      res.status(500).json({ error: 'Error al obtener los permisos por empresa', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -154,7 +154,7 @@ exports.obtenerPermisosPorParticular = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener los permisos por particular', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener los permisos por particular', detalle: error });
+      res.status(500).json({ error: 'Error al obtener los permisos por particular', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -199,7 +199,7 @@ exports.actualizarPermiso = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al actualizar el permiso', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al actualizar el permiso', detalle: error });
+      res.status(500).json({ error: 'Error al actualizar el permiso', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -222,7 +222,7 @@ exports.eliminarPermiso = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al eliminar el permiso', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al eliminar el permiso', detalle: error });
+      res.status(500).json({ error: 'Error al eliminar el permiso', detalle: error.message, stack: error.stack });
     }
   }
 };

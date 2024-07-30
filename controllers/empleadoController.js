@@ -39,7 +39,7 @@ exports.nuevoEmpleado = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear el empleado', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear el empleado', detalle: error });
+      res.status(500).json({ error: 'Error al crear el empleado', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -64,7 +64,7 @@ exports.getEmpleados = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener los empleados', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener los empleados', detalle: error });
+      res.status(500).json({ error: 'Error al obtener los empleados', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -89,7 +89,7 @@ exports.getEmpleado = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener el empleado', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener el empleado', detalle: error });
+      res.status(500).json({ error: 'Error al obtener el empleado', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -125,7 +125,7 @@ exports.eliminarEmpleado = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al eliminar el empleado', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al eliminar el empleado', detalle: error });
+      res.status(500).json({ error: 'Error al eliminar el empleado', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -163,7 +163,7 @@ exports.cambiarEstadoEmpleado = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al habilitar/deshabilitar el empleado', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al habilitar/deshabilitar el empleado', detalle: error });
+      res.status(500).json({ error: 'Error al habilitar/deshabilitar el empleado', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -214,7 +214,7 @@ exports.modificarEmpleado = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al modificar el empleado', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al modificar el empleado', detalle: error });
+      res.status(500).json({ error: 'Error al modificar el empleado', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -242,7 +242,7 @@ exports.getEmpleadosActivosYSinUsuario = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener los empleados', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener los empleados', detalle: error });
+      res.status(500).json({ error: 'Error al obtener los empleados', detalle: error.message, stack: error.stack });
     }
   }
 };

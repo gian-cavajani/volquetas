@@ -47,7 +47,7 @@ exports.nuevoTelefono = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear el teléfono', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear el teléfono', detalle: error });
+      res.status(500).json({ error: 'Error al crear el teléfono', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -63,7 +63,7 @@ exports.getAllTelefonos = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener los teléfonos', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener los teléfonos', detalle: error });
+      res.status(500).json({ error: 'Error al obtener los teléfonos', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -82,7 +82,7 @@ exports.getTelefono = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener el teléfono', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener el teléfono', detalle: error });
+      res.status(500).json({ error: 'Error al obtener el teléfono', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -105,7 +105,7 @@ exports.updateTelefono = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al actualizar el teléfono', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al actualizar el teléfono', detalle: error });
+      res.status(500).json({ error: 'Error al actualizar el teléfono', detalle: error.message, stack: error.stack });
     }
   }
 };

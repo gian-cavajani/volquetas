@@ -42,7 +42,7 @@ exports.createSugerencia = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear la sugerencia', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear la sugerencia', detalle: error });
+      res.status(500).json({ error: 'Error al crear la sugerencia', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -79,7 +79,7 @@ exports.updateSugerencia = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al actualizar la sugerencia', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al actualizar la sugerencia', detalle: error });
+      res.status(500).json({ error: 'Error al actualizar la sugerencia', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -99,7 +99,7 @@ exports.deleteSugerencia = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al borrar la sugerencia', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al borrar la sugerencia', detalle: error });
+      res.status(500).json({ error: 'Error al borrar la sugerencia', detalle: error.message, stack: error.stack });
     }
   }
 };

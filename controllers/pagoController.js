@@ -28,7 +28,7 @@ exports.modificarPago = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al modificar el pago', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al modificar el pago', detalle: error.message });
+      res.status(500).json({ error: 'Error al modificar el pago', detalle: error.message, stack: error.stack.message });
     }
   }
 };

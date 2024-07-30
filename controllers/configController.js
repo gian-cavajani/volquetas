@@ -25,7 +25,7 @@ exports.createConfig = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear la configuración', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear la configuración', detalle: error });
+      res.status(500).json({ error: 'Error al crear la configuración', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -46,7 +46,7 @@ exports.getConfigId = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener la configuración', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener la configuración', detalle: error });
+      res.status(500).json({ error: 'Error al obtener la configuración', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -62,7 +62,7 @@ exports.getConfigs = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener la configuración', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener la configuración', detalle: error });
+      res.status(500).json({ error: 'Error al obtener la configuración', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -78,7 +78,7 @@ exports.getConfigActiva = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener la configuración activa', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener la configuración activa', detalle: error });
+      res.status(500).json({ error: 'Error al obtener la configuración activa', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -111,7 +111,7 @@ exports.updateConfig = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al actualizar la configuración', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al actualizar la configuración', detalle: error });
+      res.status(500).json({ error: 'Error al actualizar la configuración', detalle: error.message, stack: error.stack });
     }
   }
 };

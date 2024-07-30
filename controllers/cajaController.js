@@ -63,7 +63,7 @@ exports.nuevaCaja = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear la caja', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear la caja', detalle: error });
+      res.status(500).json({ error: 'Error al crear la caja', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -144,7 +144,7 @@ exports.getCajas = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener los datos de la caja', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener los datos de la caja', detalle: error });
+      res.status(500).json({ error: 'Error al obtener los datos de la caja', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -198,7 +198,7 @@ exports.getCaja = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener la caja', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener la caja', detalle: error });
+      res.status(500).json({ error: 'Error al obtener la caja', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -219,7 +219,7 @@ exports.eliminarCaja = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al eliminar la caja', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al eliminar la caja', detalle: error });
+      res.status(500).json({ error: 'Error al eliminar la caja', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -271,7 +271,7 @@ exports.modificarCaja = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al modificar la caja', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al modificar la caja', detalle: error });
+      res.status(500).json({ error: 'Error al modificar la caja', detalle: error.message, stack: error.stack });
     }
   }
 };

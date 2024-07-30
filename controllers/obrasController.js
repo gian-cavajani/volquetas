@@ -67,7 +67,7 @@ exports.createObra = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear la obra', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear la obra', detalle: error });
+      res.status(500).json({ error: 'Error al crear la obra', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -103,7 +103,7 @@ exports.getAllObras = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener las obras', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener las obras', detalle: error });
+      res.status(500).json({ error: 'Error al obtener las obras', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -153,7 +153,7 @@ exports.getObra = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener la obra', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener la obra', detalle: error });
+      res.status(500).json({ error: 'Error al obtener la obra', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -173,7 +173,7 @@ exports.updateObra = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al actualizar la obra', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al actualizar la obra', detalle: error });
+      res.status(500).json({ error: 'Error al actualizar la obra', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -193,7 +193,7 @@ exports.updateObraDetalles = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al actualizar los detalles de la obra', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al actualizar los detalles de la obra', detalle: error });
+      res.status(500).json({ error: 'Error al actualizar los detalles de la obra', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -215,7 +215,7 @@ exports.deleteObra = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al eliminar la obra', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al eliminar la obra', detalle: error });
+      res.status(500).json({ error: 'Error al eliminar la obra', detalle: error.message, stack: error.stack });
     }
   }
 };

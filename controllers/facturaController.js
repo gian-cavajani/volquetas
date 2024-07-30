@@ -96,7 +96,7 @@ exports.crearFactura = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear la factura', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear la factura', detalle: error.message });
+      res.status(500).json({ error: 'Error al crear la factura', detalle: error.message, stack: error.stack.message });
     }
   }
 };
@@ -139,7 +139,7 @@ exports.getFacturas = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener facturas', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener facturas', detalle: error });
+      res.status(500).json({ error: 'Error al obtener facturas', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -159,7 +159,7 @@ exports.getFactura = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener la factura', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener la factura', detalle: error });
+      res.status(500).json({ error: 'Error al obtener la factura', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -193,7 +193,7 @@ exports.modificarFactura = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al modificar Factura', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al modificar Factura', detalle: error });
+      res.status(500).json({ error: 'Error al modificar Factura', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -221,7 +221,7 @@ exports.recalcularMonto = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al modificar Factura', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al modificar Factura', detalle: error });
+      res.status(500).json({ error: 'Error al modificar Factura', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -274,7 +274,7 @@ exports.cambiarEstadoFactura = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al modificar Factura', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al modificar Factura', detalle: error });
+      res.status(500).json({ error: 'Error al modificar Factura', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -298,7 +298,7 @@ exports.eliminarFactura = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al Eliminar Factura', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al Eliminar Factura', detalle: error });
+      res.status(500).json({ error: 'Error al Eliminar Factura', detalle: error.message, stack: error.stack });
     }
   }
 };

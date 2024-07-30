@@ -25,7 +25,7 @@ exports.nuevoCamion = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear camion', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear camion', detalle: error });
+      res.status(500).json({ error: 'Error al crear camion', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -41,7 +41,7 @@ exports.getCamiones = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener camiones', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener camiones', detalle: error });
+      res.status(500).json({ error: 'Error al obtener camiones', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -58,7 +58,7 @@ exports.getCamion = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener camion', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener camion', detalle: error });
+      res.status(500).json({ error: 'Error al obtener camion', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -87,7 +87,7 @@ exports.actualizarCamion = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al actualizar camion', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al actualizar camion', detalle: error });
+      res.status(500).json({ error: 'Error al actualizar camion', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -113,7 +113,7 @@ exports.borrarCamion = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al borrar camion', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al borrar camion', detalle: error });
+      res.status(500).json({ error: 'Error al borrar camion', detalle: error.message, stack: error.stack });
     }
   }
 };

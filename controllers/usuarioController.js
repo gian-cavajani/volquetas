@@ -47,7 +47,7 @@ exports.nuevoUsuario = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear usuario', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear usuario', detalle: error });
+      res.status(500).json({ error: 'Error al crear usuario', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -62,7 +62,7 @@ exports.getUsuarios = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener usuarios', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener usuarios', detalle: error });
+      res.status(500).json({ error: 'Error al obtener usuarios', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -83,7 +83,7 @@ exports.getUsuario = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener usuario', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener usuario', detalle: error });
+      res.status(500).json({ error: 'Error al obtener usuario', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -98,7 +98,7 @@ exports.getUsuariosInactivos = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener usuarios', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener usuarios', detalle: error });
+      res.status(500).json({ error: 'Error al obtener usuarios', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -131,7 +131,7 @@ exports.loginUsuario = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al loguear usuario', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al loguear usuario', detalle: error });
+      res.status(500).json({ error: 'Error al loguear usuario', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -159,7 +159,7 @@ exports.confirmarUsuario = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al confirmar usuario', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al confirmar usuario', detalle: error });
+      res.status(500).json({ error: 'Error al confirmar usuario', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -184,7 +184,7 @@ exports.borrarUsuario = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al borrar usuario', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al borrar usuario', detalle: error });
+      res.status(500).json({ error: 'Error al borrar usuario', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -214,7 +214,7 @@ exports.modificarUsuario = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al modificar usuario', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al modificar usuario', detalle: error });
+      res.status(500).json({ error: 'Error al modificar usuario', detalle: error.message, stack: error.stack });
     }
   }
 };

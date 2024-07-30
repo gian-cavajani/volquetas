@@ -44,7 +44,7 @@ exports.registrarUsoCamion = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear el historico-camion', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear el historico-camion', detalle: error });
+      res.status(500).json({ error: 'Error al crear el historico-camion', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -78,7 +78,7 @@ exports.obtenerAsignacionesActuales = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener el historico-camion', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener el historico-camion', detalle: error });
+      res.status(500).json({ error: 'Error al obtener el historico-camion', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -127,7 +127,7 @@ exports.obtenerHistoricoPorCamionOEmpleado = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener el historico-camion', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener el historico-camion', detalle: error });
+      res.status(500).json({ error: 'Error al obtener el historico-camion', detalle: error.message, stack: error.stack });
     }
   }
 };

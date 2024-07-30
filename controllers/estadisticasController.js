@@ -93,7 +93,7 @@ exports.countMovimientosPorChofer = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al contar los movimientos', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al contar los movimientos', detalle: error });
+      res.status(500).json({ error: 'Error al contar los movimientos', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -160,7 +160,7 @@ exports.countMovimientosChoferesActivos = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al contar los movimientos', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al contar los movimientos', detalle: error });
+      res.status(500).json({ error: 'Error al contar los movimientos', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -253,7 +253,7 @@ exports.getInfoPedidosCliente = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener estadisticas del cliente', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener estadisticas del cliente', detalle: error });
+      res.status(500).json({ error: 'Error al obtener estadisticas del cliente', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -344,7 +344,7 @@ const getResumen = async (whereClause) => {
     if (errorsSequelize.length > 0) {
       return res.status(500).json({ error: 'Error al obtener estadisticas', detalle: errorsSequelize });
     } else {
-      return res.status(500).json({ error: 'Error al obtener estadisticas', detalle: error });
+      return res.status(500).json({ error: 'Error al obtener estadisticas', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -377,7 +377,7 @@ exports.getInfoPedidosClientes = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener estadisticas', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener estadisticas', detalle: error });
+      res.status(500).json({ error: 'Error al obtener estadisticas', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -408,7 +408,7 @@ exports.getInfoPedidos = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener estadisticas', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener estadisticas', detalle: error });
+      res.status(500).json({ error: 'Error al obtener estadisticas', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -474,7 +474,7 @@ exports.getInfoMayoresDeudores = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener estadisticas', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener estadisticas', detalle: error });
+      res.status(500).json({ error: 'Error al obtener estadisticas', detalle: error.message, stack: error.stack });
     }
   }
 };

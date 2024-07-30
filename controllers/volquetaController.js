@@ -17,7 +17,7 @@ exports.createVolqueta = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear la volqueta', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear la volqueta', detalle: error });
+      res.status(500).json({ error: 'Error al crear la volqueta', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -56,7 +56,7 @@ exports.getVolquetaById = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener movimientos de la volqueta', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener movimientos de la volqueta', detalle: error });
+      res.status(500).json({ error: 'Error al obtener movimientos de la volqueta', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -83,7 +83,7 @@ exports.getAllVolquetas = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener volquetas con sus últimos movimientos', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener volquetas con sus últimos movimientos', detalle: error });
+      res.status(500).json({ error: 'Error al obtener volquetas con sus últimos movimientos', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -109,7 +109,7 @@ exports.updateVolquetaById = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al actualizar la volqueta', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al actualizar la volqueta', detalle: error });
+      res.status(500).json({ error: 'Error al actualizar la volqueta', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -131,7 +131,7 @@ exports.deleteVolquetaById = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al borrar la volqueta', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al borrar la volqueta', detalle: error });
+      res.status(500).json({ error: 'Error al borrar la volqueta', detalle: error.message, stack: error.stack });
     }
   }
 };

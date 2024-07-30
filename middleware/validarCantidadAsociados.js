@@ -26,7 +26,7 @@ const validarCantidadAsociados = async (req, res, next) => {
     next();
   } catch (error) {
     console.error('Error al validar cantidad de asociados:', error);
-    res.status(500).json({ error: 'Error al validar cantidad de asociados.', detalle: error.message });
+    res.status(500).json({ error: 'Error al validar cantidad de asociados.', detalle: error.message, stack: error.stack.message });
   }
 };
 

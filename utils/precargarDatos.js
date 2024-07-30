@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
 const { randomUUID, getRandomValues } = require('crypto');
-const precargarPedidos = require('./precargarPedidos');
+//const precargarPedidos = require('./precargarPedidos');
 const {
   fechaAleatoriaEnMesAnio,
   getRandomDate,

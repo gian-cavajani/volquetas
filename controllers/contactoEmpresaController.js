@@ -33,7 +33,7 @@ exports.createContactoEmpresa = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear el contacto empresa', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear el contacto empresa', detalle: error });
+      res.status(500).json({ error: 'Error al crear el contacto empresa', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -60,7 +60,7 @@ exports.getContactoEmpresa = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener el contacto empresa', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener el contacto empresa', detalle: error });
+      res.status(500).json({ error: 'Error al obtener el contacto empresa', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -82,7 +82,7 @@ exports.getAllContactoEmpresas = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener los contactos empresa', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener los contactos empresa', detalle: error });
+      res.status(500).json({ error: 'Error al obtener los contactos empresa', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -123,7 +123,7 @@ exports.asignarObra = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al asignar la obra al contacto de la empresa', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al asignar la obra al contacto de la empresa', detalle: error });
+      res.status(500).json({ error: 'Error al asignar la obra al contacto de la empresa', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -143,7 +143,7 @@ exports.updateContactoEmpresa = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al actualizar contacto empresa', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al actualizar contacto empresa', detalle: error });
+      res.status(500).json({ error: 'Error al actualizar contacto empresa', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -165,7 +165,7 @@ exports.deleteContactoEmpresa = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al actualizar el contacto de la empresa', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al actualizar el contacto de la empresa', detalle: error });
+      res.status(500).json({ error: 'Error al actualizar el contacto de la empresa', detalle: error.message, stack: error.stack });
     }
   }
 };

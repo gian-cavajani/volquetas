@@ -17,7 +17,7 @@ app.use('/api', router());
 
 (async () => {
   try {
-    await db.sync({ force: true }); // Usar { force: true } solo en desarrollo para reiniciar las tablas
+    await db.sync({ sync: true }); // Usar { force: true } solo en desarrollo para reiniciar las // sync: true -> si las tablas ya existen no las hace de nuevo
     console.log('DB conectada ' + new Date().getHours() + ':' + new Date().getMinutes());
 
     const { precargarDatos } = require('./utils/precargarDatos');

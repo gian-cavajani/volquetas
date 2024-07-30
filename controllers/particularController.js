@@ -32,7 +32,7 @@ exports.createParticular = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear el particular', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear el particular', detalle: error });
+      res.status(500).json({ error: 'Error al crear el particular', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -58,7 +58,7 @@ exports.getParticular = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener el particular', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener el particular', detalle: error });
+      res.status(500).json({ error: 'Error al obtener el particular', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -80,7 +80,7 @@ exports.getAllParticulares = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener los particulares', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener los particulares', detalle: error });
+      res.status(500).json({ error: 'Error al obtener los particulares', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -121,7 +121,7 @@ exports.buscarParticular = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al buscar los particulares', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al buscar los particulares', detalle: error });
+      res.status(500).json({ error: 'Error al buscar los particulares', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -141,7 +141,7 @@ exports.updateParticular = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al actualizar el particular', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al actualizar el particular', detalle: error });
+      res.status(500).json({ error: 'Error al actualizar el particular', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -163,7 +163,7 @@ exports.deleteParticular = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al eliminar el particular', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al eliminar el particular', detalle: error });
+      res.status(500).json({ error: 'Error al eliminar el particular', detalle: error.message, stack: error.stack });
     }
   }
 };

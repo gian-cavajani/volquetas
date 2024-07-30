@@ -172,7 +172,7 @@ exports.createPedidoNuevo = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear el pedido', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear el pedido', detalle: error.message });
+      res.status(500).json({ error: 'Error al crear el pedido', detalle: error.message, stack: error.stack.message });
     }
   }
 };
@@ -188,7 +188,7 @@ exports.createPedidoMultiple = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al crear los pedidos', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al crear los pedidos', detalle: error.message });
+      res.status(500).json({ error: 'Error al crear los pedidos', detalle: error.message, stack: error.stack.message });
     }
   }
 };
@@ -243,7 +243,7 @@ exports.getPedidos = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener pedidos', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener pedidos', detalle: error });
+      res.status(500).json({ error: 'Error al obtener pedidos', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -271,7 +271,7 @@ exports.getPedidosMultiples = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener pedidos multiples', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener pedidos multiples', detalle: error.toString() });
+      res.status(500).json({ error: 'Error al obtener pedidos multiples', detalle: error.message, stack: error.stack.toString() });
     }
   }
 };
@@ -377,7 +377,7 @@ exports.getPedidosConFiltro = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener pedido', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener pedido', detalle: error });
+      res.status(500).json({ error: 'Error al obtener pedido', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -437,7 +437,7 @@ exports.getPedidoId = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al obtener pedido', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al obtener pedido', detalle: error });
+      res.status(500).json({ error: 'Error al obtener pedido', detalle: error.message, stack: error.stack });
     }
   }
 };
@@ -484,7 +484,7 @@ exports.modificarPedido = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al modificar el pedido', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al modificar el pedido', detalle: error.message });
+      res.status(500).json({ error: 'Error al modificar el pedido', detalle: error.message, stack: error.stack.message });
     }
   }
 };
@@ -529,7 +529,7 @@ exports.modificarPermiso = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al modificar el permiso del pedido', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al modificar el permiso del pedido', detalle: error.message });
+      res.status(500).json({ error: 'Error al modificar el permiso del pedido', detalle: error.message, stack: error.stack.message });
     }
   }
 };
@@ -564,7 +564,7 @@ exports.eliminarPedido = async (req, res) => {
     if (errorsSequelize.length > 0) {
       res.status(500).json({ error: 'Error al eliminar el pedido', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al eliminar el pedido', detalle: error });
+      res.status(500).json({ error: 'Error al eliminar el pedido', detalle: error.message, stack: error.stack });
     }
   }
 };
