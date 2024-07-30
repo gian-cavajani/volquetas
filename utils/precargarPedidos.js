@@ -82,7 +82,7 @@ for (let i = 1; i < 78; i++) {
       pedidoId: i, //obligatorio
       choferId: randomChofer, //obligatorio
       horario: randomFecha, //obligatorio
-      numeroVolqueta: i < 20 ? i : null, //opcional
+      numeroVolqueta: i + 5 < 10 ? i + 5 : null, //opcional
       tipo: 'entrega', //obligatorio, solo puede ser "entrega" o "levante"
     });
 
@@ -92,7 +92,7 @@ for (let i = 1; i < 78; i++) {
         pedidoId: i, //obligatorio
         choferId: randomChofer, //obligatorio
         horario: fechaMasUnDia, //obligatorio
-        numeroVolqueta: i < 20 ? i : null, //opcional
+        numeroVolqueta: i + 5 < 14 ? i + 5 : null, //opcional
         tipo: 'levante',
       });
     }
