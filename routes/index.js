@@ -141,7 +141,7 @@ module.exports = function () {
   router.post('/pedidos/nuevo', verificarToken(), validarBodyVacioYSanitizar, pedidoController.createPedidoNuevo);
   router.post('/pedidos/entrega-levante', verificarToken(), validarBodyVacioYSanitizar, pedidoController.createPedidoNuevo);
   router.post('/pedidos/recambio', verificarToken(), validarBodyVacioYSanitizar, pedidoController.createPedidoNuevo);
-  //router.get('/pedidos', verificarToken(), pedidoController.getPedidos);
+  router.get('/pedidos-multiples/:pedidoId', verificarToken(), validarId('pedidoId'), pedidoController.getPedidosMultiples);
   router.get('/pedidos-filtro', verificarToken(), pedidoController.getPedidosConFiltro);
   router.get('/pedidos/:pedidoId', verificarToken(), validarId('pedidoId'), pedidoController.getPedidoId);
   router.put('/pedidos/:pedidoId', verificarToken(), validarBodyVacioYSanitizar, validarId('pedidoId'), pedidoController.modificarPedido);

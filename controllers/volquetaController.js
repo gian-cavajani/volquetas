@@ -1,4 +1,4 @@
-const { Volquetas, Movimientos, Pedidos } = require('../models');
+const { Obras, Volquetas, Movimientos, Pedidos } = require('../models');
 const { Op } = require('sequelize');
 
 exports.createVolqueta = async (req, res) => {
@@ -67,8 +67,10 @@ exports.getAllVolquetas = async (req, res) => {
       include: [
         {
           model: Movimientos,
+          attributes: ['id', 'horario', 'tipo', 'choferId', 'pedidoId'],
           limit: 1,
           order: [['horario', 'DESC']],
+          include: [{ model: Pedidos, attributes: ['id'], include: [{ model: Obras, attributes: ['id', 'calle'] }] }],
         },
       ],
     });

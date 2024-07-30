@@ -248,6 +248,34 @@ exports.getPedidos = async (req, res) => {
   }
 };
 
+exports.getPedidosMultiples = async (req, res) => {
+  const pedidoId = req.params.pedidoId;
+  try {
+    const pedidoBaseId = await Pedidos.findByPk(pedidoId, { attributes: ['id', 'referenciaId', 'creadoComo'] });
+    if (!pedidoBaseId || pedidoBaseId.creadoComo !== 'multiple' || !pedidoBaseId.referenciaId) {
+      return res.status(400).json({ error: 'Id de pedido incorrecto, pedido debe existir y ser multiple' });
+    }
+
+    const pedidoMatriz = await Pedidos.findByPk(pedidoBaseId.referenciaId, { attributes: ['id', 'creadoComo'] });
+    if (pedidoMatriz.creadoComo !== 'multiple') {
+      return res.status(400).json({ error: 'Pedido Matriz debe ser multiple' });
+    }
+
+    const idPedidos = await Pedidos.findAll({ where: { referenciaId: pedidoMatriz.id, creadoComo: 'multiple' }, attributes: ['id', 'estado'] });
+
+    res.status(200).json(idPedidos);
+  } catch (error) {
+    console.error('Error al obtener pedidos:', error);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener pedidos multiples', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener pedidos multiples', detalle: error.toString() });
+    }
+  }
+};
+
 exports.getPedidosConFiltro = async (req, res) => {
   const { ultimos, estado, pagado, fechaInicio, fechaFin, empresaId, particularId, tipoHorario, obraId, choferId, choferSugeridoId } = req.query;
 
