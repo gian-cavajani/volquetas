@@ -69,6 +69,7 @@ const Pedidos = db.define(
     },
   },
   {
+    paranoid: true,
     getterMethods: {
       async getEntrega() {
         return await Movimientos.findOne({

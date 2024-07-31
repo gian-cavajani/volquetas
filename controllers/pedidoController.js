@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { Permisos, PagoPedidos, Pedidos, Movimientos, Sugerencias, Obras, Particulares, Empresas, Empleados } = require('../models');
+const { Permisos, PagoPedidos, Pedidos, Movimientos, Sugerencias, Obras, Particulares, Empresas, Empleados, Facturas } = require('../models');
 const validator = require('validator');
 
 const validarPedido = async (req, creadoComo) => {
@@ -251,17 +251,17 @@ exports.getPedidos = async (req, res) => {
 exports.getPedidosMultiples = async (req, res) => {
   const pedidoId = req.params.pedidoId;
   try {
-    const pedidoBaseId = await Pedidos.findByPk(pedidoId, { attributes: ['id', 'referenciaId', 'creadoComo'] });
+    const pedidoBaseId = await Pedidos.findByPk(pedidoId, { paranoid: false, attributes: ['id', 'referenciaId', 'creadoComo'] });
     if (!pedidoBaseId || pedidoBaseId.creadoComo !== 'multiple' || !pedidoBaseId.referenciaId) {
       return res.status(400).json({ error: 'Id de pedido incorrecto, pedido debe existir y ser multiple' });
     }
 
-    const pedidoMatriz = await Pedidos.findByPk(pedidoBaseId.referenciaId, { attributes: ['id', 'creadoComo'] });
+    const pedidoMatriz = await Pedidos.findByPk(pedidoBaseId.referenciaId, { paranoid: false, attributes: ['id', 'creadoComo'] });
     if (pedidoMatriz.creadoComo !== 'multiple') {
       return res.status(400).json({ error: 'Pedido Matriz debe ser multiple' });
     }
 
-    const idPedidos = await Pedidos.findAll({ where: { referenciaId: pedidoMatriz.id, creadoComo: 'multiple' }, attributes: ['id', 'estado'] });
+    const idPedidos = await Pedidos.findAll({ paranoid: false, where: { referenciaId: pedidoMatriz.id, creadoComo: 'multiple' }, attributes: ['id', 'estado'] });
 
     res.status(200).json(idPedidos);
   } catch (error) {
@@ -386,6 +386,7 @@ exports.getPedidoId = async (req, res) => {
   const { pedidoId } = req.params;
   try {
     const pedido = await Pedidos.findByPk(pedidoId, {
+      paranoid: false,
       include: [
         {
           model: PagoPedidos,
@@ -539,24 +540,28 @@ exports.eliminarPedido = async (req, res) => {
     const { pedidoId } = req.params;
 
     // Validar si el pedido existe
-    const pedido = await Pedidos.findByPk(pedidoId);
+    const pedido = await Pedidos.findByPk(pedidoId, { include: [{ model: PagoPedidos, as: 'pagoPedido' }] });
     if (!pedido) {
       return res.status(404).json({ error: 'Pedido no encontrado' });
     }
 
     const numMovimientos = await pedido.getCountMovimientos;
-    if (numMovimientos > 0) return res.status(400).json({ error: 'Error al eliminar el Pedido, tiene movimientos vinculados' });
+    if (numMovimientos > 0) return res.status(400).json({ error: 'Error al cancelar el Pedido, tiene movimientos vinculados' });
 
-    // Eliminar sugerencias vinculadas
-    await Sugerencias.destroy({ where: { pedidoId: pedidoId } });
+    if (pedido.pagoPedido.facturaId !== null) return res.status(400).json({ error: 'Error al cancelar el Pedido, El pedido tiene una factura vinculada' });
+    if (pedido.pagoPedido.pagado) return res.status(400).json({ error: 'Error al cancelar el Pedido, El pedido fue pagado' });
 
     // Eliminar pagoPedido vinculado
     if (pedido.pagoPedidoId) await PagoPedidos.destroy({ where: { id: pedido.pagoPedidoId } });
 
+    // Eliminar sugerencias vinculadas
+    await Sugerencias.destroy({ where: { pedidoId: pedidoId } });
     // Eliminar el pedido
+    pedido.estado = 'cancelado';
+    pedido.save();
     await pedido.destroy();
 
-    res.status(200).json({ detalle: 'Pedido eliminado exitosamente' });
+    res.status(200).json({ detalle: 'Pedido cancelado exitosamente' });
   } catch (error) {
     console.error(error.message);
     const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
@@ -568,5 +573,3 @@ exports.eliminarPedido = async (req, res) => {
     }
   }
 };
-
-//deberia hacer un cancelar pedido?? complica las cosas para el conteo de viajes por empleado
