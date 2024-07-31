@@ -186,7 +186,7 @@ module.exports = function () {
   router.delete('/cajas/:cajaId', verificarToken(), validarId('cajaId'), cajaController.eliminarCaja);
 
   //Estadisticas
-  router.get('/estadisticas-movimientos-chofer/:choferId', verificarToken(), validarId('choferId'), estadisticasController.countMovimientosPorChofer);
+  router.get('/estadisticas-chofer/:choferId', verificarToken(), validarId('choferId'), estadisticasController.countMovimientosPorChofer);
   router.get('/estadisticas-movimientos-choferes', verificarToken(), estadisticasController.countMovimientosChoferesActivos);
   router.get('/estadisticas-cliente', verificarToken(), estadisticasController.getInfoPedidosCliente);
   router.get('/estadisticas-clientes', verificarToken(), estadisticasController.getInfoPedidosClientes);

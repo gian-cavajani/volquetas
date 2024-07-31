@@ -3,97 +3,213 @@ const { PagoPedidos, Facturas, Pedidos, Obras, Movimientos, Empleados, Particula
 const db = require('../config/db');
 
 //Trae movimientos de volqueta de un chofer
+// exports.countMovimientosPorChofer = async (req, res) => {
+//   try {
+//     const { choferId } = req.params;
+//     const { fechaInicio, fechaFin } = req.query;
+
+//     const inicio = new Date(fechaInicio);
+//     const fin = new Date(fechaFin);
+
+//     if (isNaN(inicio) || isNaN(fin)) return res.status(400).json({ error: 'Las fechas no son válidas' });
+
+//     if (inicio > fin) return res.status(400).json({ error: 'La fecha de inicio debe ser menor a la de final' });
+
+//     // Contar los movimientos de tipo 'entrega'
+//     const entregasCount = await Movimientos.count({
+//       where: {
+//         choferId,
+//         tipo: 'entrega',
+//         horario: {
+//           [Op.between]: [fechaInicio, fechaFin],
+//         },
+//       },
+//     });
+
+//     // Contar los movimientos de tipo 'levante'
+//     const levantesCount = await Movimientos.count({
+//       where: {
+//         choferId,
+//         tipo: 'levante',
+//         horario: {
+//           [Op.between]: [fechaInicio, fechaFin],
+//         },
+//       },
+//     });
+
+//     const pedidos = await Pedidos.findAll({
+//       attributes: ['id'],
+//       include: [
+//         {
+//           model: Movimientos,
+//           required: true,
+//           attributes: ['id', 'tipo', 'horario', 'choferId'],
+//           where: {
+//             choferId,
+//             horario: {
+//               [Op.between]: [fechaInicio, fechaFin],
+//             },
+//           },
+//         },
+//         // { model: PagoPedidos, as: 'pagoPedido' },
+//       ],
+//     });
+
+//     // Calcular el total de movimientos
+//     const totalCount = entregasCount + levantesCount;
+
+//     const datos = await Jornales.findAll({
+//       where: {
+//         empleadoId: choferId,
+//         fecha: { [Op.and]: [{ [Op.gte]: fechaInicio }, { [Op.lte]: fechaFin }] },
+//       },
+//       attributes: [
+//         'empleadoId',
+//         [db.fn('COUNT', db.col('id')), 'registros'],
+//         [db.fn('SUM', db.literal(`CASE WHEN tipo = 'trabajo' THEN 1 ELSE 0 END`)), 'diasTrabajo'],
+//         [db.fn('SUM', db.literal(`CASE WHEN tipo = 'licencia' THEN 1 ELSE 0 END`)), 'diasLicencia'],
+//         [db.fn('SUM', db.literal(`CASE WHEN tipo = 'enfermedad' THEN 1 ELSE 0 END`)), 'diasEnfermedad'],
+//         [db.fn('SUM', db.literal(`CASE WHEN tipo = 'falta' THEN 1 ELSE 0 END`)), 'diasFalta'],
+//         [db.fn('SUM', db.literal(`CASE WHEN tipo = 'trabajo' THEN EXTRACT(EPOCH FROM (salida - entrada)) / 3600 ELSE 0 END`)), 'horasTrabajadas'],
+//         [db.fn('SUM', db.col('horasExtra')), 'horasExtra'],
+//       ],
+
+//       group: ['empleadoId'],
+//       raw: true,
+//     });
+
+//     res.status(200).json({
+//       entregas: entregasCount,
+//       levantes: levantesCount,
+//       total: totalCount,
+//       pedidos,
+//       datos,
+//     });
+//     // res.status(200).json(movimientos, totalCount);
+//   } catch (error) {
+//     console.error(error.message);
+//     const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+//     if (errorsSequelize.length > 0) {
+//       res.status(500).json({ error: 'Error al contar los movimientos', detalle: errorsSequelize });
+//     } else {
+//       res.status(500).json({ error: 'Error al contar los movimientos', detalle: error.message, stack: error.stack });
+//     }
+//   }
+// };
+
 exports.countMovimientosPorChofer = async (req, res) => {
+  const choferId = req.params.choferId;
+  const { fechaInicio, fechaFin, valorJornal, valorExtra } = req.query;
+
+  let valorJornalNum = parseFloat(valorJornal);
+  let valorExtraNum = parseFloat(valorExtra);
+
+  if (!valorJornalNum || valorJornalNum < 0) return res.status(400).json({ error: 'El valor del jornal debe ser mayor a 0' });
+  if (!valorExtraNum || valorExtraNum < 0) return res.status(400).json({ error: 'El valor de la hora extra debe ser mayor a 0' });
+
+  if (!fechaInicio || !fechaFin) {
+    return res.status(400).json({ error: 'Debe ingresar fecha de inicio y fecha de fin' });
+  }
+
+  const inicio = new Date(fechaInicio);
+  const fin = new Date(fechaFin);
+
+  if (isNaN(inicio) || isNaN(fin)) {
+    return res.status(400).json({ error: 'Las fechas proporcionadas no son válidas' });
+  }
+
+  if (inicio > fin) {
+    return res.status(400).json({ error: 'La fecha de inicio debe ser menor a la de final' });
+  }
+
   try {
-    const { choferId } = req.params;
-    const { fechaInicio, fechaFin } = req.query;
-
-    const inicio = new Date(fechaInicio);
-    const fin = new Date(fechaFin);
-
-    if (isNaN(inicio) || isNaN(fin)) return res.status(400).json({ error: 'Las fechas no son válidas' });
-
-    if (inicio > fin) return res.status(400).json({ error: 'La fecha de inicio debe ser menor a la de final' });
-
-    // Contar los movimientos de tipo 'entrega'
-    const entregasCount = await Movimientos.count({
-      where: {
-        choferId,
-        tipo: 'entrega',
-        horario: {
-          [Op.between]: [fechaInicio, fechaFin],
-        },
-      },
-    });
-
-    // Contar los movimientos de tipo 'levante'
-    const levantesCount = await Movimientos.count({
-      where: {
-        choferId,
-        tipo: 'levante',
-        horario: {
-          [Op.between]: [fechaInicio, fechaFin],
-        },
-      },
-    });
-
-    const pedidos = await Pedidos.findAll({
-      attributes: ['id'],
-      include: [
-        {
-          model: Movimientos,
-          required: true,
-          attributes: ['id', 'tipo', 'horario', 'choferId'],
-          where: {
-            choferId,
-            horario: {
-              [Op.between]: [fechaInicio, fechaFin],
-            },
-          },
-        },
-        // { model: PagoPedidos, as: 'pagoPedido' },
-      ],
-    });
-
-    // Calcular el total de movimientos
-    const totalCount = entregasCount + levantesCount;
-
-    const datos = await Jornales.findAll({
+    // Obtener los jornales del chofer en el rango de fechas
+    const jornales = await Jornales.findAll({
       where: {
         empleadoId: choferId,
-        fecha: { [Op.and]: [{ [Op.gte]: fechaInicio }, { [Op.lte]: fechaFin }] },
+        fecha: {
+          [Op.between]: [fechaInicio, fechaFin],
+        },
       },
-      attributes: [
-        'empleadoId',
-        [db.fn('COUNT', db.col('id')), 'registros'],
-        [db.fn('SUM', db.literal(`CASE WHEN tipo = 'trabajo' THEN 1 ELSE 0 END`)), 'diasTrabajo'],
-        [db.fn('SUM', db.literal(`CASE WHEN tipo = 'licencia' THEN 1 ELSE 0 END`)), 'diasLicencia'],
-        [db.fn('SUM', db.literal(`CASE WHEN tipo = 'enfermedad' THEN 1 ELSE 0 END`)), 'diasEnfermedad'],
-        [db.fn('SUM', db.literal(`CASE WHEN tipo = 'falta' THEN 1 ELSE 0 END`)), 'diasFalta'],
-        [db.fn('SUM', db.literal(`CASE WHEN tipo = 'trabajo' THEN EXTRACT(EPOCH FROM (salida - entrada)) / 3600 ELSE 0 END`)), 'horasTrabajadas'],
-        [db.fn('SUM', db.col('horasExtra')), 'horasExtra'],
-      ],
-
-      group: ['empleadoId'],
-      raw: true,
     });
+
+    // Obtener los movimientos del chofer en el rango de fechas
+    const movimientos = await Movimientos.findAll({
+      where: {
+        choferId,
+        horario: {
+          [Op.between]: [inicio, fin.setDate(fin.getDate() + 1)],
+        },
+      },
+    });
+
+    // Procesar los jornales y movimientos
+    const jornalesResumen = [];
+    const datosResumen = {
+      diasTrabajo: 0,
+      horas: 0,
+      extra: 0,
+      entregas: 0,
+      levantes: 0,
+      viajes: 0,
+    };
+
+    //console.log(movimientos);
+    jornales.forEach((jornal) => {
+      const dia = new Date(jornal.fecha); // Asegurarse de que `dia` sea un objeto `Date`
+      const tipo = jornal.tipo.toUpperCase();
+      const horas = jornal.entrada && jornal.salida ? (new Date(`1970-01-01T${jornal.salida}Z`) - new Date(`1970-01-01T${jornal.entrada}Z`)) / 3600000 : 0;
+      const extra = jornal.horasExtra || 0;
+      //const total = horas + extra;
+
+      const viajes = movimientos.reduce(
+        (acc, mov) => {
+          const movDia = new Date(mov.horario).toISOString().slice(0, 10);
+          if (movDia === dia.toISOString().slice(0, 10)) {
+            if (mov.tipo === 'entrega') acc.entregas += 1;
+            if (mov.tipo === 'levante') acc.levantes += 1;
+          }
+          return acc;
+        },
+        { entregas: 0, levantes: 0 }
+      );
+
+      jornalesResumen.push({
+        jornal: { dia: dia.toISOString().slice(0, 10), tipo, horas, extra },
+        viajes: { entregas: viajes.entregas, levantes: viajes.levantes, viajes: viajes.entregas + viajes.levantes },
+      });
+
+      if (tipo === 'TRABAJO') {
+        datosResumen.diasTrabajo += 1;
+        datosResumen.horas += horas;
+        datosResumen.extra += extra;
+        datosResumen.entregas += viajes.entregas;
+        datosResumen.levantes += viajes.levantes;
+        datosResumen.viajes += viajes.entregas + viajes.levantes;
+      }
+    });
+
+    //PROMEDIOS
+    datosResumen.promedioHorasPorDia = datosResumen.horas / datosResumen.diasTrabajo;
+    datosResumen.promedioViajesPorDia = datosResumen.viajes / datosResumen.diasTrabajo;
+    datosResumen.salario = datosResumen.diasTrabajo * valorJornalNum + datosResumen.extra * valorExtraNum;
+    datosResumen.precioPorViaje = datosResumen.salario / datosResumen.viajes;
+
+    datosResumen.info = `El salario se calcula con la siguiente fórmula: (días trabajados (${datosResumen.diasTrabajo}) x valor jornal (${valorJornalNum})) + (horas extra (${datosResumen.extra}) x valor hora extra (${valorExtraNum}))`;
 
     res.status(200).json({
-      entregas: entregasCount,
-      levantes: levantesCount,
-      total: totalCount,
-      pedidos,
-      datos,
+      jornales: jornalesResumen,
+      datos: datosResumen,
     });
-    // res.status(200).json(movimientos, totalCount);
   } catch (error) {
-    console.error(error.message);
+    console.error('Error al obtener estadísticas del chofer:', error);
     const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
 
     if (errorsSequelize.length > 0) {
-      res.status(500).json({ error: 'Error al contar los movimientos', detalle: errorsSequelize });
+      res.status(500).json({ error: 'Error al obtener estadísticas del chofer', detalle: errorsSequelize });
     } else {
-      res.status(500).json({ error: 'Error al contar los movimientos', detalle: error.message, stack: error.stack });
+      res.status(500).json({ error: 'Error al obtener estadísticas del chofer', detalle: error.message, stack: error.stack });
     }
   }
 };
