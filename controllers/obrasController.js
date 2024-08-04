@@ -1,5 +1,6 @@
 const { Obras, Empresas, Particulares, ContactoEmpresas, ObraDetalles, Telefonos, Pedidos } = require('../models');
 const validator = require('validator');
+const { Op, Sequelize } = require('sequelize');
 
 exports.createObra = async (req, res) => {
   const { dias, destinoFinal, calle, esquina, barrio, coordenadas, numeroPuerta, descripcion, detalleResiduos, residuosMezclados, residuosReciclados, frecuenciaSemanal, particularId, empresaId } =
@@ -154,6 +155,72 @@ exports.getObra = async (req, res) => {
       res.status(500).json({ error: 'Error al obtener la obra', detalle: errorsSequelize });
     } else {
       res.status(500).json({ error: 'Error al obtener la obra', detalle: error.message, stack: error.stack });
+    }
+  }
+};
+
+exports.getObrasConPedidosRecientes = async (req, res) => {
+  const { cantidadMeses } = req.query;
+  if (!cantidadMeses || cantidadMeses < 1) {
+    return res.status(400).json({ error: 'La cantidad de meses debe ser mayor a 0' });
+  }
+  try {
+    // Calcular la fecha de hace x meses
+    const fechaInicio = new Date();
+    fechaInicio.setMonth(fechaInicio.getMonth() - Number(cantidadMeses));
+
+    // Buscar los pedidos en los últimos x meses
+    const pedidos = await Pedidos.findAll({
+      where: {
+        createdAt: {
+          [Op.gte]: fechaInicio,
+        },
+      },
+      attributes: ['obraId', [Sequelize.fn('COUNT', Sequelize.col('obraId')), 'pedidoCount']],
+      include: [
+        {
+          model: Obras,
+          attributes: ['empresaId', 'particularId'],
+          where: {
+            particularId: null, // Filtrar solo obras de empresas
+          },
+        },
+      ],
+      group: ['obraId', 'Obra.id'],
+      order: [[Sequelize.fn('COUNT', Sequelize.col('obraId')), 'DESC']],
+    });
+
+    // Extraer los ids de las obras de los pedidos encontrados
+    const obraIds = pedidos.map((pedido) => pedido.obraId);
+
+    // Buscar las obras relacionadas con esos ids
+    const obras = await Obras.findAll({
+      where: {
+        id: {
+          [Op.in]: obraIds,
+        },
+      },
+      include: [{ model: ObraDetalles }, { model: Empresas, as: 'empresa' }],
+    });
+
+    // Formatear la respuesta con el conteo de pedidos
+    const resultado = obras.map((obra) => {
+      const pedido = pedidos.find((p) => p.obraId === obra.id);
+      return {
+        ...obra.toJSON(),
+        cantidadPedidos: pedido ? pedido.dataValues.pedidoCount : 0,
+      };
+    });
+
+    res.status(200).json(resultado);
+  } catch (error) {
+    console.error('Error al obtener obras con pedidos recientes:', error);
+    const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];
+
+    if (errorsSequelize.length > 0) {
+      res.status(500).json({ error: 'Error al obtener obras con pedidos recientes', detalle: errorsSequelize });
+    } else {
+      res.status(500).json({ error: 'Error al obtener obras con pedidos recientes', detalle: error.toString() });
     }
   }
 };

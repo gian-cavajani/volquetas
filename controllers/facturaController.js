@@ -147,11 +147,26 @@ exports.getFacturas = async (req, res) => {
 exports.getFactura = async (req, res) => {
   const { facturaId } = req.params;
   try {
-    const factura = await Facturas.findByPk(facturaId);
+    const factura = await Facturas.findByPk(facturaId, { include: [{ model: PagoPedidos, include: [{ model: Pedidos, attributes: ['id'], as: 'pedido' }] }] });
     if (!factura) {
       return res.status(404).json({ error: 'factura no encontrada' });
     }
-    res.status(200).json(factura);
+
+    let fact = {
+      id: factura.id,
+      tipo: factura.tipo,
+      numeracion: factura.numeracion,
+      estado: factura.estado,
+      fechaPago: factura.fechaPago,
+      monto: factura.monto,
+      descripcion: factura.descripcion,
+      particularId: factura.particularId,
+      empresaId: factura.empresaId,
+      createdAt: factura.createdAt,
+    };
+    fact.pedidos = factura.PagoPedidos.map((pp) => ({ pedidoId: pp.pedido[0].id, pagoPedidoId: pp.id, precio: pp.precio, remito: pp.remito, tipoPago: pp.tipoPago, pagado: pp.pagado }));
+
+    res.status(200).json(fact);
   } catch (error) {
     console.error(error.message);
     const errorsSequelize = error.errors ? error.errors.map((err) => err.message) : [];

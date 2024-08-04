@@ -115,6 +115,7 @@ module.exports = function () {
   // Obras
   router.post('/obras', validarBodyVacioYSanitizar, verificarToken(), obrasController.createObra);
   router.get('/obras', verificarToken(), obrasController.getAllObras);
+  router.get('/obras-ultimos-meses', verificarToken(), obrasController.getObrasConPedidosRecientes);
   router.get('/obras/:obraId', verificarToken(), validarId('obraId'), obrasController.getObra);
   router.put('/obras/:obraId', validarBodyVacioYSanitizar, verificarToken(), validarId('obraId'), obrasController.updateObra);
   router.put('/obras-detalle/:obraId', validarBodyVacioYSanitizar, verificarToken(), validarId('obraId'), obrasController.updateObraDetalles);
